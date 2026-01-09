@@ -1,68 +1,44 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* ======================================================= */
+/* LOAD TAILWIND CSS */
+@import "tailwindcss";
+/* ======================================================  */
+/* Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+/* ======================================================= */
+/* Custom Theme  */
+/* ======================================================== */
+@theme {
+  /* Fonts */
+  --font-sans: "Inter", system-ui, sans-serif;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* Colors */
+  --color-primary: #10b77f;
+  --color-primary-text: #ffffff;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  --color-secondary: #eeebe8;
+  --color-secondary-text: #3a312c;
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+  --color-accent: #def8ee;
+  --color-accent-text: #0a7552;
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
+  --color-background: #fcfaf8;
+  --color-text: #231d1a;
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
+  --color-card: #fdfdfc;
+  --color-card-text: #231d1a;
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
+  --color-popover: #fdfdfc;
+  --color-popover-text: #231d1a;
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+  --color-muted: #f3f0ed;
+  --color-muted-text: #7e7167;
+
+  --color-destructive: #dc2828;
+  --color-destructive-text: #ffffff;
+
+  /* Borders */
+  --border-radius: 1rem;
+  --color-shadow: #000000;
+  --opacity-shadow: 0.1;
+  --blur-shadow: 30px;
 }
