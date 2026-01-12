@@ -30,7 +30,7 @@ export default function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // Mock authentication state - will be replaced with better-auth later
-  const isAuthenticated = true;
+  const isAuthenticated = false;
   const user = {
     name: "John Doe",
     email: "john@example.com",
@@ -99,7 +99,7 @@ export default function Navbar() {
                   <User className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 p-2">
+              <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl">
                 <div className="flex items-center gap-2 p-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
                     <User className="h-4 w-4 text-primary" />
@@ -112,16 +112,16 @@ export default function Navbar() {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem className="rounded-lg">
                   <Ticket className="mr-2 h-4 w-4" />
                   My Tickets
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem className="rounded-lg">
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   Dashboard
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive focus:text-destructive">
+                <DropdownMenuItem className="text-destructive focus:text-destructive rounded-lg">
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
                 </DropdownMenuItem>
@@ -197,7 +197,7 @@ export default function Navbar() {
                 Log in to your account
               </h2>
               <p className="text-sm text-muted-foreground mb-4">
-                Tp use all features in Eventify
+                To use all features in Eventify
               </p>
               <div className="flex gap-3">
                 <Button

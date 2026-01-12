@@ -158,7 +158,7 @@ export default function Footer() {
                   to="/resources"
                   className="text-muted-foreground hover:text-foreground"
                 >
-                  All Cities
+                  All Locations
                 </Link>
               </li>
             </ul>
