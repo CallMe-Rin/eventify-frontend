@@ -1,45 +1,41 @@
+// import { Button } from "./components/ui/button";
+// import { AlertDialog } from "./components/ui/alert-dialog";
+// import { Avatar } from "./components/ui/avatar";
+// import { Badge } from "./components/ui/badge";
+// import { Card } from "./components/ui/card";
+// import { Field } from "./components/ui/field";
+// import { Input } from "./components/ui/input";
+// import { Label } from "./components/ui/label";
+// import { Pagination } from "./components/ui/pagination";
+// import { Separator } from "./components/ui/separator";
+// import { Sheet } from "./components/ui/sheet";
+// import { Sidebar } from "./components/ui/sidebar";
+// import { Sonner } from "./components/ui/sonner";
+// import { Tooltip } from "./components/ui/tooltip";
+// import Navbar from "./components/layout/navbar";
+// import LoginPage from "./pages/login";
+import RegisterPage from "./pages/register";
+
 export default function App() {
   return (
-    <div className="min-h-screen bg-background text-text font-(--font-sans)] flex items-center justify-center p-6">
-      {/* Card */}
-      <div className="w-full max-w-md bg-card text-card-text rounded-xl shadow-lg p-6 space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-semibold text-primary">
-            Tailwind v4 Theme
-          </h1>
-          <p className="mt-2 text-muted-text">
-            Contoh penggunaan color & font dari index.css
-          </p>
-        </div>
-
-        {/* Content */}
-        <div className="space-y-4">
-          <div className="bg-accent text-accent-text p-4 rounded-xl">
-            Accent section
-          </div>
-
-          <div className="bg-muted text-muted-text p-4 rounded-xl">
-            Muted section
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-3">
-          <button className="flex-1 bg-primary text-primary-text py-2 rounded-xl hover:opacity-90 transition">
-            Primary
-          </button>
-
-          <button className="flex-1 bg-secondary text-secondary-text py-2 rounded-xl hover:opacity-90 transition">
-            Secondary
-          </button>
-        </div>
-
-        {/* Destructive */}
-        <button className="w-full bg-destructive text-destructive-text py-2 rounded-xl hover:opacity-90 transition">
-          Delete
-        </button>
-      </div>
+    <div>
+    {/* <Button>Hello World</Button> */}
+    {/* <AlertDialog /> */}
+    {/* <Avatar /> */}
+    {/* <Badge>New</Badge> */}
+    {/* <Card>This is a card component</Card> */}
+    {/* <Field label="Name" placeholder="Enter your name" /> */}
+    {/* <Input placeholder="Enter text here" /> */}
+    {/* <Label htmlFor="input-field">Username</Label> */}
+    {/* <Pagination totalPages={10} currentPage={1} onPageChange={(page) => console.log(page)} /> */}
+    {/* <Separator /> */}
+    {/* <Sheet /> */}
+    {/* <Sidebar /> */}
+    {/* <Sonner /> */}
+    {/* <Tooltip content="This is a tooltip">Hover over me</Tooltip> */}
+    {/* <Navbar /> */}
+    {/* <LoginPage /> */}
+    <RegisterPage />
     </div>
   );
 }
