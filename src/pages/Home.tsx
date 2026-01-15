@@ -10,7 +10,7 @@ import Layout from "@/components/layout/Layout";
 import { type EventCategory } from "@/types";
 import { useMemo, useState } from "react";
 
-export default function Index() {
+export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<
     EventCategory | "all"
   >("all");
