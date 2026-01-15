@@ -1,4 +1,4 @@
-import { eventsWithTiers } from "@/components/data/mockEvents";
+import { eventsWithTiers } from "@/data/mockEvents";
 import CategoryFilters from "@/components/home/CategoryFilters";
 import EventGrid from "@/components/home/EventGrid";
 

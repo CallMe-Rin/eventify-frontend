@@ -20,7 +20,10 @@ export default function RegisterPage() {
         {/* LOGO */}
         <div className="flex justify-center mb-8 items-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500 shadow-lg shadow-emerald-500/30">
-            <Ticket className="h-8 w-8 text-white" strokeWidth={2} />
+            <Ticket
+              className="h-8 w-8 text-primary-foreground"
+              strokeWidth={2}
+            />
           </div>
           <span className="ml-3 text-2xl font-semibold">Eventify</span>
         </div>

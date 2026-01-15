@@ -39,6 +39,11 @@
   --color-destructive: #dc2828;
   --color-destructive-text: #ffffff;
 
+  --color-instagram: #ff0169;
+  --color-whatsapp: #25d366;
+  --color-facebook: #0049cc;
+  --color-twitter: #1da1f2;
+
   /* Borders */
   --border-radius: 1rem;
   --color-shadow: #000000;

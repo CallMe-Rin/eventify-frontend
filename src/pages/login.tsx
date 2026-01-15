@@ -18,9 +18,14 @@ export default function LoginPage() {
         {/* LOGO */}
         <div className="flex justify-center mb-8">
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500 shadow-lg shadow-emerald-500/30">
-            <Ticket className="h-8 w-8 text-white" strokeWidth={2} />
+            <Ticket
+              className="h-8 w-8 text-primary-foreground"
+              strokeWidth={2}
+            />
           </div>
-          <span className="ml-3 self-center text-2xl font-semibold">Eventify</span>
+          <span className="ml-3 self-center text-2xl font-semibold">
+            Eventify
+          </span>
         </div>
 
         {/* CARD */}
@@ -74,7 +79,9 @@ export default function LoginPage() {
           <CardFooter className="flex flex-col gap-4">
             <div className="flex items-center w-full gap-3">
               <div className="h-px w-full bg-border" />
-              <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">OR CONTINUE WITH</span>
+              <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">
+                OR CONTINUE WITH
+              </span>
               <div className="h-px w-full bg-border" />
             </div>
 
