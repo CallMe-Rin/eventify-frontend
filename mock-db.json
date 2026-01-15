@@ -1,0 +1,416 @@
+{
+  "events": [
+    {
+      "id": "evt-001",
+      "title": "Jakarta Tech Summit 2025",
+      "description": "Join Indonesia's largest technology conference featuring keynotes from industry leaders, hands-on workshops, and networking opportunities with over 2,000 tech professionals.",
+      "shortDescription": "Indonesia's premier technology conference with industry leaders and workshops.",
+      "coverImage": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80",
+      "images": [
+        "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80",
+        "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=80"
+      ],
+      "category": "technology",
+      "location": "Jakarta",
+      "venue": "Jakarta Convention Center",
+      "date": "2025-03-15T09:00:00.000Z",
+      "endDate": "2025-03-16T18:00:00.000Z",
+      "organizerId": "org-001",
+      "ticketTiers": [],
+      "isFree": false,
+      "status": "published",
+      "averageRating": 4.8,
+      "totalReviews": 156,
+      "createdAt": "2024-12-01T00:00:00.000Z",
+      "updatedAt": "2024-12-15T00:00:00.000Z"
+    },
+    {
+      "id": "evt-002",
+      "title": "Bali Music Festival",
+      "description": "Experience three days of incredible live music on the beautiful beaches of Bali. Featuring international DJs, local bands, and unforgettable sunset performances.",
+      "shortDescription": "Three days of live music on Bali's stunning beaches.",
+      "coverImage": "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800&q=80",
+      "images": [
+        "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800&q=80",
+        "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80"
+      ],
+      "category": "music",
+      "location": "Bali",
+      "venue": "Kuta Beach Arena",
+      "date": "2025-04-20T16:00:00.000Z",
+      "endDate": "2025-04-22T23:00:00.000Z",
+      "organizerId": "org-002",
+      "ticketTiers": [],
+      "isFree": false,
+      "status": "published",
+      "averageRating": 4.9,
+      "totalReviews": 342,
+      "createdAt": "2024-11-15T00:00:00.000Z",
+      "updatedAt": "2024-12-10T00:00:00.000Z"
+    },
+    {
+      "id": "evt-003",
+      "title": "Startup Pitch Night",
+      "description": "Watch 10 promising startups pitch their ideas to top investors. Network with founders, VCs, and tech enthusiasts in an inspiring evening of innovation.",
+      "shortDescription": "Watch startups pitch to investors and network with the tech community.",
+      "coverImage": "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800&q=80",
+      "images": [
+        "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800&q=80"
+      ],
+      "category": "business",
+      "location": "Bandung",
+      "venue": "Creative Hub Bandung",
+      "date": "2025-02-28T18:00:00.000Z",
+      "endDate": null,
+      "organizerId": "org-003",
+      "ticketTiers": [],
+      "isFree": true,
+      "status": "published",
+      "averageRating": 4.6,
+      "totalReviews": 89,
+      "createdAt": "2024-12-05T00:00:00.000Z",
+      "updatedAt": "2024-12-18T00:00:00.000Z"
+    },
+    {
+      "id": "evt-004",
+      "title": "Yoga & Wellness Retreat",
+      "description": "A transformative weekend of yoga, meditation, and wellness workshops in the serene mountains of Ubud. Includes healthy meals and accommodation.",
+      "shortDescription": "A weekend of yoga and meditation in Ubud's serene mountains.",
+      "coverImage": "https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=800&q=80",
+      "images": [
+        "https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=800&q=80",
+        "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80"
+      ],
+      "category": "health",
+      "location": "Bali",
+      "venue": "Ubud Wellness Center",
+      "date": "2025-03-08T07:00:00.000Z",
+      "endDate": "2025-03-10T17:00:00.000Z",
+      "organizerId": "org-004",
+      "ticketTiers": [],
+      "isFree": false,
+      "status": "published",
+      "averageRating": 4.9,
+      "totalReviews": 67,
+      "createdAt": "2024-11-20T00:00:00.000Z",
+      "updatedAt": "2024-12-12T00:00:00.000Z"
+    },
+    {
+      "id": "evt-005",
+      "title": "Street Food Festival",
+      "description": "Celebrate Indonesia's culinary diversity with over 50 street food vendors, cooking demos, and eating competitions. A foodie's paradise!",
+      "shortDescription": "50+ street food vendors showcasing Indonesia's culinary diversity.",
+      "coverImage": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80",
+      "images": [
+        "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80",
+        "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80"
+      ],
+      "category": "food",
+      "location": "Surabaya",
+      "venue": "Taman Bungkul",
+      "date": "2025-02-14T10:00:00.000Z",
+      "endDate": "2025-02-16T22:00:00.000Z",
+      "organizerId": "org-005",
+      "ticketTiers": [],
+      "isFree": true,
+      "status": "published",
+      "averageRating": 4.7,
+      "totalReviews": 423,
+      "createdAt": "2024-12-01T00:00:00.000Z",
+      "updatedAt": "2024-12-20T00:00:00.000Z"
+    },
+    {
+      "id": "evt-006",
+      "title": "Indonesia Art Biennale",
+      "description": "Explore contemporary Indonesian art from over 100 artists. Featuring installations, paintings, sculptures, and interactive digital art experiences.",
+      "shortDescription": "Contemporary art from 100+ Indonesian artists in one venue.",
+      "coverImage": "https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=800&q=80",
+      "images": [
+        "https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=800&q=80",
+        "https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=800&q=80"
+      ],
+      "category": "art",
+      "location": "Yogyakarta",
+      "venue": "Jogja National Museum",
+      "date": "2025-04-01T10:00:00.000Z",
+      "endDate": "2025-04-30T18:00:00.000Z",
+      "organizerId": "org-006",
+      "ticketTiers": [],
+      "isFree": false,
+      "status": "published",
+      "averageRating": 4.8,
+      "totalReviews": 234,
+      "createdAt": "2024-10-15T00:00:00.000Z",
+      "updatedAt": "2024-12-01T00:00:00.000Z"
+    },
+    {
+      "id": "evt-007",
+      "title": "Marathon Jakarta 2025",
+      "description": "Join thousands of runners in the annual Jakarta Marathon. Choose from 5K, 10K, half marathon, or full marathon distances.",
+      "shortDescription": "Annual Jakarta Marathon with 5K, 10K, half and full distances.",
+      "coverImage": "https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?w=800&q=80",
+      "images": [
+        "https://images.unsplash.com/photo-1452626038306-9aae5e071dd3?w=800&q=80",
+        "https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=800&q=80"
+      ],
+      "category": "sports",
+      "location": "Jakarta",
+      "venue": "Monas - National Monument",
+      "date": "2025-05-18T05:00:00.000Z",
+      "endDate": null,
+      "organizerId": "org-007",
+      "ticketTiers": [],
+      "isFree": false,
+      "status": "published",
+      "averageRating": 4.6,
+      "totalReviews": 567,
+      "createdAt": "2024-09-01T00:00:00.000Z",
+      "updatedAt": "2024-12-15T00:00:00.000Z"
+    },
+    {
+      "id": "evt-008",
+      "title": "Web3 Developer Workshop",
+      "description": "Hands-on workshop covering blockchain development, smart contracts, and DeFi. Perfect for developers looking to enter the Web3 space.",
+      "shortDescription": "Hands-on blockchain and smart contract development workshop.",
+      "coverImage": "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&q=80",
+      "images": [
+        "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&q=80"
+      ],
+      "category": "education",
+      "location": "Jakarta",
+      "venue": "Block71 Jakarta",
+      "date": "2025-03-22T09:00:00.000Z",
+      "endDate": "2025-03-22T17:00:00.000Z",
+      "organizerId": "org-008",
+      "ticketTiers": [],
+      "isFree": false,
+      "status": "published",
+      "averageRating": 4.7,
+      "totalReviews": 45,
+      "createdAt": "2024-12-10T00:00:00.000Z",
+      "updatedAt": "2024-12-18T00:00:00.000Z"
+    }
+  ],
+  "locations": [
+    {
+      "id": "loc-000",
+      "name": "All Locations"
+    },
+    {
+      "id": "loc-001",
+      "name": "Jakarta"
+    },
+    {
+      "id": "loc-002",
+      "name": "Bali"
+    },
+    {
+      "id": "loc-003",
+      "name": "Bandung"
+    },
+    {
+      "id": "loc-004",
+      "name": "Surabaya"
+    },
+    {
+      "id": "loc-005",
+      "name": "Yogyakarta"
+    },
+    {
+      "id": "loc-006",
+      "name": "Medan"
+    },
+    {
+      "id": "loc-007",
+      "name": "Semarang"
+    }
+  ],
+  "users": [
+    {
+      "id": "user-001",
+      "email": "john@example.com",
+      "name": "John Doe",
+      "avatar_url": null,
+      "phone": "+62812345678",
+      "bio": "Event enthusiast",
+      "referral_code": "JOHN2024",
+      "role": "customer",
+      "points": 50000,
+      "created_at": "2026-01-14T22:08:12.000Z"
+    },
+    {
+      "id": "user-002",
+      "email": "jane@example.com",
+      "name": "Jane Smith",
+      "avatar_url": null,
+      "phone": "+62887654321",
+      "bio": "Event organizer",
+      "referral_code": "JANE2024",
+      "role": "organizer",
+      "points": 0,
+      "created_at": "2026-01-14T22:08:12.000Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx-001",
+      "user_id": "user-001",
+      "event_id": "evt-001",
+      "ticket_tier_id": "tier-001",
+      "quantity": 2,
+      "total_amount": 500000,
+      "discount_amount": 0,
+      "points_used": 0,
+      "status": "done",
+      "created_at": "2026-01-07T22:08:12.000Z",
+      "expires_at": "2026-02-13T22:08:12.000Z"
+    },
+    {
+      "id": "tx-002",
+      "user_id": "user-001",
+      "event_id": "evt-002",
+      "ticket_tier_id": "tier-002",
+      "quantity": 1,
+      "total_amount": 150000,
+      "discount_amount": 50000,
+      "points_used": 0,
+      "status": "waiting_payment",
+      "created_at": "2026-01-14T22:08:12.000Z",
+      "expires_at": "2026-01-15T00:08:12.000Z"
+    }
+  ],
+  "coupons": [
+    {
+      "id": "coupon-001",
+      "code": "SAVE10",
+      "discount_type": "percentage",
+      "discount_value": 10,
+      "min_purchase": 100000,
+      "max_discount": 50000,
+      "usage_limit": 100,
+      "used_count": 45,
+      "valid_from": "2025-12-15T22:08:12.000Z",
+      "valid_until": "2026-02-13T22:08:12.000Z"
+    },
+    {
+      "id": "coupon-002",
+      "code": "FLAT25K",
+      "discount_type": "fixed",
+      "discount_value": 25000,
+      "min_purchase": 200000,
+      "usage_limit": 50,
+      "used_count": 20,
+      "valid_from": "2025-12-30T22:08:12.000Z",
+      "valid_until": "2026-03-15T22:08:12.000Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": "cat-tech",
+      "value": "technology",
+      "label": "Technology",
+      "icon": "💻"
+    },
+    { "id": "cat-music", "value": "music", "label": "Music", "icon": "🎵" },
+    { "id": "cat-sports", "value": "sports", "label": "Sports", "icon": "⚽" },
+    { "id": "cat-art", "value": "art", "label": "Art & Culture", "icon": "🎨" },
+    {
+      "id": "cat-food",
+      "value": "food",
+      "label": "Food & Drink",
+      "icon": "🍕"
+    },
+    { "id": "cat-biz", "value": "business", "label": "Business", "icon": "💼" },
+    {
+      "id": "cat-edu",
+      "value": "education",
+      "label": "Education",
+      "icon": "📚"
+    },
+    {
+      "id": "cat-health",
+      "value": "health",
+      "label": "Health & Wellness",
+      "icon": "🧘"
+    }
+  ],
+  "ticket-tiers": [
+    {
+      "id": "evt-001-early",
+      "eventId": "evt-001",
+      "name": "Early Bird",
+      "description": "Limited early bird tickets",
+      "price": 150000,
+      "quantity": 100,
+      "sold": 100,
+      "benefits": ["Priority entry", "Event merchandise"]
+    },
+    {
+      "id": "evt-001-regular",
+      "eventId": "evt-001",
+      "name": "Regular",
+      "description": "Standard admission",
+      "price": 250000,
+      "quantity": 300,
+      "sold": 187,
+      "benefits": ["General admission"]
+    },
+    {
+      "id": "evt-001-vip",
+      "eventId": "evt-001",
+      "name": "VIP",
+      "description": "Premium experience",
+      "price": 750000,
+      "quantity": 50,
+      "sold": 23,
+      "benefits": ["Front row access", "Meet & greet", "Exclusive lounge"]
+    },
+    {
+      "id": "evt-003-free",
+      "eventId": "evt-003",
+      "name": "Free Entry",
+      "description": "General admission",
+      "price": 0,
+      "quantity": 500,
+      "sold": 234
+    }
+  ],
+  "reviews": [
+    {
+      "id": "rev-001",
+      "userId": "user-001",
+      "eventId": "evt-001",
+      "transactionId": "tx-001",
+      "rating": 5,
+      "comment": "Incredible speakers and networking opportunities!",
+      "createdAt": "2025-03-20T10:00:00Z"
+    },
+    {
+      "id": "rev-002",
+      "userId": "user-002",
+      "eventId": "evt-001",
+      "transactionId": "tx-003",
+      "rating": 4,
+      "comment": "Great content, but the venue was a bit crowded.",
+      "createdAt": "2025-03-21T14:30:00Z"
+    }
+  ],
+  "user-points": [
+    {
+      "id": "pt-001",
+      "userId": "user-001",
+      "amount": 10000,
+      "source": "referral",
+      "expiresAt": "2026-12-31T23:59:59Z",
+      "createdAt": "2025-01-01T08:00:00Z"
+    },
+    {
+      "id": "pt-002",
+      "userId": "user-001",
+      "amount": 40000,
+      "source": "purchase",
+      "expiresAt": "2026-06-30T23:59:59Z",
+      "createdAt": "2025-01-14T10:00:00Z"
+    }
+  ]
+}
