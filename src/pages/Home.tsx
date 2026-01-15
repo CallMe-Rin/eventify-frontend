@@ -1,4 +1,4 @@
-import { eventsWithTiers } from "@/components/data/mockEvents";
+import { eventsWithTiers } from "@/data/mockEvents";
 import CategoryFilters from "@/components/home/CategoryFilters";
 import EventGrid from "@/components/home/EventGrid";
 
@@ -10,7 +10,7 @@ import Layout from "@/components/layout/Layout";
 import { type EventCategory } from "@/types";
 import { useMemo, useState } from "react";
 
-export default function Index() {
+export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<
     EventCategory | "all"
   >("all");

@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MapPin, Filter } from "lucide-react";
-import { LOCATIONS } from "../data/mockEvents";
+import { LOCATIONS } from "../../data/mockEvents";
 
 interface CategoryFiltersProps {
   selectedCategory: EventCategory | "all";
