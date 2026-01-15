@@ -12,7 +12,7 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { User, Users, Calendar, Mail, Lock, Ticket } from "lucide-react";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [role, setRole] = useState<"user" | "organizer" | null>(null);
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/40 py-8 px-4">
