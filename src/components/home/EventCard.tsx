@@ -1,18 +1,18 @@
 import { Link } from "react-router";
-import {
-  type Event,
-  formatIDR,
-  formatEventDate,
-  formatEventTime,
-  EVENT_CATEGORIES,
-} from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Star, Users, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  formatEventDate,
+  formatEventTime,
+  formatIDR,
+  type EventWithTiers,
+  EVENT_CATEGORIES,
+} from "@/types/api";
 
 interface EventCardProps {
-  event: Event;
+  event: EventWithTiers;
   featured?: boolean;
 }
 
