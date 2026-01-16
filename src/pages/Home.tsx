@@ -52,6 +52,7 @@ export default function HomePage() {
         onLocationChange={setSelectedLocation}
         locations={locationNames}
       />
+
       {/* Loading State */}
       {isEventsLoading && (
         <section className="container mx-auto py-16">
@@ -71,6 +72,7 @@ export default function HomePage() {
           </div>
         </section>
       )}
+
       {/* Error State */}
       {isEventsError && !isEventsLoading && (
         <section className="container mx-auto py-16">
@@ -87,7 +89,7 @@ export default function HomePage() {
             <Button
               onClick={() => refetchEvents()}
               variant="outline"
-              className="gap-2"
+              className="gap-2 rounded-full"
             >
               <RefreshCcw className="h-4 w-4" />
               Try Again

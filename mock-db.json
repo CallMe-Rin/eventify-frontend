@@ -366,13 +366,132 @@
       "benefits": ["Front row access", "Meet & greet", "Exclusive lounge"]
     },
     {
+      "id": "evt-002-ga",
+      "eventId": "evt-002",
+      "name": "3-Day Pass GA",
+      "description": "General admission for all three days",
+      "price": 1200000,
+      "quantity": 1000,
+      "sold": 650,
+      "benefits": ["Access to all stages", "Beach zone access"]
+    },
+    {
+      "id": "evt-002-vip",
+      "eventId": "evt-002",
+      "name": "VIP Sunset Club",
+      "description": "Premium 3-day experience",
+      "price": 3500000,
+      "quantity": 200,
+      "sold": 145,
+      "benefits": ["Private bar", "Elevated viewing platform", "Backstage tour"]
+    },
+    {
       "id": "evt-003-free",
       "eventId": "evt-003",
       "name": "Free Entry",
       "description": "General admission",
       "price": 0,
       "quantity": 500,
-      "sold": 234
+      "sold": 234,
+      "benefits": ["Networking session", "Pitch access"]
+    },
+    {
+      "id": "evt-004-shared",
+      "eventId": "evt-004",
+      "name": "Shared Room Package",
+      "description": "Retreat access with twin-sharing accommodation",
+      "price": 2800000,
+      "quantity": 20,
+      "sold": 12,
+      "benefits": ["Yoga sessions", "Healthy meals", "Shared villa"]
+    },
+    {
+      "id": "evt-004-private",
+      "eventId": "evt-004",
+      "name": "Private Villa Package",
+      "description": "Retreat access with private accommodation",
+      "price": 4500000,
+      "quantity": 10,
+      "sold": 8,
+      "benefits": [
+        "Private luxury villa",
+        "All workshops",
+        "Personal wellness consultation"
+      ]
+    },
+    {
+      "id": "evt-005-free",
+      "eventId": "evt-005",
+      "name": "General Admission",
+      "description": "Free entry to the festival grounds",
+      "price": 0,
+      "quantity": 5000,
+      "sold": 3200,
+      "benefits": ["Access to all food stalls", "Live cooking demos"]
+    },
+    {
+      "id": "evt-006-standard",
+      "eventId": "evt-006",
+      "name": "Standard Entry",
+      "description": "One-day exhibition pass",
+      "price": 75000,
+      "quantity": 2000,
+      "sold": 890,
+      "benefits": ["Gallery access", "Digital art guide"]
+    },
+    {
+      "id": "evt-006-student",
+      "eventId": "evt-006",
+      "name": "Student/Senior Pass",
+      "description": "Discounted entry for students and seniors",
+      "price": 35000,
+      "quantity": 500,
+      "sold": 210,
+      "benefits": ["Gallery access", "Valid ID required"]
+    },
+    {
+      "id": "evt-007-full",
+      "eventId": "evt-007",
+      "name": "Full Marathon (42K)",
+      "description": "Full distance race entry",
+      "price": 900000,
+      "quantity": 1000,
+      "sold": 750,
+      "benefits": ["Race kit", "Finisher medal", "Timing chip"]
+    },
+    {
+      "id": "evt-007-half",
+      "eventId": "evt-007",
+      "name": "Half Marathon (21K)",
+      "description": "Half distance race entry",
+      "price": 650000,
+      "quantity": 1500,
+      "sold": 1200,
+      "benefits": ["Race kit", "Finisher medal", "Refreshments"]
+    },
+    {
+      "id": "evt-007-fun",
+      "eventId": "evt-007",
+      "name": "10K/5K Fun Run",
+      "description": "Short distance run entry",
+      "price": 400000,
+      "quantity": 2000,
+      "sold": 1850,
+      "benefits": ["Race kit", "Medal"]
+    },
+    {
+      "id": "evt-008-standard",
+      "eventId": "evt-008",
+      "name": "Workshop Pass",
+      "description": "Full day hands-on training",
+      "price": 550000,
+      "quantity": 50,
+      "sold": 38,
+      "benefits": [
+        "Certificate of completion",
+        "Source code access",
+        "Lunch provided"
+      ]
     }
   ],
   "reviews": [

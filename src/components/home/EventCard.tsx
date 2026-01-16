@@ -31,6 +31,8 @@ export default function EventCard({ event, featured = false }: EventCardProps) {
     availableTickets < totalTickets * 0.1 && availableTickets > 0;
   const isSoldOut = availableTickets === 0;
 
+  console.log(lowestPrice);
+
   return (
     <Link
       to={`/events/${event.id}`}

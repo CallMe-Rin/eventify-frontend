@@ -17,21 +17,18 @@ export const ticketTierKeys = {
 };
 
 // Fetch all events
-
 export async function fetchEvents(): Promise<EventItem[]> {
   const { data } = await axiosInstance.get<EventItem[]>("/events");
   return data;
 }
 
 // Fetch event by ID
-
 export async function fetchEventById(id: string): Promise<EventItem> {
   const { data } = await axiosInstance.get<EventItem>(`/events/${id}`);
   return data;
 }
 
 // Fetch ticket tiers by event ID
-
 export async function fetchTicketTiersByEventId(
   eventId: string
 ): Promise<TicketTier[]> {
@@ -42,7 +39,6 @@ export async function fetchTicketTiersByEventId(
 }
 
 // Fetch event with tiers
-
 export async function fetchEventWithTiers(id: string): Promise<EventWithTiers> {
   const [event, ticketTiers] = await Promise.all([
     fetchEventById(id),
@@ -52,7 +48,6 @@ export async function fetchEventWithTiers(id: string): Promise<EventWithTiers> {
 }
 
 // Fetch events with tiers
-
 export async function fetchEventsWithTiers(): Promise<EventWithTiers[]> {
   const [events, allTicketTiers] = await Promise.all([
     fetchEvents(),
