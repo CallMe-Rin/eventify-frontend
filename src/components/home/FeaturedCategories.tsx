@@ -1,6 +1,6 @@
 import { Link } from "react-router";
-import { EVENT_CATEGORIES } from "@/types";
 import { ArrowRight } from "lucide-react";
+import { EVENT_CATEGORIES } from "@/types/api";
 
 const categoryImages: Record<string, string> = {
   music:
@@ -58,11 +58,11 @@ export default function FeaturedCategories() {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="mb-1 block text-3xl">{category.icon}</span>
-                    <h3 className="text-xl font-bold text-white">
+                    <h3 className="text-xl font-bold text-primary-foreground">
                       {category.label}
                     </h3>
                   </div>
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-all group-hover:bg-primary group-hover:text-primary-foreground">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-primary-foreground backdrop-blur-sm transition-all group-hover:bg-primary group-hover:text-primary-foreground">
                     <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5" />
                   </div>
                 </div>

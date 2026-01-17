@@ -1,5 +1,5 @@
-import { useState, useMemo, useEffect } from "react"; // Added useEffect
-import { useParams, useNavigate } from "react-router";
+import { useState, useMemo, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,20 +19,27 @@ import {
   ArrowLeft,
   FileText,
   Link2,
+  AlertCircle,
+  RefreshCcw,
 } from "lucide-react";
 import { SocialIcon } from "react-social-icons";
-
-import { eventsWithTiers } from "@/data/mockEvents";
-import { formatIDR, EVENT_CATEGORIES } from "@/types";
+import { useEventWithTiers } from "@/hooks/useEvents";
+import { EVENT_CATEGORIES, formatIDR } from "@/types/api";
+import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function EventDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("description"); // Track active section
+  const [activeTab, setActiveTab] = useState("description");
 
-  const event = useMemo(() => {
-    return eventsWithTiers.find((e) => e.id === id);
-  }, [id]);
+  // Fetch event from API
+  const {
+    data: event,
+    isPending: isLoading,
+    isError,
+    refetch,
+  } = useEventWithTiers(id || "");
 
   const [openTiers, setOpenTiers] = useState<Record<string, boolean>>({});
 
@@ -40,7 +47,7 @@ export default function EventDetailPage() {
   useEffect(() => {
     const handleScroll = () => {
       const sections = ["description", "tickets", "terms"];
-      const scrollPosition = window.scrollY + 100; // Offset for the sticky nav
+      const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
         const element = document.getElementById(section);
@@ -62,6 +69,7 @@ export default function EventDetailPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Group tiers by category
   const groupedTiers = useMemo(() => {
     if (!event?.ticketTiers) return {};
     const groups: Record<string, typeof event.ticketTiers> = {};
@@ -73,6 +81,7 @@ export default function EventDetailPage() {
     return groups;
   }, [event]);
 
+  // Get event starting price
   const startingPrice = useMemo(() => {
     if (!event?.ticketTiers?.length) return 0;
     const prices = event.ticketTiers.map((t) => t.price).filter((p) => p >= 0);
@@ -92,28 +101,132 @@ export default function EventDetailPage() {
     }
   };
 
-  if (!event) return null;
+  // Handle share
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: event?.title,
+          text: event?.shortDescription,
+          url,
+        });
+      } catch {
+        // User cancelled
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied to clipboard!");
+    }
+  };
 
-  const category = EVENT_CATEGORIES.find((c) => c.value === event.category);
-
+  // Format date range if endDate exists
   const formatDateRange = () => {
+    if (!event) return "";
     const start = new Date(event.date);
     const end = event.endDate ? new Date(event.endDate) : null;
+
     const startStr = start.toLocaleDateString("id-ID", {
       day: "numeric",
       month: "short",
       year: "numeric",
     });
+
     if (end) {
       const endStr = end.toLocaleDateString("id-ID", {
         day: "numeric",
         month: "short",
         year: "numeric",
       });
-      return `${startStr} - ${endStr}`;
+      const timeStr = `${start.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })} - ${end.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })} WIB`;
+      return `${startStr} - ${endStr}, ${timeStr}`;
     }
-    return startStr;
+    return `${startStr}, ${start.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    })} WIB`;
   };
+
+  // Loading State
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-background">
+          {/* Header Skeleton */}
+          <div className="bg-secondary text-primary-foreground">
+            <div className="container mx-auto py-6">
+              <Skeleton className="h-8 w-20 mb-4 bg-secondary" />
+              <div className="grid lg:grid-cols-[1fr_400px] gap-8">
+                <div className="space-y-4">
+                  <Skeleton className="h-10 w-3/4 bg-secondary" />
+                  <Skeleton className="h-5 w-1/2 bg-secondary" />
+                  <Skeleton className="h-5 w-1/3 bg-secondary" />
+                  <Skeleton className="h-5 w-1/4 bg-secondary" />
+                </div>
+                <div className="hidden lg:block">
+                  <Skeleton className="aspect-16/10 rounded-xl bg-secondary" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Content Skeleton */}
+          <div className="container mx-auto py-8">
+            <div className="grid lg:grid-cols-[1fr_380px] gap-8">
+              <div className="space-y-4">
+                <Skeleton className="h-12 w-full bg-secondary" />
+                <Skeleton className="h-40 w-full bg-secondary" />
+              </div>
+              <div className="space-y-4">
+                <Skeleton className="h-64 w-full rounded-xl bg-secondary" />
+                <Skeleton className="h-48 w-full rounded-xl bg-secondary" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Error State
+  if (isError) {
+    return (
+      <Layout>
+        <div className="container mx-auto py-20">
+          <div className="flex flex-col items-center">
+            <div className="mb-4 rounded-full bg-destructive/10 p-4">
+              <AlertCircle className="h-8 w-8 text-destructive" />
+            </div>
+            <h1 className="text-2xl font-bold mb-2">Failed to Load Events</h1>
+            <p className="text-muted-foreground mb-6 max-w-sm">
+              Unable to connect to the server.
+            </p>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="gap-2 rounded-full"
+                onClick={() => refetch()}
+              >
+                <RefreshCcw className="h-4 w-4" />
+                Try Again
+              </Button>
+              <Button className="rounded-full" asChild>
+                <Link to="/">Back to Home</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  const category = EVENT_CATEGORIES.find((c) => c.value === event?.category);
 
   return (
     <Layout>
@@ -122,7 +235,7 @@ export default function EventDetailPage() {
         <div className="relative text-primary-foreground overflow-hidden">
           <div
             className="absolute inset-0 z-0 bg-cover bg-center scale-105"
-            style={{ backgroundImage: `url(${event.coverImage})` }}
+            style={{ backgroundImage: `url(${event?.coverImage})` }}
           >
             <div className="absolute inset-0 bg-black/70 backdrop-blur-xl" />
           </div>
@@ -132,20 +245,20 @@ export default function EventDetailPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foretext-primary-foreground/10 -ml-2 rounded-full"
+                className="text-primary-foreground/80 -ml-2 rounded-full hover:text-primary-foreground/80 hover:bg-primary-foreground/10 hover:cursor-pointer"
                 onClick={() => navigate(-1)}
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <ArrowLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
               <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-                {event.title}
+                {event?.title}
               </h1>
               <div className="flex flex-col gap-4 text-lg text-primary-foreground/90">
                 <div className="flex items-center gap-2">
                   <MapPin className="h-5 w-5 text-primary" />
                   <span>
-                    {event.venue}, {event.location}
+                    {event?.venue}, {event?.location}
                   </span>
                 </div>
 
@@ -192,7 +305,7 @@ export default function EventDetailPage() {
                 {/* Description Section */}
                 <section id="description" className="scroll-mt-20">
                   <div className="prose prose-blue max-w-none text-muted-foreground leading-relaxed">
-                    <p>{event.description}</p>
+                    <p>{event?.description}</p>
                   </div>
                 </section>
 
@@ -324,9 +437,9 @@ export default function EventDetailPage() {
                 {/* ... existing card content ... */}
                 <div className="aspect-auto overflow-hidden">
                   <img
-                    src={event.coverImage}
+                    src={event?.coverImage}
                     className="w-full h-full object-cover"
-                    alt={event.title}
+                    alt={event?.title}
                   />
                 </div>
                 <CardContent className="p-6 space-y-6 bg-primary-foretext-primary-foreground">
@@ -349,13 +462,13 @@ export default function EventDetailPage() {
 
                   <div className="space-y-4">
                     <h3 className="font-bold text-2xl text-foreground leading-tight">
-                      {event.title}
+                      {event?.title}
                     </h3>
                     <div className="space-y-3 text-muted-foreground">
                       <div className="flex gap-3 items-start text-sm">
                         <MapPin className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                         <span>
-                          {event.venue}, {event.location}
+                          {event?.venue}, {event?.location}
                         </span>
                       </div>
                       <div className="flex gap-3 items-start text-sm">
@@ -374,8 +487,8 @@ export default function EventDetailPage() {
                     </h3>
                     <div className="flex gap-2">
                       <a
-                        href="#"
                         className="flex h-9 w-9 items-center justify-center rounded-full bg-transparent text-muted-foreground transition-colors hover:bg-accent/50 hover:text-primary border hover:border-ring/10"
+                        onClick={handleShare}
                       >
                         <Link2 className="h-4 w-4" />
                       </a>

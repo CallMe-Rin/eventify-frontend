@@ -3,10 +3,11 @@ import { TooltipProvider } from "./components/ui/tooltip";
 import { Toaster as Sonner, Toaster } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import HomePage from "./pages/Home";
-import LoginPage from "./pages/Login";
-import RegisterPage from "./pages/Register";
+
 import EventDetailPage from "./pages/EventDetail";
-import DashboardHome from "./pages/dashboardHome";
+import DashboardHome from "./pages/OrganizerDashboard";
+import LoginPage from "./pages/login";
+import RegisterPage from "./pages/register";
 
 const queryClient = new QueryClient();
 
