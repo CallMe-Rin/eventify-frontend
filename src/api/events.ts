@@ -30,7 +30,7 @@ export async function fetchEventById(id: string): Promise<EventItem> {
 
 // Fetch ticket tiers by event ID
 export async function fetchTicketTiersByEventId(
-  eventId: string
+  eventId: string,
 ): Promise<TicketTier[]> {
   const { data } = await axiosInstance.get<TicketTier[]>("/ticket-tiers", {
     params: { eventId },

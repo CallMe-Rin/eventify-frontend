@@ -65,3 +65,9 @@ export const EVENT_CATEGORIES: Category[] = [
   { id: "cat-health", value: "health", label: "Health & Wellness", icon: "🧘" },
   { id: "cat-other", value: "other", label: "Other", icon: "✨" },
 ];
+
+export const EVENT_TYPES = [
+  { value: "all", label: "All Events" },
+  { value: "paid", label: "Paid Events" },
+  { value: "free", label: "Free Events" },
+] as const;
