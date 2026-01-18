@@ -91,7 +91,7 @@ export default function EventDetailPage() {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      const navHeight = 70; // Height of the sticky nav
+      const navHeight = 70;
       const elementPosition =
         element.getBoundingClientRect().top + window.pageYOffset;
       window.scrollTo({
@@ -340,7 +340,7 @@ export default function EventDetailPage() {
                                 {tiers.length} ticket category • Prices start
                                 from{" "}
                                 {formatIDR(
-                                  Math.min(...tiers.map((t) => t.price))
+                                  Math.min(...tiers.map((t) => t.price)),
                                 )}
                               </p>
                             </div>

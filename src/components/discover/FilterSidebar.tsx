@@ -14,47 +14,65 @@ import { useLocations } from "@/hooks/useLocations";
 import { cn } from "@/lib/utils";
 import { Separator } from "../ui/separator";
 
-export default function FilterSidebar() {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedLocation, setSelectedLocation] = useState("All Locations");
-  const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>(
-    [],
-  );
-  const [eventType, setEventType] = useState("all");
-  const [onlineOnly, setOnlineOnly] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+interface FilterSidebarProps {
+  selectedLocation: string;
+  onLocationChange: (location: string) => void;
 
-  // Collapsible states
+  selectedCategories: EventCategory[];
+  onCategoryToggle: (category: EventCategory) => void;
+
+  eventType: string;
+  onEventTypeChange: (type: string) => void;
+
+  onlineOnly: boolean;
+  onOnlineOnlyChange: (value: boolean) => void;
+
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
+
+  onClearFilters: () => void;
+  hasActiveFilters: boolean;
+}
+
+export default function FilterSidebar({
+  selectedLocation,
+  onLocationChange,
+  selectedCategories,
+  onCategoryToggle,
+  eventType,
+  onEventTypeChange,
+  onlineOnly,
+  onOnlineOnlyChange,
+  searchQuery,
+  onSearchChange,
+  onClearFilters,
+  hasActiveFilters,
+}: FilterSidebarProps) {
   const [locationOpen, setLocationOpen] = useState(true);
   const [typeOpen, setTypeOpen] = useState(true);
   const [categoryOpen, setCategoryOpen] = useState(true);
 
   const { data: locations = [] } = useLocations();
 
-  const toggleCategory = (category: EventCategory) => {
-    setSelectedCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((c) => c !== category)
-        : [...prev, category],
-    );
-    setCurrentPage(1);
+  // Handle the Online Switch Toggle
+  const handleOnlineToggle = (checked: boolean) => {
+    onOnlineOnlyChange(checked);
+    if (checked) {
+      // If switch turned ON, force location to Online
+      onLocationChange("Online");
+    } else {
+      // If switch turned OFF, reset to All Locations
+      onLocationChange("All Locations");
+    }
   };
 
-  const clearFilters = () => {
-    setSelectedLocation("All Locations");
-    setSelectedCategories([]);
-    setEventType("all");
-    setOnlineOnly(false);
-    setSearchQuery("");
-    setCurrentPage(1);
+  // Handle specific Location Selection
+  const handleLocationSelect = (locationName: string) => {
+    onLocationChange(locationName);
+    if (locationName !== "Online") {
+      onOnlineOnlyChange(false);
+    }
   };
-
-  const hasActiveFilters =
-    selectedLocation !== "All Locations" ||
-    selectedCategories.length > 0 ||
-    eventType !== "all" ||
-    onlineOnly ||
-    searchQuery.length > 0;
 
   return (
     <div className="space-y-6">
@@ -64,8 +82,8 @@ export default function FilterSidebar() {
         <Button
           variant="ghost"
           size="sm"
-          onClick={clearFilters}
-          className="h-8 gap-1 text-primary hover:text-primary"
+          onClick={onClearFilters}
+          className="h-8 gap-1 text-primary hover:text-primary/80 hover:bg-transparent rounded-xl cursor-pointer"
           disabled={!hasActiveFilters}
         >
           <RefreshCcw className="h-4 w-4" />
@@ -80,8 +98,8 @@ export default function FilterSidebar() {
         </Label>
         <Switch
           id="online-events"
-          checked={onlineOnly}
-          onCheckedChange={setOnlineOnly}
+          checked={onlineOnly || selectedLocation === "Online"}
+          onCheckedChange={handleOnlineToggle}
         ></Switch>
       </div>
 
@@ -102,14 +120,15 @@ export default function FilterSidebar() {
             <Input
               placeholder="Search Location"
               className="pl-9 bg-background rounded-xl"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
             />
           </div>
           {locations.slice(0, 8).map((location) => (
             <button
               key={location.id}
               onClick={() => {
-                setSelectedLocation(location.name);
-                setCurrentPage(1);
+                handleLocationSelect(location.name);
               }}
               className={cn(
                 "block w-full rounded-full px-3 py-2 text-left text-sm transition-colors",
@@ -143,8 +162,7 @@ export default function FilterSidebar() {
             <button
               key={type.value}
               onClick={() => {
-                setEventType(type.value);
-                setCurrentPage(1);
+                onEventTypeChange(type.value);
               }}
               className={cn(
                 "block w-full rounded-full px-3 py-2 text-left text-sm transition-colors",
@@ -177,7 +195,7 @@ export default function FilterSidebar() {
           {EVENT_CATEGORIES.map((category) => (
             <button
               key={category.value}
-              onClick={() => toggleCategory(category.value)}
+              onClick={() => onCategoryToggle(category.value)}
               className={cn(
                 "flex w-full items-center gap-2 rounded-full px-3 py-2 text-left text-sm transition-colors",
                 selectedCategories.includes(category.value)
