@@ -1,42 +1,74 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Ticket, Clock, Gift, Check, Copy } from "lucide-react";
+import axios from "axios";
+
+/* ================= TYPES ================= */
+type User = {
+  id: string;
+  name: string;
+  points: number;
+  referral_code: string;
+};
+
+type Event = {
+  id: string;
+  title: string;
+};
+
+type Transaction = {
+  id: string;
+  user_id: string;
+  event_id: string;
+  quantity: number;
+  total_amount: number;
+  status: "done" | "waiting_payment";
+  created_at: string;
+};
+
+type MockDB = {
+  users: User[];
+  events: Event[];
+  transactions: Transaction[];
+};
 
 const CURRENT_USER_ID = "user-001";
 
+const fetchMockDB = async (): Promise<MockDB> => {
+  const { data } = await axios.get("/mock-db.json");
+  return data;
+};
+
 export default function DashboardUser() {
   const [copied, setCopied] = useState(false);
-  const [users, setUsers] = useState<User[]>([]);
-  const [events, setEvents] = useState<Event[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-  /* FETCH MOCK DB */
-  useEffect(() => {
-    fetch("/mock-db.json")
-      .then((res) => res.json())
-      .then((data) => {
-        setUsers(data.users);
-        setEvents(data.events);
-        setTransactions(data.transactions);
-      });
-  }, []);
+  const { data, isLoading } = useQuery({
+    queryKey: ["mock-db"],
+    queryFn: fetchMockDB,
+  });
 
-  /* CURRENT USER */
-  const currentUser = users.find((u) => u.id === CURRENT_USER_ID);
-
-  /* USER TRANSACTIONS */
-  const myTransactions = useMemo(
-    () => transactions.filter((t) => t.user_id === CURRENT_USER_ID),
-    [transactions],
+  const currentUser = data?.users.find(
+    (u) => u.id === CURRENT_USER_ID
   );
 
-  /* STATS */
-  const myTickets = myTransactions.reduce((sum, t) => sum + t.quantity, 0);
+  const myTransactions = useMemo(
+    () =>
+      data?.transactions.filter(
+        (t) => t.user_id === CURRENT_USER_ID
+      ) ?? [],
+    [data]
+  );
+
+  const myTickets = myTransactions.reduce(
+    (sum, t) => sum + t.quantity,
+    0
+  );
 
   const pendingCount = myTransactions.filter(
-    (t) => t.status === "waiting_payment",
+    (t) => t.status === "waiting_payment"
   ).length;
 
   const referralCode = currentUser?.referral_code ?? "—";
@@ -47,6 +79,14 @@ export default function DashboardUser() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="p-10 text-center">Loading...</div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="min-h-screen bg-muted/30">
@@ -54,7 +94,7 @@ export default function DashboardUser() {
           {/* HEADER */}
           <div>
             <h1 className="text-3xl font-bold">
-              Welcome, {currentUser?.name ?? "User"}
+              Welcome, {currentUser?.name}
             </h1>
             <p className="text-muted-foreground">
               Manage your tickets and rewards
@@ -85,7 +125,7 @@ export default function DashboardUser() {
 
           {/* REFERRAL */}
           <Card className="bg-emerald-50 border-emerald-200">
-            <CardContent className="flex items-center justify-between p-6">
+            <CardContent className="flex justify-between items-center p-6">
               <div>
                 <h2 className="font-semibold">Your Referral Code</h2>
                 <p className="text-sm text-muted-foreground">
@@ -94,7 +134,7 @@ export default function DashboardUser() {
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="px-4 py-2 rounded-xl bg-white font-semibold">
+                <div className="px-4 py-2 bg-white rounded-xl font-semibold">
                   {referralCode}
                 </div>
                 <Button size="icon" variant="outline" onClick={handleCopy}>
@@ -111,28 +151,34 @@ export default function DashboardUser() {
           {/* PURCHASE HISTORY */}
           <Card>
             <CardContent className="p-8">
-              <h2 className="text-xl font-semibold mb-6">Purchase History</h2>
+              <h2 className="text-xl font-semibold mb-6">
+                Purchase History
+              </h2>
 
               {myTransactions.length === 0 ? (
                 <div className="text-center py-16">
                   <p className="text-muted-foreground mb-4">
                     No transactions yet
                   </p>
-                  <Button className="rounded-full">Discover Events</Button>
+                  <Button className="rounded-full">
+                    Discover Events
+                  </Button>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {myTransactions.map((tx) => {
-                    const event = events.find((e) => e.id === tx.event_id);
+                    const event = data?.events.find(
+                      (e) => e.id === tx.event_id
+                    );
 
                     return (
                       <div
                         key={tx.id}
-                        className="flex items-center justify-between border rounded-xl p-4"
+                        className="flex justify-between items-center border rounded-xl p-4"
                       >
                         <div>
                           <p className="font-semibold">
-                            {event?.title ?? "Event"}
+                            {event?.title}
                           </p>
                           <p className="text-sm text-muted-foreground">
                             {new Date(tx.created_at).toLocaleDateString()}
@@ -141,7 +187,8 @@ export default function DashboardUser() {
 
                         <div className="text-right">
                           <p className="font-semibold">
-                            Rp {tx.total_amount.toLocaleString("id-ID")}
+                            Rp{" "}
+                            {tx.total_amount.toLocaleString("id-ID")}
                           </p>
                           <span
                             className={`text-xs px-3 py-1 rounded-full ${
@@ -168,7 +215,7 @@ export default function DashboardUser() {
   );
 }
 
-/* ================= STAT COMPONENT ================= */
+/* ================= STAT ================= */
 function Stat({
   icon,
   title,
@@ -186,7 +233,7 @@ function Stat({
   };
 
   return (
-    <div className="bg-white border rounded-xl p-5 flex items-center gap-4">
+    <div className="bg-white border rounded-xl p-5 flex gap-4 items-center">
       <div
         className={`h-12 w-12 rounded-xl flex items-center justify-center ${colors[color]}`}
       >
