@@ -89,7 +89,7 @@ export default function HomePage() {
             <Button
               onClick={() => refetchEvents()}
               variant="outline"
-              className="gap-2 rounded-full"
+              className="gap-2 rounded-full hover:cursor-pointer"
             >
               <RefreshCcw className="h-4 w-4" />
               Try Again
