@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { SocialIcon } from "react-social-icons";
 import { useEventWithTiers } from "@/hooks/useEvents";
+import { useAuthContext } from "@/hooks/useAuthContext";
 import { EVENT_CATEGORIES, formatIDR } from "@/types/api";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -32,6 +33,10 @@ export default function EventDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("description");
+
+  // Get authenticated user
+  const auth = useAuthContext();
+  const isAuthenticated = auth?.isAuthenticated;
 
   // Fetch event from API
   const {
@@ -42,6 +47,36 @@ export default function EventDetailPage() {
   } = useEventWithTiers(id || "");
 
   const [openTiers, setOpenTiers] = useState<Record<string, boolean>>({});
+
+  // Handle Buy Ticket click with auth and role guard
+  const handleBuyTicket = (ticketTierId: string) => {
+    if (!isAuthenticated) {
+      toast.error("Please sign in to purchase tickets");
+      // Store the intended destination for post-login redirect
+      const returnUrl = `/checkout?eventId=${id}&ticketTierId=${ticketTierId}&quantity=1`;
+      localStorage.setItem("redirectAfterLogin", returnUrl);
+      navigate("/login", { state: { from: { pathname: returnUrl } } });
+      return;
+    }
+
+    // Check if user is organizer
+    if (auth?.role === "organizer") {
+      toast.error(
+        "Organizers cannot purchase tickets. Please use a customer account.",
+      );
+      return;
+    }
+
+    // Navigate to checkout with search params
+    navigate(`/checkout?eventId=${id}&ticketTierId=${ticketTierId}&quantity=1`);
+  };
+
+  // Handle group Buy Ticket (select first tier in group)
+  const handleBuyTicketGroup = (tiers: { id: string }[]) => {
+    if (tiers && tiers.length > 0) {
+      handleBuyTicket(tiers[0].id);
+    }
+  };
 
   // Auto-update active tab on scroll
   useEffect(() => {
@@ -345,7 +380,10 @@ export default function EventDetailPage() {
                               </p>
                             </div>
                             <div className="flex items-center gap-4">
-                              <Button className="bg-primary hover:bg-primary/90 px-4 font-bold h-10 rounded-2xl">
+                              <Button
+                                className="bg-primary hover:bg-primary/90 px-4 font-bold h-10 rounded-2xl"
+                                onClick={() => handleBuyTicketGroup(tiers)}
+                              >
                                 Buy Ticket
                               </Button>
                               <CollapsibleTrigger asChild>
@@ -455,6 +493,14 @@ export default function EventDetailPage() {
                     <Button
                       size="lg"
                       className="bg-primary hover:bg-primary/90 px-4 font-bold rounded-2xl"
+                      onClick={() => {
+                        if (
+                          event?.ticketTiers &&
+                          event.ticketTiers.length > 0
+                        ) {
+                          handleBuyTicket(event.ticketTiers[0].id);
+                        }
+                      }}
                     >
                       Buy Ticket
                     </Button>

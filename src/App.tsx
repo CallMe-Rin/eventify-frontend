@@ -3,6 +3,8 @@ import { TooltipProvider } from "./components/ui/tooltip";
 import { Toaster as Sonner, Toaster } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./contexts/AuthContext";
+import { RoleBasedRoute } from "./components/auth/RoleBasedRoute";
+import { CheckoutProtected } from "./components/checkout/CheckoutProtected";
 import HomePage from "./pages/Home";
 import EventDetailPage from "./pages/EventDetail";
 import DashboardHome from "./pages/OrganizerDashboard";
@@ -27,8 +29,24 @@ export default function App() {
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/events/:id" element={<EventDetailPage />} />
               <Route
+                path="/checkout"
+                element={
+                  <RoleBasedRoute allowedRoles={["customer"]}>
+                    <CheckoutProtected>
+                      <CheckoutPage />
+                    </CheckoutProtected>
+                  </RoleBasedRoute>
+                }
+              />
+              <Route
                 path="/events/:eventId/checkout"
-                element={<CheckoutPage />}
+                element={
+                  <RoleBasedRoute allowedRoles={["customer"]}>
+                    <CheckoutProtected>
+                      <CheckoutPage />
+                    </CheckoutProtected>
+                  </RoleBasedRoute>
+                }
               />
               <Route path="/dashboard" element={<DashboardHome />} />
               <Route path="/discover" element={<DiscoverPage />} />

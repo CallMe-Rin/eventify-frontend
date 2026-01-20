@@ -8,9 +8,9 @@ export interface AuthContextType extends AuthState {
     password: string,
     name: string,
     role: AppRole,
-  ) => Promise<User>;
-  signIn: (email: string, password: string) => Promise<User>;
-  signInWithGoogle: () => Promise<User>;
+  ) => Promise<User | undefined>;
+  signIn: (email: string, password: string) => Promise<User | undefined>;
+  signInWithGoogle: () => Promise<User | undefined>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
