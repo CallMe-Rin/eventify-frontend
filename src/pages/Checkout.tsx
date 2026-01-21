@@ -88,6 +88,39 @@ export default function CheckoutPage() {
     maxPointsAvailable: checkout.userPoints,
   });
 
+  // Format date range if endDate exists
+  const formatDateRange = () => {
+    if (!event) return "";
+    const start = new Date(event.date);
+    const end = event.endDate ? new Date(event.endDate) : null;
+
+    const startStr = start.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+
+    if (end) {
+      const endStr = end.toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
+      const timeStr = `${start.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })} - ${end.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })} WIB`;
+      return `${startStr} - ${endStr}, ${timeStr}`;
+    }
+    return `${startStr}, ${start.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    })} WIB`;
+  };
+
   // Check for loading states including auth
   const isAuthLoading = auth?.isLoading;
 
@@ -215,7 +248,11 @@ export default function CheckoutPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="mb-6">
-          <Button variant="ghost" onClick={() => navigate(-1)} className="p-0">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(-1)}
+            className="p-0 gap-1 rounded-full hover:bg-secondary hover:cursor-pointer"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
@@ -223,8 +260,10 @@ export default function CheckoutPage() {
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Checkout</h1>
-          <p className="text-gray-600">{event.title}</p>
+          <h1 className="text-3xl font-bold mb-2">{event?.title}</h1>
+          <p className="text-secondary-foreground text-sm">
+            {event?.venue} • {formatDateRange()} - {event?.shortDescription}
+          </p>
         </div>
 
         {/* Main Layout */}
@@ -243,28 +282,6 @@ export default function CheckoutPage() {
               selectedMethod={checkout.selectedPaymentMethod}
               onChange={checkout.setSelectedPaymentMethod}
             />
-
-            {/* Checkout Button */}
-            <div className="flex gap-3">
-              <Button
-                onClick={handleCheckout}
-                disabled={isSubmitting}
-                size="lg"
-                className="flex-1"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    Complete Checkout -{" "}
-                    {formatIDR(priceCalculation.finalPayable)}
-                  </>
-                )}
-              </Button>
-            </div>
           </div>
 
           {/* Right Column: Order Summary (Sticky) */}
@@ -284,6 +301,9 @@ export default function CheckoutPage() {
               onRemoveCoupon={checkout.removeCoupon}
               onPointsChange={checkout.updatePointsUsed}
               setCouponCode={checkout.setCouponCode}
+              onCheckout={handleCheckout}
+              isSubmitting={isSubmitting}
+              finalAmount={priceCalculation.finalPayable}
             />
           </div>
         </div>

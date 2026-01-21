@@ -1,6 +1,14 @@
 import { Card } from "@/components/ui/card";
-import { CreditCard, Landmark, Wallet, Clock, QrCode } from "lucide-react";
+import {
+  CreditCard,
+  Landmark,
+  Wallet,
+  Clock,
+  QrCode,
+  Lightbulb,
+} from "lucide-react";
 import type { PaymentMethod } from "@/types/checkout";
+import { Separator } from "@/components/ui/separator";
 
 interface PaymentMethodOption {
   id: PaymentMethod;
@@ -52,13 +60,15 @@ export function PaymentMethodSelector({
   onChange,
 }: PaymentMethodSelectorProps) {
   return (
-    <Card className="p-6 space-y-6">
+    <Card className="p-6 space-y-1">
       <div>
-        <h3 className="font-semibold text-lg mb-4">Payment Method</h3>
-        <p className="text-sm text-gray-600 mb-4">
+        <h3 className="font-semibold text-lg mb-1 mt-1">Payment Method</h3>
+        <p className="text-sm text-gray-600 mb-0">
           Choose your preferred payment method
         </p>
       </div>
+
+      <Separator />
 
       <div className="space-y-3">
         {PAYMENT_METHODS.map((method) => (
@@ -94,10 +104,13 @@ export function PaymentMethodSelector({
       </div>
 
       {/* Payment Method Info */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <p className="text-xs text-blue-700">
-          💡 <strong>Tip:</strong> Virtual accounts offer the most flexibility
-          and security for online purchases.
+      <div className="bg-primary/10 border-primary/10 border rounded-lg p-4 flex flex-row gap-2 items-center justify-left mb-2">
+        <span>
+          <Lightbulb className="h-5 w-5 text-primary" />
+        </span>
+        <p className="text-xs text-primary">
+          <strong>Tip:</strong> Virtual accounts offer the most flexibility and
+          security for online purchases.
         </p>
       </div>
     </Card>

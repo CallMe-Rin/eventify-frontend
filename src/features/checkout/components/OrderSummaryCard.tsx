@@ -24,6 +24,9 @@ interface OrderSummaryCardProps {
   onRemoveCoupon: () => void;
   onPointsChange: (points: number) => void;
   setCouponCode: (code: string) => void;
+  onCheckout: () => void;
+  isSubmitting: boolean;
+  finalAmount: number;
 }
 
 export function OrderSummaryCard({
@@ -41,8 +44,13 @@ export function OrderSummaryCard({
   onRemoveCoupon,
   onPointsChange,
   setCouponCode,
+  onCheckout,
+  isSubmitting,
+  finalAmount,
 }: OrderSummaryCardProps) {
   const [usePoints, setUsePoints] = useState(false);
+  const [pointsInput, setPointsInput] = useState("");
+
   const maxUsablePoints = Math.min(
     userPoints,
     calculation.finalPayable + pointsUsed,
@@ -51,11 +59,21 @@ export function OrderSummaryCard({
   const handlePointsToggle = (checked: boolean) => {
     setUsePoints(checked);
     if (checked) {
-      // Auto-apply max usable points
-      onPointsChange(maxUsablePoints);
-    } else {
+      // When turning ON the switch, close input and reset
       onPointsChange(0);
+      setPointsInput("");
     }
+  };
+
+  const handlePointsInputChange = (value: string) => {
+    // Allow only numbers
+    const numericValue = value.replace(/\D/g, "");
+    setPointsInput(numericValue);
+
+    // Convert to number and clamp to max usable points
+    const points = Number(numericValue) || 0;
+    const clampedPoints = Math.min(points, maxUsablePoints);
+    onPointsChange(clampedPoints);
   };
 
   const handleCouponSubmit = (e: React.FormEvent) => {
@@ -66,7 +84,7 @@ export function OrderSummaryCard({
   };
 
   return (
-    <Card className="sticky top-4 p-6 space-y-6">
+    <Card className="sticky top-4 p-6 space-y-0">
       {/* Order Items */}
       <div className="space-y-3">
         <h3 className="font-semibold text-lg">Order Summary</h3>
@@ -100,7 +118,7 @@ export function OrderSummaryCard({
 
         {/* Points Used */}
         {calculation.pointsUsed > 0 && (
-          <div className="flex justify-between items-center text-blue-600">
+          <div className="flex justify-between items-center text-primary">
             <span className="text-sm">Points Used</span>
             <span className="font-medium">
               -{formatIDR(calculation.pointsUsed)}
@@ -197,24 +215,26 @@ export function OrderSummaryCard({
             </label>
           </div>
 
-          {usePoints && userPoints > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <p className="text-xs text-blue-600 mb-2">
-                Up to {formatIDR(maxUsablePoints)} can be used
+          {!usePoints && userPoints > 0 && (
+            <div className="pt-2 space-y-2">
+              <p className="text-xs text-destructive mb-1">
+                Maximum usable: {formatIDR(maxUsablePoints)} points
               </p>
-              <input
-                type="range"
-                min="0"
-                max={maxUsablePoints}
-                value={pointsUsed}
-                onChange={(e) => onPointsChange(Number(e.target.value))}
-                className="w-full"
+              <Input
+                type="text"
+                inputMode="numeric"
+                placeholder="Enter points to use"
+                value={pointsInput}
+                onChange={(e) => handlePointsInputChange(e.target.value)}
+                className="text-sm"
               />
-              <div className="flex justify-between text-xs text-blue-700 mt-2">
-                <span>0</span>
-                <span className="font-medium">{formatIDR(pointsUsed)}</span>
-                <span>{formatIDR(maxUsablePoints)}</span>
-              </div>
+              {pointsUsed > 0 && (
+                <p className="text-xs text-primary">
+                  Using:{" "}
+                  <span className="font-medium">{formatIDR(pointsUsed)}</span>{" "}
+                  points
+                </p>
+              )}
             </div>
           )}
 
@@ -230,7 +250,7 @@ export function OrderSummaryCard({
       <div className="space-y-2">
         <div className="flex justify-between items-center text-lg font-bold">
           <span>Total Payable</span>
-          <span className="text-blue-600">
+          <span className="text-primary">
             {formatIDR(calculation.finalPayable)}
           </span>
         </div>
@@ -240,6 +260,23 @@ export function OrderSummaryCard({
           </p>
         )}
       </div>
+
+      {/* Checkout Button */}
+      <Button
+        onClick={onCheckout}
+        disabled={isSubmitting}
+        size="lg"
+        className="w-full"
+      >
+        {isSubmitting ? (
+          <>
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            Processing...
+          </>
+        ) : (
+          <>Complete Checkout - {formatIDR(finalAmount)}</>
+        )}
+      </Button>
     </Card>
   );
 }
