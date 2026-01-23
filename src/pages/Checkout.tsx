@@ -1,29 +1,47 @@
-import { useState, useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router";
-import { useQuery } from "@tanstack/react-query";
-import { Loader2, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import Layout from "@/components/layout/Layout";
-import { AttendeeForm } from "@/features/checkout/components/AttendeeForm";
-import { PaymentMethodSelector } from "@/features/checkout/components/PaymentMethodSelector";
-import { OrderSummaryCard } from "@/features/checkout/components/OrderSummaryCard";
-import { useCheckout } from "@/hooks/useCheckout";
-import { usePriceCalculation } from "@/hooks/usePriceCalculation";
-import { useAuthContext } from "@/hooks/useAuthContext";
-import * as checkoutApi from "@/api/checkout";
-import * as eventsApi from "@/api/events";
-import { formatIDR } from "@/types/index";
-import { toast } from "sonner";
+import { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router';
+import { useQuery } from '@tanstack/react-query';
+import { Loader2, ArrowLeft, Calendar, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Layout from '@/components/layout/Layout';
+
+import { useCheckout } from '@/hooks/useCheckout';
+import { usePriceCalculation } from '@/hooks/usePriceCalculation';
+import { useAuthContext } from '@/hooks/useAuthContext';
+import * as checkoutApi from '@/api/checkout';
+import * as eventsApi from '@/api/events';
+import { formatIDR } from '@/types/api';
+import type { Coupon } from '@/types/user';
+import type { DiscountCoupon } from '@/types/checkout';
+import { toast } from 'sonner';
+import { PriceBreakdownCard } from '@/features/checkout/components/PriceBreakdownCard';
+import { TicketTierSelector } from '@/features/checkout/components/TicketTierSelector';
+
+// Helper function to convert DiscountCoupon to Coupon type
+function convertDiscountCouponToCoupon(discountCoupon: DiscountCoupon): Coupon {
+  return {
+    id: discountCoupon.id,
+    code: discountCoupon.code,
+    discountType: discountCoupon.discount_type,
+    discountValue: discountCoupon.discount_value,
+    minPurchase: discountCoupon.min_purchase,
+    maxDiscount: discountCoupon.max_discount,
+    validFrom: discountCoupon.valid_from,
+    validUntil: discountCoupon.valid_until,
+    usageLimit: discountCoupon.usage_limit,
+    usedCount: discountCoupon.used_count,
+    isReferral: discountCoupon.is_referral || false,
+  };
+}
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // Extract eventId and ticketTierId from URL search params (not path params)
-  const eventId = searchParams.get("eventId");
-  const ticketTierId = searchParams.get("ticketTierId");
-  const quantityParam = searchParams.get("quantity");
+  // Extract eventId and ticketTierId from URL search params
+  const eventId = searchParams.get('eventId');
+  const ticketTierId = searchParams.get('ticketTierId');
+  const quantityParam = searchParams.get('quantity');
   const quantity = Math.max(1, Math.min(100, Number(quantityParam) || 1));
 
   // Get authenticated user from context
@@ -31,18 +49,16 @@ export default function CheckoutPage() {
   const userId = auth?.profile?.id;
   const isAuthenticated = auth?.isAuthenticated;
 
-  // Form validation state
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  // Form state
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Auth guard: Redirect to login if not authenticated
   useEffect(() => {
     if (!isAuthenticated && !auth?.isLoading) {
-      // Store the intended destination for post-login redirect
       const returnUrl = `/checkout?eventId=${eventId}&ticketTierId=${ticketTierId}&quantity=${quantity}`;
-      localStorage.setItem("redirectAfterLogin", returnUrl);
-      toast.error("Please sign in to proceed with checkout");
-      navigate("/login");
+      localStorage.setItem('redirectAfterLogin', returnUrl);
+      toast.error('Please sign in to proceed with checkout');
+      navigate('/login');
     }
   }, [
     isAuthenticated,
@@ -53,29 +69,31 @@ export default function CheckoutPage() {
     navigate,
   ]);
 
-  // Fetch event with tiers (ALL HOOKS MUST BE HERE)
+  // Fetch event details
   const { data: event, isLoading: eventLoading } = useQuery({
-    queryKey: ["event", eventId || ""],
-    queryFn: () => eventsApi.fetchEventById(eventId || ""),
+    queryKey: ['event', eventId || ''],
+    queryFn: () => eventsApi.fetchEventById(eventId || ''),
     enabled: !!eventId && !!userId,
   });
 
   // Fetch ticket tiers
   const { data: ticketTiers, isLoading: tiersLoading } = useQuery({
-    queryKey: ["ticket-tiers", eventId || ""],
-    queryFn: () => eventsApi.fetchTicketTiersByEventId(eventId || ""),
+    queryKey: ['ticket-tiers', eventId || ''],
+    queryFn: () => eventsApi.fetchTicketTiersByEventId(eventId || ''),
     enabled: !!eventId && !!userId,
   });
 
-  // Find the selected ticket tier
+  // Find the selected ticket tier from fetched tiers
   const selectedTicketTier = ticketTiers?.find((t) => t.id === ticketTierId);
+
+  // Calculate base price
   const basePrice = selectedTicketTier
     ? selectedTicketTier.price * quantity
     : 0;
 
-  // Checkout state management
+  // Initialize checkout hook
   const checkout = useCheckout({
-    userId: userId || "",
+    userId: userId || '',
     quantity,
     ticketPrice: selectedTicketTier?.price || 0,
   });
@@ -88,101 +106,48 @@ export default function CheckoutPage() {
     maxPointsAvailable: checkout.userPoints,
   });
 
-  // Format date range if endDate exists
+  // Format date range
   const formatDateRange = () => {
-    if (!event) return "";
+    if (!event) return '';
     const start = new Date(event.date);
     const end = event.endDate ? new Date(event.endDate) : null;
 
-    const startStr = start.toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
+    const startStr = start.toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
     });
 
     if (end) {
-      const endStr = end.toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
+      const endStr = end.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
       });
-      const timeStr = `${start.toLocaleTimeString("id-ID", {
-        hour: "2-digit",
-        minute: "2-digit",
-      })} - ${end.toLocaleTimeString("id-ID", {
-        hour: "2-digit",
-        minute: "2-digit",
+      const timeStr = `${start.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })} - ${end.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit',
       })} WIB`;
       return `${startStr} - ${endStr}, ${timeStr}`;
     }
-    return `${startStr}, ${start.toLocaleTimeString("id-ID", {
-      hour: "2-digit",
-      minute: "2-digit",
+    return `${startStr}, ${start.toLocaleTimeString('id-ID', {
+      hour: '2-digit',
+      minute: '2-digit',
     })} WIB`;
-  };
-
-  // Check for loading states including auth
-  const isAuthLoading = auth?.isLoading;
-
-  // Validation checks - early return if missing required params
-  if (!isAuthLoading && (!eventId || !ticketTierId)) {
-    return (
-      <Layout>
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Invalid Checkout URL</h1>
-            <p className="text-gray-600 mb-6">
-              Missing required parameters. Please make sure you're coming from
-              an event page.
-            </p>
-            <Button onClick={() => navigate("/")}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
-            </Button>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
-
-  const validateForm = () => {
-    const errors: Record<string, string> = {};
-
-    if (!checkout.attendeeInfo.fullName.trim()) {
-      errors.fullName = "Full name is required";
-    }
-
-    if (!checkout.attendeeInfo.email.trim()) {
-      errors.email = "Email is required";
-    } else if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(checkout.attendeeInfo.email)
-    ) {
-      errors.email = "Please enter a valid email address";
-    }
-
-    if (!checkout.attendeeInfo.phoneNumber.trim()) {
-      errors.phoneNumber = "Phone number is required";
-    }
-
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
   };
 
   // Handle checkout submission
   const handleCheckout = async () => {
-    if (!validateForm()) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
     if (priceCalculation.finalPayable === 0 && !checkout.appliedCoupon) {
-      toast.error("Invalid checkout state");
+      toast.error('Invalid checkout state');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      // Create transaction
       await checkoutApi.createTransaction(
         userId!,
         eventId!,
@@ -194,26 +159,48 @@ export default function CheckoutPage() {
         checkout.appliedCoupon?.id,
       );
 
-      // Add cashback points if earned
       if (priceCalculation.cashbackEarned > 0) {
         await checkoutApi.updateUserPoints(
           userId!,
           priceCalculation.cashbackEarned,
-          "cashback",
+          'cashback',
         );
       }
 
-      toast.success("Checkout successful!");
+      toast.success('Checkout successful!');
       navigate(`/events/${eventId}`);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Checkout failed");
+      toast.error(error instanceof Error ? error.message : 'Checkout failed');
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // Loading states
+  const isAuthLoading = auth?.isLoading;
   const isLoading =
     isAuthLoading || eventLoading || tiersLoading || checkout.pointsLoading;
+
+  // Early returns for validation
+  if (!isAuthLoading && (!eventId || !ticketTierId)) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Invalid Checkout URL</h1>
+            <p className="text-gray-600 mb-6">
+              Missing required parameters. Please make sure you're coming from
+              an event page.
+            </p>
+            <Button onClick={() => navigate('/')}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Home
+            </Button>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -233,7 +220,7 @@ export default function CheckoutPage() {
             <h1 className="text-2xl font-bold mb-4">
               Event or Ticket Not Found
             </h1>
-            <Button onClick={() => navigate("/")}>
+            <Button onClick={() => navigate('/')}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Home
             </Button>
@@ -247,7 +234,7 @@ export default function CheckoutPage() {
     <Layout>
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
-        <div className="mb-6">
+        <div className="mb-2">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
@@ -258,66 +245,140 @@ export default function CheckoutPage() {
           </Button>
         </div>
 
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">{event?.title}</h1>
-          <p className="text-secondary-foreground text-sm">
-            {event?.venue} • {formatDateRange()} - {event?.shortDescription}
-          </p>
-        </div>
-
         {/* Main Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column: Forms */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Attendee Form */}
-            <AttendeeForm
-              attendeeInfo={checkout.attendeeInfo}
-              onUpdate={checkout.updateAttendeeInfo}
-              errors={formErrors}
-            />
+        <main className="container mx-auto py-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column: Ticket Selector */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Event Summary */}
+              <div className="flex gap-4 bg-card rounded-xl p-4 border mb-8">
+                <img
+                  src={event.coverImage}
+                  alt={event.title}
+                  className="w-24 h-24 rounded-lg object-cover"
+                />
+                <div className="flex-1 min-w-0">
+                  <h2 className="font-bold text-lg truncate">{event.title}</h2>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                    <Calendar className="size-4" />
+                    <span>{formatDateRange()}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                    <MapPin className="size-4" />
+                    <span>
+                      {event.venue}, {event.location}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              {/* Ticket Tier */}
+              <TicketTierSelector
+                tiers={ticketTiers || []}
+                selectedTier={selectedTicketTier}
+                onSelect={(tier) => {
+                  navigate(
+                    `/checkout?eventId=${eventId}&ticketTierId=${tier.id}&quantity=${quantity}`,
+                    { replace: true },
+                  );
+                }}
+              />
+            </div>
 
-            {/* Payment Method */}
-            <PaymentMethodSelector
-              selectedMethod={checkout.selectedPaymentMethod}
-              onChange={checkout.setSelectedPaymentMethod}
-            />
+            {/* Right Column: Order Summary (Sticky) */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-4 space-y-4">
+                <PriceBreakdownCard
+                  breakdown={{
+                    subtotal: basePrice,
+                    pointsDiscount: priceCalculation.pointsUsed,
+                    voucherDiscount: 0,
+                    couponDiscount: priceCalculation.couponDiscount,
+                    totalDiscount:
+                      priceCalculation.pointsUsed +
+                      priceCalculation.couponDiscount,
+                    total: priceCalculation.finalPayable,
+                  }}
+                  ticketName={selectedTicketTier.name}
+                  quantity={quantity}
+                  ticketPrice={selectedTicketTier.price}
+                  maxQuantity={selectedTicketTier.quantity || 100}
+                  onQuantityChange={(newQty) => {
+                    navigate(
+                      `/checkout?eventId=${eventId}&ticketTierId=${ticketTierId}&quantity=${newQty}`,
+                      { replace: true },
+                    );
+                  }}
+                  userPoints={checkout.userPoints}
+                  pointsToUse={checkout.pointsUsed}
+                  onPointsChange={checkout.updatePointsUsed}
+                  voucher={null}
+                  voucherError={null}
+                  onApplyVoucher={() => {}}
+                  onRemoveVoucher={() => {}}
+                  isVoucherLoading={false}
+                  coupon={
+                    checkout.appliedCoupon
+                      ? convertDiscountCouponToCoupon(checkout.appliedCoupon)
+                      : null
+                  }
+                  couponError={checkout.couponError}
+                  onApplyCoupon={checkout.applyCoupon}
+                  onRemoveCoupon={checkout.removeCoupon}
+                  isCouponLoading={checkout.couponValidating}
+                />
+                {/* Desktop Submit Button */}
+                <div className="hidden lg:block">
+                  <Button
+                    onClick={handleCheckout}
+                    disabled={isSubmitting}
+                    className="w-full h-12 text-lg rounded-xl hover:cursor-pointer"
+                    size="lg"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      'Proceed to Payment'
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
+        </main>
 
-          {/* Right Column: Order Summary (Sticky) */}
-          <div className="lg:col-span-1">
-            <OrderSummaryCard
-              eventTitle={event.title}
-              ticketTierName={selectedTicketTier.name}
-              quantity={quantity}
-              calculation={priceCalculation}
-              userPoints={checkout.userPoints}
-              pointsUsed={checkout.pointsUsed}
-              appliedCoupon={checkout.appliedCoupon}
-              couponCode={checkout.couponCode}
-              couponError={checkout.couponError}
-              isValidatingCoupon={checkout.couponValidating}
-              onApplyCoupon={checkout.applyCoupon}
-              onRemoveCoupon={checkout.removeCoupon}
-              onPointsChange={checkout.updatePointsUsed}
-              setCouponCode={checkout.setCouponCode}
-              onCheckout={handleCheckout}
-              isSubmitting={isSubmitting}
-              finalAmount={priceCalculation.finalPayable}
-            />
+        {/* Mobile Bottom Bar */}
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-background border-t p-4 shadow-lg z-50">
+          <div className="container mx-auto">
+            <div className="flex items-center justify-between mb-16">
+              <span className="text-xl font-bold text-primary">
+                {formatIDR(priceCalculation.finalPayable)}
+              </span>
+              <span>
+                <Button
+                  onClick={handleCheckout}
+                  disabled={isSubmitting}
+                  className="w-full h-12 text-base rounded-xl hover:cursor-pointer"
+                  size="sm"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    'Proceed to Payment'
+                  )}
+                </Button>
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Mobile Only: Hidden on Desktop */}
-        <div className="lg:hidden mt-8">
-          <Separator />
-          <div className="mt-4 sticky bottom-0 bg-white p-4 border-t">
-            <p className="text-sm text-gray-600 mb-2">Total Payable</p>
-            <p className="text-2xl font-bold text-blue-600">
-              {formatIDR(priceCalculation.finalPayable)}
-            </p>
-          </div>
-        </div>
+        {/* Mobile padding to prevent content from being hidden by fixed bottom bar */}
+        <div className="lg:hidden h-32" />
       </div>
     </Layout>
   );

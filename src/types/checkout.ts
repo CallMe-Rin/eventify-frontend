@@ -1,16 +1,16 @@
-import type { TicketTier } from "./event";
+import type { TicketTier } from './event';
 
 export type PaymentMethod =
-  | "credit-card"
-  | "virtual-account"
-  | "wallet"
-  | "paylater"
-  | "qris";
+  | 'credit-card'
+  | 'virtual-account'
+  | 'wallet'
+  | 'paylater'
+  | 'qris';
 
 export interface DiscountCoupon {
   id: string;
   code: string;
-  discount_type: "percentage" | "fixed";
+  discount_type: 'percentage' | 'fixed';
   discount_value: number;
   min_purchase?: number;
   max_discount?: number;
@@ -63,12 +63,12 @@ export interface Transaction {
   pointsUsed: number;
   couponId?: string;
   status:
-    | "waiting_payment"
-    | "admin_confirm"
-    | "done"
-    | "rejected"
-    | "expired"
-    | "canceled";
+    | 'waiting_payment'
+    | 'admin_confirm'
+    | 'done'
+    | 'rejected'
+    | 'expired'
+    | 'canceled';
   paymentProofUrl?: string;
   expiresAt: string;
   createdAt: string;
@@ -78,4 +78,30 @@ export interface Transaction {
 export interface CheckoutResponse {
   transaction: Transaction;
   cashbackPoints?: number;
+}
+
+// Price Breakdown Interface
+export interface PriceBreakdown {
+  subtotal: number;
+  pointsDiscount: number;
+  voucherDiscount: number;
+  couponDiscount: number;
+  totalDiscount: number;
+  total: number;
+}
+
+// Voucher Interface (Organizer-specific)
+export interface Voucher {
+  id: string;
+  code: string;
+  eventId: string;
+  organizerId: string;
+  discountType: 'percentage' | 'fixed';
+  discountValue: number;
+  minPurchase?: number;
+  maxDiscount?: number;
+  usageLimit: number;
+  usedCount: number;
+  validFrom: string;
+  validUntil: string;
 }
