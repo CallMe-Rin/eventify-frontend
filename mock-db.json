@@ -1047,6 +1047,61 @@
       "discountAmount": 0,
       "pointsUsed": 0,
       "status": "waiting_payment"
+    },
+    {
+      "id": "8e52",
+      "userId": "user-001",
+      "eventId": "evt-002",
+      "ticketTierId": "evt-002-ga",
+      "quantity": 1,
+      "totalAmount": 1200000,
+      "discountAmount": 0,
+      "pointsUsed": 0,
+      "status": "waiting_payment"
+    },
+    {
+      "id": "34c2",
+      "userId": "user-001",
+      "eventId": "evt-002",
+      "ticketTierId": "evt-002-ga",
+      "quantity": 1,
+      "totalAmount": 1200000,
+      "discountAmount": 0,
+      "pointsUsed": 0,
+      "status": "waiting_payment"
+    },
+    {
+      "id": "6515",
+      "userId": "user-001",
+      "eventId": "evt-002",
+      "ticketTierId": "evt-002-ga",
+      "quantity": 1,
+      "totalAmount": 1183000,
+      "discountAmount": 0,
+      "pointsUsed": 17000,
+      "status": "waiting_payment"
+    },
+    {
+      "id": "6852",
+      "userId": "user-001",
+      "eventId": "evt-002",
+      "ticketTierId": "evt-002-ga",
+      "quantity": 1,
+      "totalAmount": 1200000,
+      "discountAmount": 0,
+      "pointsUsed": 0,
+      "status": "waiting_payment"
+    },
+    {
+      "id": "b0fc",
+      "userId": "user-001",
+      "eventId": "evt-001",
+      "ticketTierId": "evt-001-vip",
+      "quantity": 1,
+      "totalAmount": 750000,
+      "discountAmount": 0,
+      "pointsUsed": 0,
+      "status": "waiting_payment"
     }
   ],
   "coupons": [

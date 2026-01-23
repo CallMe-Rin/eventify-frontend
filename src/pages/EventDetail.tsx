@@ -1,15 +1,15 @@
-import { useState, useMemo, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router";
-import Layout from "@/components/layout/Layout";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useState, useMemo, useEffect } from 'react';
+import { useParams, useNavigate, Link } from 'react-router';
+import Layout from '@/components/layout/Layout';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+} from '@/components/ui/collapsible';
 
 import {
   Calendar,
@@ -21,18 +21,18 @@ import {
   Link2,
   AlertCircle,
   RefreshCcw,
-} from "lucide-react";
-import { SocialIcon } from "react-social-icons";
-import { useEventWithTiers } from "@/hooks/useEvents";
-import { useAuthContext } from "@/hooks/useAuthContext";
-import { EVENT_CATEGORIES, formatIDR } from "@/types/api";
-import { toast } from "sonner";
-import { Skeleton } from "@/components/ui/skeleton";
+} from 'lucide-react';
+import { SocialIcon } from 'react-social-icons';
+import { useEventWithTiers } from '@/hooks/useEvents';
+import { useAuthContext } from '@/hooks/useAuthContext';
+import { EVENT_CATEGORIES, formatIDR } from '@/types/api';
+import { toast } from 'sonner';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function EventDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("description");
+  const [activeTab, setActiveTab] = useState('description');
 
   // Get authenticated user
   const auth = useAuthContext();
@@ -44,25 +44,25 @@ export default function EventDetailPage() {
     isPending: isLoading,
     isError,
     refetch,
-  } = useEventWithTiers(id || "");
+  } = useEventWithTiers(id || '');
 
   const [openTiers, setOpenTiers] = useState<Record<string, boolean>>({});
 
   // Handle Buy Ticket click with auth and role guard
   const handleBuyTicket = (ticketTierId: string) => {
     if (!isAuthenticated) {
-      toast.error("Please sign in to purchase tickets");
+      toast.error('Please sign in to purchase tickets');
       // Store the intended destination for post-login redirect
       const returnUrl = `/checkout?eventId=${id}&ticketTierId=${ticketTierId}&quantity=1`;
-      localStorage.setItem("redirectAfterLogin", returnUrl);
-      navigate("/login", { state: { from: { pathname: returnUrl } } });
+      localStorage.setItem('redirectAfterLogin', returnUrl);
+      navigate('/login', { state: { from: { pathname: returnUrl } } });
       return;
     }
 
     // Check if user is organizer
-    if (auth?.role === "organizer") {
+    if (auth?.role === 'organizer') {
       toast.error(
-        "Organizers cannot purchase tickets. Please use a customer account.",
+        'Organizers cannot purchase tickets. Please use a customer account.',
       );
       return;
     }
@@ -81,7 +81,7 @@ export default function EventDetailPage() {
   // Auto-update active tab on scroll
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ["description", "tickets", "terms"];
+      const sections = ['description', 'tickets', 'terms'];
       const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
@@ -100,8 +100,8 @@ export default function EventDetailPage() {
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Group tiers by category
@@ -109,7 +109,7 @@ export default function EventDetailPage() {
     if (!event?.ticketTiers) return {};
     const groups: Record<string, typeof event.ticketTiers> = {};
     event.ticketTiers.forEach((tier) => {
-      const groupKey = tier.name.split("-")[0]?.trim() || "General";
+      const groupKey = tier.name.split('-')[0]?.trim() || 'General';
       if (!groups[groupKey]) groups[groupKey] = [];
       groups[groupKey].push(tier);
     });
@@ -131,7 +131,7 @@ export default function EventDetailPage() {
         element.getBoundingClientRect().top + window.pageYOffset;
       window.scrollTo({
         top: elementPosition - navHeight,
-        behavior: "smooth",
+        behavior: 'smooth',
       });
     }
   };
@@ -151,40 +151,40 @@ export default function EventDetailPage() {
       }
     } else {
       await navigator.clipboard.writeText(url);
-      toast.success("Link copied to clipboard!");
+      toast.success('Link copied to clipboard!');
     }
   };
 
   // Format date range if endDate exists
   const formatDateRange = () => {
-    if (!event) return "";
+    if (!event) return '';
     const start = new Date(event.date);
     const end = event.endDate ? new Date(event.endDate) : null;
 
-    const startStr = start.toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
+    const startStr = start.toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
     });
 
     if (end) {
-      const endStr = end.toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
+      const endStr = end.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
       });
-      const timeStr = `${start.toLocaleTimeString("id-ID", {
-        hour: "2-digit",
-        minute: "2-digit",
-      })} - ${end.toLocaleTimeString("id-ID", {
-        hour: "2-digit",
-        minute: "2-digit",
+      const timeStr = `${start.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit',
+      })} - ${end.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit',
       })} WIB`;
       return `${startStr} - ${endStr}, ${timeStr}`;
     }
-    return `${startStr}, ${start.toLocaleTimeString("id-ID", {
-      hour: "2-digit",
-      minute: "2-digit",
+    return `${startStr}, ${start.toLocaleTimeString('id-ID', {
+      hour: '2-digit',
+      minute: '2-digit',
     })} WIB`;
   };
 
@@ -318,17 +318,17 @@ export default function EventDetailPage() {
               {/* STICKY NAVIGATION - Fixed to top on scroll */}
               <nav className="sticky top-0 bg-background/95 backdrop-blur-sm z-40 border-b flex gap-8 mb-8 mt-1">
                 {[
-                  { id: "description", label: "Description" },
-                  { id: "tickets", label: "Ticket" },
-                  { id: "terms", label: "Terms & Conditions" },
+                  { id: 'description', label: 'Description' },
+                  { id: 'tickets', label: 'Ticket' },
+                  { id: 'terms', label: 'Terms & Conditions' },
                 ].map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => scrollToSection(tab.id)}
                     className={`py-4 text-sm font-semibold border-b-2 transition-all ${
                       activeTab === tab.id
-                        ? "border-primary text-primary"
-                        : "border-transparent text-muted-foreground hover:text-primary"
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-muted-foreground hover:text-primary'
                     }`}
                   >
                     {tab.label}
@@ -373,7 +373,7 @@ export default function EventDetailPage() {
                               </h3>
                               <p className="text-xs text-muted-foreground">
                                 {tiers.length} ticket category • Prices start
-                                from{" "}
+                                from{' '}
                                 {formatIDR(
                                   Math.min(...tiers.map((t) => t.price)),
                                 )}
@@ -394,7 +394,7 @@ export default function EventDetailPage() {
                                 >
                                   <ChevronDown
                                     className={`h-5 w-5 text-primary transition-transform duration-200 ${
-                                      openTiers[groupName] ? "rotate-180" : ""
+                                      openTiers[groupName] ? 'rotate-180' : ''
                                     }`}
                                   />
                                 </Button>
@@ -412,7 +412,7 @@ export default function EventDetailPage() {
                                   <div className="space-y-1">
                                     <p className="font-bold text-lg text-foreground">
                                       {tier.price === 0
-                                        ? "Free"
+                                        ? 'Free'
                                         : formatIDR(tier.price)}
                                     </p>
                                     <h4 className="font-medium text-sm text-gray-700">

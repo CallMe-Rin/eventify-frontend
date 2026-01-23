@@ -1,9 +1,9 @@
-import FilterSidebar from "@/components/discover/FilterSidebar";
+import FilterSidebar from '@/components/discover/FilterSidebar';
 
-import EventCard from "@/components/home/EventCard";
-import Layout from "@/components/layout/Layout";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import EventCard from '@/components/home/EventCard';
+import Layout from '@/components/layout/Layout';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Pagination,
   PaginationContent,
@@ -12,25 +12,25 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
+} from '@/components/ui/pagination';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useEventsWithTiers } from "@/hooks/useEvents";
-import { cn } from "@/lib/utils";
-import { EVENT_CATEGORIES, EVENT_TYPES, type EventCategory } from "@/types/api";
+} from '@/components/ui/sheet';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useEventsWithTiers } from '@/hooks/useEvents';
+import { cn } from '@/lib/utils';
+import { EVENT_CATEGORIES, EVENT_TYPES, type EventCategory } from '@/types/api';
 import {
   AlertCircle,
   Loader2,
@@ -39,44 +39,44 @@ import {
   SlidersHorizontal,
   Trash2,
   X,
-} from "lucide-react";
-import { useMemo, useState } from "react";
+} from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 const ITEMS_PER_PAGE = 8;
 
 const SORT_OPTIONS = [
   {
-    value: "date_asc",
-    label: "Start Time (Soonest)",
+    value: 'date_asc',
+    label: 'Start Time (Soonest)',
   },
   {
-    value: "date_desc",
-    label: "Start Time (Latest)",
+    value: 'date_desc',
+    label: 'Start Time (Latest)',
   },
   {
-    value: "price_asc",
-    label: "Price (Low to High)",
+    value: 'price_asc',
+    label: 'Price (Low to High)',
   },
   {
-    value: "price_desc",
-    label: "Price (High to Low)",
+    value: 'price_desc',
+    label: 'Price (High to Low)',
   },
   {
-    value: "rating_desc",
-    label: "Rating (Highest)",
+    value: 'rating_desc',
+    label: 'Rating (Highest)',
   },
 ];
 
 export default function DiscoverPage() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState("date_asc");
-  const [selectedLocation, setSelectedLocation] = useState("All Locations");
+  const [sortBy, setSortBy] = useState('date_asc');
+  const [selectedLocation, setSelectedLocation] = useState('All Locations');
   const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>(
     [],
   );
-  const [eventType, setEventType] = useState("all");
+  const [eventType, setEventType] = useState('all');
   const [onlineOnly, setOnlineOnly] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch data from API
   const {
@@ -96,18 +96,18 @@ export default function DiscoverPage() {
   };
 
   const clearFilters = () => {
-    setSelectedLocation("All Locations");
+    setSelectedLocation('All Locations');
     setSelectedCategories([]);
-    setEventType("all");
+    setEventType('all');
     setOnlineOnly(false);
-    setSearchQuery("");
+    setSearchQuery('');
     setCurrentPage(1);
   };
 
   const hasActiveFilters =
-    selectedLocation !== "All Locations" ||
+    selectedLocation !== 'All Locations' ||
     selectedCategories.length > 0 ||
-    eventType !== "all" ||
+    eventType !== 'all' ||
     onlineOnly ||
     searchQuery.length > 0;
 
@@ -127,7 +127,7 @@ export default function DiscoverPage() {
     }
 
     // Location filter
-    if (selectedLocation !== "All Locations") {
+    if (selectedLocation !== 'All Locations') {
       filtered = filtered.filter(
         (event) => event.location === selectedLocation,
       );
@@ -141,20 +141,20 @@ export default function DiscoverPage() {
     }
 
     // Event type filter
-    if (eventType === "paid") {
+    if (eventType === 'paid') {
       filtered = filtered.filter((event) => !event.isFree);
-    } else if (eventType === "free") {
+    } else if (eventType === 'free') {
       filtered = filtered.filter((event) => event.isFree);
     }
 
     // Sort
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case "date_asc":
+        case 'date_asc':
           return new Date(a.date).getTime() - new Date(b.date).getTime();
-        case "date_desc":
+        case 'date_desc':
           return new Date(b.date).getTime() - new Date(a.date).getTime();
-        case "price_asc": {
+        case 'price_asc': {
           const priceA = a.isFree
             ? 0
             : Math.min(...a.ticketTiers.map((t) => t.price));
@@ -163,7 +163,7 @@ export default function DiscoverPage() {
             : Math.min(...b.ticketTiers.map((t) => t.price));
           return priceA - priceB;
         }
-        case "price_desc": {
+        case 'price_desc': {
           const priceA = a.isFree
             ? 0
             : Math.min(...a.ticketTiers.map((t) => t.price));
@@ -172,7 +172,7 @@ export default function DiscoverPage() {
             : Math.min(...b.ticketTiers.map((t) => t.price));
           return priceB - priceA;
         }
-        case "rating_desc":
+        case 'rating_desc':
           return (b.averageRating || 0) - (a.averageRating || 0);
         default:
           return 0;
@@ -226,22 +226,22 @@ export default function DiscoverPage() {
             <span className="text-sm text-muted-foreground">
               Active filters:
             </span>
-            {selectedLocation !== "All Locations" && (
+            {selectedLocation !== 'All Locations' && (
               <Badge variant="secondary" className="gap-1 pl-2">
                 {selectedLocation}
                 <button
-                  onClick={() => setSelectedLocation("All Locations")}
+                  onClick={() => setSelectedLocation('All Locations')}
                   className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"
                 >
                   <X className="h-3 w-3 hover:cursor-pointer" />
                 </button>
               </Badge>
             )}
-            {eventType !== "all" && (
+            {eventType !== 'all' && (
               <Badge variant="secondary" className="gap-1 pl-2">
                 {EVENT_TYPES.find((t) => t.value === eventType)?.label}
                 <button
-                  onClick={() => setEventType("all")}
+                  onClick={() => setEventType('all')}
                   className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"
                 >
                   <X className="h-3 w-3 hover:cursor-pointer" />
@@ -311,8 +311,8 @@ export default function DiscoverPage() {
                       Filters
                       {hasActiveFilters && (
                         <Badge className="ml-1 h-5 w-5 rounded-full p-0 text-xs">
-                          {(selectedLocation !== "All Locations" ? 1 : 0) +
-                            (eventType !== "all" ? 1 : 0) +
+                          {(selectedLocation !== 'All Locations' ? 1 : 0) +
+                            (eventType !== 'all' ? 1 : 0) +
                             selectedCategories.length}
                         </Badge>
                       )}
@@ -358,16 +358,16 @@ export default function DiscoverPage() {
                     </span>
                   ) : (
                     <>
-                      Showing{" "}
+                      Showing{' '}
                       <span className="font-medium text-foreground">
                         {filteredEvents.length > 0
                           ? `${startItem} - ${endItem}`
-                          : "0"}
-                      </span>{" "}
-                      of{" "}
+                          : '0'}
+                      </span>{' '}
+                      of{' '}
                       <span className="font-medium text-foreground">
                         {filteredEvents.length}
-                      </span>{" "}
+                      </span>{' '}
                       events
                     </>
                   )}
@@ -470,8 +470,8 @@ export default function DiscoverPage() {
                           setCurrentPage((p) => Math.max(1, p - 1))
                         }
                         className={cn(
-                          "cursor-pointer",
-                          currentPage === 1 && "pointer-events-none opacity-50",
+                          'cursor-pointer',
+                          currentPage === 1 && 'pointer-events-none opacity-50',
                         )}
                       />
                     </PaginationItem>
@@ -515,9 +515,9 @@ export default function DiscoverPage() {
                           setCurrentPage((p) => Math.min(totalPages, p + 1))
                         }
                         className={cn(
-                          "cursor-pointer",
+                          'cursor-pointer',
                           currentPage === totalPages &&
-                            "pointer-events-none opacity-50",
+                            'pointer-events-none opacity-50',
                         )}
                       />
                     </PaginationItem>

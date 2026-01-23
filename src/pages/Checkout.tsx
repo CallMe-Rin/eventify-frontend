@@ -1,7 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { Loader2, ArrowLeft, Calendar, MapPin } from 'lucide-react';
+import {
+  Loader2,
+  ArrowLeft,
+  Calendar,
+  MapPin,
+  ShoppingCart,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Layout from '@/components/layout/Layout';
 
@@ -11,28 +17,11 @@ import { useAuthContext } from '@/hooks/useAuthContext';
 import * as checkoutApi from '@/api/checkout';
 import * as eventsApi from '@/api/events';
 import { formatIDR } from '@/types/api';
-import type { Coupon } from '@/types/user';
-import type { DiscountCoupon } from '@/types/checkout';
 import { toast } from 'sonner';
 import { PriceBreakdownCard } from '@/features/checkout/components/PriceBreakdownCard';
 import { TicketTierSelector } from '@/features/checkout/components/TicketTierSelector';
-
-// Helper function to convert DiscountCoupon to Coupon type
-function convertDiscountCouponToCoupon(discountCoupon: DiscountCoupon): Coupon {
-  return {
-    id: discountCoupon.id,
-    code: discountCoupon.code,
-    discountType: discountCoupon.discount_type,
-    discountValue: discountCoupon.discount_value,
-    minPurchase: discountCoupon.min_purchase,
-    maxDiscount: discountCoupon.max_discount,
-    validFrom: discountCoupon.valid_from,
-    validUntil: discountCoupon.valid_until,
-    usageLimit: discountCoupon.usage_limit,
-    usedCount: discountCoupon.used_count,
-    isReferral: discountCoupon.is_referral || false,
-  };
-}
+import { ConfirmationDialog } from '@/features/checkout/components/ConfirmationDialog';
+import CheckoutSkeleton from '@/features/checkout/components/CheckoutSkeleton';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
@@ -49,25 +38,11 @@ export default function CheckoutPage() {
   const userId = auth?.profile?.id;
   const isAuthenticated = auth?.isAuthenticated;
 
+  // Confirmation dialog state
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
   // Form state
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Auth guard: Redirect to login if not authenticated
-  useEffect(() => {
-    if (!isAuthenticated && !auth?.isLoading) {
-      const returnUrl = `/checkout?eventId=${eventId}&ticketTierId=${ticketTierId}&quantity=${quantity}`;
-      localStorage.setItem('redirectAfterLogin', returnUrl);
-      toast.error('Please sign in to proceed with checkout');
-      navigate('/login');
-    }
-  }, [
-    isAuthenticated,
-    auth?.isLoading,
-    eventId,
-    ticketTierId,
-    quantity,
-    navigate,
-  ]);
 
   // Fetch event details
   const { data: event, isLoading: eventLoading } = useQuery({
@@ -105,6 +80,23 @@ export default function CheckoutPage() {
     pointsUsed: checkout.pointsUsed,
     maxPointsAvailable: checkout.userPoints,
   });
+
+  const isLoading =
+    auth?.isLoading ||
+    eventLoading ||
+    tiersLoading ||
+    checkout.pointsLoading ||
+    !userId;
+
+  useEffect(() => {
+    // Only run auth check after loading is complete
+    if (!isLoading && !isAuthenticated) {
+      const returnUrl = `/checkout?eventId=${eventId}&ticketTierId=${ticketTierId}&quantity=${quantity}`;
+      localStorage.setItem('redirectAfterLogin', returnUrl);
+      toast.error('Please sign in to proceed with checkout');
+      navigate('/login');
+    }
+  }, [isLoading, isAuthenticated, eventId, ticketTierId, quantity, navigate]);
 
   // Format date range
   const formatDateRange = () => {
@@ -176,37 +168,25 @@ export default function CheckoutPage() {
     }
   };
 
-  // Loading states
-  const isAuthLoading = auth?.isLoading;
-  const isLoading =
-    isAuthLoading || eventLoading || tiersLoading || checkout.pointsLoading;
+  if (isLoading) {
+    return <CheckoutSkeleton />;
+  }
 
-  // Early returns for validation
-  if (!isAuthLoading && (!eventId || !ticketTierId)) {
+  if (!eventId || !ticketTierId) {
     return (
       <Layout>
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 pt-26">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Invalid Checkout URL</h1>
-            <p className="text-gray-600 mb-6">
+            <p className="text-secondary-foreground mb-6">
               Missing required parameters. Please make sure you're coming from
               an event page.
             </p>
-            <Button onClick={() => navigate('/')}>
+            <Button onClick={() => navigate('/')} className="rounded-full">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Home
             </Button>
           </div>
-        </div>
-      </Layout>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <Layout>
-        <div className="container mx-auto px-4 py-8 flex justify-center items-center min-h-[60vh]">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
         </div>
       </Layout>
     );
@@ -316,24 +296,20 @@ export default function CheckoutPage() {
                   onApplyVoucher={() => {}}
                   onRemoveVoucher={() => {}}
                   isVoucherLoading={false}
-                  coupon={
-                    checkout.appliedCoupon
-                      ? convertDiscountCouponToCoupon(checkout.appliedCoupon)
-                      : null
-                  }
-                  couponError={checkout.couponError}
-                  onApplyCoupon={checkout.applyCoupon}
-                  onRemoveCoupon={checkout.removeCoupon}
-                  isCouponLoading={checkout.couponValidating}
+                  coupon={checkout.appliedCoupon}
+                  couponError={null}
+                  onApplyCoupon={() => {}}
+                  onRemoveCoupon={() => {}}
                 />
                 {/* Desktop Submit Button */}
                 <div className="hidden lg:block">
                   <Button
-                    onClick={handleCheckout}
+                    onClick={() => setShowConfirmation(true)}
                     disabled={isSubmitting}
-                    className="w-full h-12 text-lg rounded-xl hover:cursor-pointer"
+                    className="w-full h-12 text-base rounded-xl hover:cursor-pointer"
                     size="lg"
                   >
+                    <ShoppingCart className="size-5 mr-2" />
                     {isSubmitting ? (
                       <>
                         <Loader2 className="w-5 h-5 mr-2 animate-spin" />
@@ -349,33 +325,58 @@ export default function CheckoutPage() {
           </div>
         </main>
 
+        {/* Confirmation Dialog */}
+        {selectedTicketTier && (
+          <ConfirmationDialog
+            open={showConfirmation}
+            onOpenChange={setShowConfirmation}
+            onConfirm={handleCheckout}
+            isLoading={isSubmitting}
+            eventTitle={event.title}
+            ticketName={selectedTicketTier.name}
+            quantity={quantity}
+            priceBreakdown={{
+              subtotal: basePrice,
+              pointsDiscount: priceCalculation.pointsUsed,
+              voucherDiscount: 0,
+              couponDiscount: priceCalculation.couponDiscount,
+              totalDiscount:
+                priceCalculation.pointsUsed + priceCalculation.couponDiscount,
+              total: priceCalculation.finalPayable,
+            }}
+          />
+        )}
+
         {/* Mobile Bottom Bar */}
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-background border-t p-4 shadow-lg z-50">
-          <div className="container mx-auto">
-            <div className="flex items-center justify-between mb-16">
-              <span className="text-xl font-bold text-primary">
-                {formatIDR(priceCalculation.finalPayable)}
-              </span>
-              <span>
-                <Button
-                  onClick={handleCheckout}
-                  disabled={isSubmitting}
-                  className="w-full h-12 text-base rounded-xl hover:cursor-pointer"
-                  size="sm"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    'Proceed to Payment'
-                  )}
-                </Button>
-              </span>
+        {!showConfirmation && (
+          <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-background border-t p-4 shadow-lg z-50">
+            <div className="container mx-auto">
+              <div className="flex items-center justify-between mb-16">
+                <span className="text-xl font-bold text-primary">
+                  {formatIDR(priceCalculation.finalPayable)}
+                </span>
+                <span>
+                  <Button
+                    onClick={() => setShowConfirmation(true)}
+                    disabled={isSubmitting}
+                    className="w-full h-12 text-base rounded-xl hover:cursor-pointer mx-1"
+                    size="sm"
+                  >
+                    <ShoppingCart className="size-5 mr-2" />
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      'Proceed to Payment'
+                    )}
+                  </Button>
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Mobile padding to prevent content from being hidden by fixed bottom bar */}
         <div className="lg:hidden h-32" />

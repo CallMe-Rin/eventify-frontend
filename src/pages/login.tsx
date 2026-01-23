@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router";
-import { Button } from "../components/ui/button";
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router';
+import { Button } from '../components/ui/button';
 import {
   Card,
   CardContent,
@@ -8,12 +8,12 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../components/ui/card";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { Ticket, Mail, Lock, AlertCircle, Loader2 } from "lucide-react";
-import { useAuthMutations } from "@/hooks/useAuthMutations";
-import { useAuthContext } from "@/hooks/useAuthContext";
+} from '../components/ui/card';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Ticket, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
+import { useAuthMutations } from '@/hooks/useAuthMutations';
+import { useAuthContext } from '@/hooks/useAuthContext';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -21,8 +21,8 @@ export default function LoginPage() {
   const { isAuthenticated, role } = useAuthContext();
   const { loginMutation } = useAuthMutations();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   // Redirect if already authenticated
@@ -34,10 +34,10 @@ export default function LoginPage() {
 
       if (from) {
         navigate(from, { replace: true });
-      } else if (role === "organizer") {
-        navigate("/dashboard", { replace: true });
+      } else if (role === 'organizer') {
+        navigate('/dashboard', { replace: true });
       } else {
-        navigate("/", { replace: true });
+        navigate('/', { replace: true });
       }
     }
   }, [isAuthenticated, role, navigate, location.state]);
@@ -47,7 +47,7 @@ export default function LoginPage() {
     setError(null);
 
     if (!email.trim() || !password.trim()) {
-      setError("Please enter both email and password");
+      setError('Please enter both email and password');
       return;
     }
 
@@ -59,7 +59,7 @@ export default function LoginPage() {
         },
         onError: (error) => {
           setError(
-            error instanceof Error ? error.message : "Login failed. Try again.",
+            error instanceof Error ? error.message : 'Login failed. Try again.',
           );
         },
       },
@@ -151,7 +151,7 @@ export default function LoginPage() {
                     Signing in...
                   </>
                 ) : (
-                  "Sign In"
+                  'Sign In'
                 )}
               </Button>
             </form>
@@ -171,7 +171,7 @@ export default function LoginPage() {
             </Button>
 
             <p className="text-sm text-muted-foreground">
-              Don&apos;t have an account?{" "}
+              Don&apos;t have an account?{' '}
               <a href="/register" className="text-emerald-500 hover:underline">
                 Sign up
               </a>

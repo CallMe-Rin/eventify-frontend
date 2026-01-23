@@ -1,22 +1,22 @@
-import CategoryFilters from "@/components/home/CategoryFilters";
-import EventGrid from "@/components/home/EventGrid";
-import FeaturedCategories from "@/components/home/FeaturedCategories";
-import Hero from "@/components/home/Hero";
-import Newsletter from "@/components/home/Newsletter";
-import Layout from "@/components/layout/Layout";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useEventsWithTiers } from "@/hooks/useEvents";
-import { useLocations } from "@/hooks/useLocations";
-import type { EventCategory } from "@/types/event";
-import { AlertCircle, RefreshCcw } from "lucide-react";
-import { useMemo, useState } from "react";
+import CategoryFilters from '@/components/home/CategoryFilters';
+import EventGrid from '@/components/home/EventGrid';
+import FeaturedCategories from '@/components/home/FeaturedCategories';
+import Hero from '@/components/home/Hero';
+import Newsletter from '@/components/home/Newsletter';
+import Layout from '@/components/layout/Layout';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useEventsWithTiers } from '@/hooks/useEvents';
+import { useLocations } from '@/hooks/useLocations';
+import type { EventCategory } from '@/types/event';
+import { AlertCircle, RefreshCcw } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<
-    EventCategory | "all"
-  >("all");
-  const [selectedLocation, setSelectedLocation] = useState("All Locations");
+    EventCategory | 'all'
+  >('all');
+  const [selectedLocation, setSelectedLocation] = useState('All Locations');
 
   const {
     data: events = [],
@@ -30,9 +30,9 @@ export default function HomePage() {
   const filteredEvents = useMemo(() => {
     return events.filter((event) => {
       const categoryMatch =
-        selectedCategory === "all" || event.category === selectedCategory;
+        selectedCategory === 'all' || event.category === selectedCategory;
       const locationMatch =
-        selectedLocation === "All Locations" ||
+        selectedLocation === 'All Locations' ||
         event.location === selectedLocation;
       return categoryMatch && locationMatch;
     });

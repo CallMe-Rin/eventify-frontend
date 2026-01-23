@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { PriceBreakdown, Voucher, Coupon } from '@/types/api';
+import type { PriceBreakdown, Voucher, DiscountCoupon } from '@/types/api';
 import { formatIDR } from '@/types/api';
 import {
   Coins,
@@ -35,7 +35,7 @@ interface PriceBreakdownCardProps {
   onRemoveVoucher: () => void;
   isVoucherLoading?: boolean;
   // Coupon
-  coupon: Coupon | null;
+  coupon: DiscountCoupon | null;
   couponError: string | null;
   onApplyCoupon: (code: string) => void;
   onRemoveCoupon: () => void;
@@ -217,9 +217,9 @@ export function PriceBreakdownCard({
                   <span className="font-medium">{coupon.code}</span>
                   <span className="text-sm">
                     (-
-                    {coupon.discountType === 'percentage'
-                      ? `${coupon.discountValue}%`
-                      : formatIDR(coupon.discountValue)}
+                    {coupon.discount_type === 'percentage'
+                      ? `${coupon.discount_value}%`
+                      : formatIDR(coupon.discount_value)}
                     )
                   </span>
                 </div>
