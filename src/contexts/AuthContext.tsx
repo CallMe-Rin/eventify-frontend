@@ -1,8 +1,6 @@
-import { type ReactNode } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { AuthContext } from "./authContextValue";
-
-export type { AppRole, Profile } from "@/hooks/useAuth";
+import { type ReactNode } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { AuthContext } from './authContextValue';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const auth = useAuth();

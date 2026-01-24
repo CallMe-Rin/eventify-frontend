@@ -1,9 +1,9 @@
-import { axiosInstance } from "@/lib/axiosInstance";
+import { axiosInstance } from '@/lib/axiosInstance';
 import type {
   DiscountCoupon,
   Transaction,
   CheckoutResponse,
-} from "@/types/checkout";
+} from '@/types/api';
 
 // Fetch user by ID
 export async function fetchUser(userId: string) {
@@ -39,7 +39,7 @@ export async function fetchCouponByCode(code: string): Promise<DiscountCoupon> {
   if (Array.isArray(data) && data.length > 0) {
     return data[0];
   }
-  throw new Error("Coupon not found");
+  throw new Error('Coupon not found');
 }
 
 // Create transaction (checkout)
@@ -53,20 +53,25 @@ export async function createTransaction(
   pointsUsed: number,
   couponId?: string,
 ): Promise<CheckoutResponse> {
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+
   const transaction: Partial<Transaction> = {
-    userId,
-    eventId,
-    ticketTierId,
+    user_id: userId,
+    event_id: eventId,
+    ticket_tier_id: ticketTierId,
     quantity,
-    totalAmount,
-    discountAmount,
-    pointsUsed,
-    couponId,
-    status: "waiting_payment",
+    total_amount: totalAmount,
+    discount_amount: discountAmount,
+    points_used: pointsUsed,
+    coupon_id: couponId,
+    status: 'waiting_payment',
+    created_at: now.toISOString(),
+    expires_at: expiresAt.toISOString(),
   };
 
   const { data } = await axiosInstance.post<CheckoutResponse>(
-    "/transactions",
+    '/transactions',
     transaction,
   );
   return data;
@@ -76,9 +81,9 @@ export async function createTransaction(
 export async function updateUserPoints(
   userId: string,
   amount: number,
-  source: "referral" | "purchase" | "bonus" | "cashback",
+  source: 'referral' | 'purchase' | 'bonus' | 'cashback',
 ): Promise<{ id: string; userId: string; amount: number }> {
-  const { data } = await axiosInstance.post("/user-points", {
+  const { data } = await axiosInstance.post('/user-points', {
     userId,
     amount,
     source,
@@ -101,12 +106,12 @@ export async function validateCoupon(
     const validUntil = new Date(coupon.valid_until);
 
     if (now < validFrom || now > validUntil) {
-      return { valid: false, error: "Coupon has expired or not yet valid" };
+      return { valid: false, error: 'Coupon has expired or not yet valid' };
     }
 
     // Check usage limit
     if (coupon.usage_limit && coupon.used_count >= coupon.usage_limit) {
-      return { valid: false, error: "Coupon usage limit reached" };
+      return { valid: false, error: 'Coupon usage limit reached' };
     }
 
     // Check minimum purchase
@@ -119,6 +124,6 @@ export async function validateCoupon(
 
     return { valid: true, coupon };
   } catch {
-    return { valid: false, error: "Coupon not found or invalid" };
+    return { valid: false, error: 'Coupon not found or invalid' };
   }
 }

@@ -160,7 +160,7 @@ export default function CheckoutPage() {
       }
 
       toast.success('Checkout successful!');
-      navigate(`/events/${eventId}`);
+      navigate(`/transactions`);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Checkout failed');
     } finally {

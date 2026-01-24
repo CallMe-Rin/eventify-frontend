@@ -1,4 +1,5 @@
 import type { TicketTier } from './event';
+import type { Transaction } from './transaction';
 
 export type PaymentMethod =
   | 'credit-card'
@@ -52,28 +53,28 @@ export interface PriceCalculation {
   cashbackEarned: number;
 }
 
-export interface Transaction {
-  id: string;
-  userId: string;
-  eventId: string;
-  ticketTierId: string;
-  quantity: number;
-  totalAmount: number;
-  discountAmount: number;
-  pointsUsed: number;
-  couponId?: string;
-  status:
-    | 'waiting_payment'
-    | 'admin_confirm'
-    | 'done'
-    | 'rejected'
-    | 'expired'
-    | 'canceled';
-  paymentProofUrl?: string;
-  expiresAt: string;
-  createdAt: string;
-  updatedAt: string;
-}
+// export interface Transaction {
+//   id: string;
+//   userId: string;
+//   eventId: string;
+//   ticketTierId: string;
+//   quantity: number;
+//   totalAmount: number;
+//   discountAmount: number;
+//   pointsUsed: number;
+//   couponId?: string;
+//   status:
+//     | 'waiting_payment'
+//     | 'admin_confirm'
+//     | 'done'
+//     | 'rejected'
+//     | 'expired'
+//     | 'canceled';
+//   paymentProofUrl?: string;
+//   expiresAt: string;
+//   createdAt: string;
+//   updatedAt: string;
+// }
 
 export interface CheckoutResponse {
   transaction: Transaction;

@@ -1,20 +1,18 @@
-import { createContext } from "react";
-import { type AuthState, type AppRole } from "@/hooks/useAuth";
-import type { User } from "@/types/api";
+import { createContext, useContext } from 'react';
+import type { useAuth as useAuthHook } from '@/hooks/useAuth';
 
-export interface AuthContextType extends AuthState {
-  signUp: (
-    email: string,
-    password: string,
-    name: string,
-    role: AppRole,
-  ) => Promise<User | undefined>;
-  signIn: (email: string, password: string) => Promise<User | undefined>;
-  signInWithGoogle: () => Promise<User | undefined>;
-  signOut: () => Promise<void>;
-  refreshProfile: () => Promise<void>;
-}
+export type { AppRole, Profile } from '@/hooks/useAuth';
 
-export const AuthContext = createContext<AuthContextType | undefined>(
-  undefined,
+// Create context with proper typing
+export const AuthContext = createContext<ReturnType<typeof useAuthHook> | null>(
+  null,
 );
+
+// Export the consumer hook
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
+  }
+  return context;
+}
