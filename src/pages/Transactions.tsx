@@ -3,8 +3,8 @@ import { useAuth } from '@/contexts/authContextValue';
 import { useTransactions } from '@/hooks/useTransactions';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Ticket } from 'lucide-react';
-import { TransactionCardSkeleton } from '@/features/checkout/components/TransactionCardSkeleton';
-import TransactionCard from '@/features/checkout/components/TransactionCard';
+import { TransactionCardSkeleton } from '@/components/checkout/TransactionCardSkeleton';
+import TransactionCard from '@/components/checkout/TransactionCard';
 import Layout from '@/components/layout/Layout';
 
 export default function TransactionsPage() {
@@ -17,9 +17,13 @@ export default function TransactionsPage() {
     <Layout>
       <div className="container mx-auto bg-background">
         <header>
-          <div className="container flex items-center gap-4 h-16">
+          <div className="container flex items-center gap-2 h-16">
             <Link to="/">
-              <Button variant="ghost" size="icon">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:cursor-pointer hover:bg-primary/10 hover:rounded-xl hover:text-primary"
+              >
                 <ArrowLeft className="size-5" />
               </Button>
             </Link>

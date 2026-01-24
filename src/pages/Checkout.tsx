@@ -18,10 +18,10 @@ import * as checkoutApi from '@/api/checkout';
 import * as eventsApi from '@/api/events';
 import { formatIDR } from '@/types/api';
 import { toast } from 'sonner';
-import { PriceBreakdownCard } from '@/features/checkout/components/PriceBreakdownCard';
-import { TicketTierSelector } from '@/features/checkout/components/TicketTierSelector';
-import { ConfirmationDialog } from '@/features/checkout/components/ConfirmationDialog';
-import CheckoutSkeleton from '@/features/checkout/components/CheckoutSkeleton';
+import { PriceBreakdownCard } from '@/components/checkout/PriceBreakdownCard';
+import { TicketTierSelector } from '@/components/checkout/TicketTierSelector';
+import { ConfirmationDialog } from '@/components/checkout/ConfirmationDialog';
+import CheckoutSkeleton from '@/components/checkout/CheckoutSkeleton';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
