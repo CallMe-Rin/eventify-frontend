@@ -13,6 +13,7 @@ import LoginPage from './pages/login';
 import RegisterPage from './pages/register';
 import CheckoutPage from './pages/Checkout';
 import TransactionsPage from './pages/Transactions';
+import ReviewFormPage from './pages/Review';
 
 const queryClient = new QueryClient();
 
@@ -52,6 +53,7 @@ export default function App() {
               <Route path="/dashboard" element={<DashboardHome />} />
               <Route path="/discover" element={<DiscoverPage />} />
               <Route path="/transactions" element={<TransactionsPage />} />
+              <Route path="/review/:eventId" element={<ReviewFormPage />} />
             </Routes>
           </AuthProvider>
         </BrowserRouter>

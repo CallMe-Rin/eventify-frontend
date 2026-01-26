@@ -65,12 +65,12 @@ export interface Transaction {
 */
 
 // Review types
-export interface Review {
-  id: string;
-  userId: string;
-  eventId: string;
-  transactionId: string;
-  rating: number;
-  comment: string;
-  createdAt: string;
-}
+// export interface Review {
+//   id: string;
+//   userId: string;
+//   eventId: string;
+//   transactionId: string;
+//   rating: number;
+//   comment: string;
+//   createdAt: string;
+// }

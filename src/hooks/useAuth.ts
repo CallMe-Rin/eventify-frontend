@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from "react";
-import { axiosInstance } from "@/lib/axiosInstance";
-import type { User } from "@/types/api";
+import { useState, useEffect, useRef } from 'react';
+import { axiosInstance } from '@/lib/axiosInstance';
+import type { User } from '@/types/api';
 
-export type AppRole = "customer" | "organizer";
+export type AppRole = 'customer' | 'organizer';
 
 export interface Profile {
   id: string;
@@ -41,8 +41,8 @@ interface ApiUser {
 
 // Generate a simple referral code
 function generateReferralCode(): string {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let result = "";
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let result = '';
   for (let i = 0; i < 8; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
@@ -86,9 +86,9 @@ export function useAuth() {
     user: null,
     session: null,
     profile: null,
-    role: null,
+    role: 'customer',
     isLoading: true,
-    isAuthenticated: false,
+    isAuthenticated: true,
   });
 
   const isMountedRef = useRef(true);
@@ -96,7 +96,7 @@ export function useAuth() {
   // Check for stored auth on mount
   useEffect(() => {
     const loadAuth = async () => {
-      const storedUserId = localStorage.getItem("auth_user_id");
+      const storedUserId = localStorage.getItem('auth_user_id');
 
       if (storedUserId) {
         try {
@@ -107,7 +107,7 @@ export function useAuth() {
           if (isMountedRef.current) {
             setState({
               user: { id: user.id, email: user.email },
-              session: { access_token: "mock-token" },
+              session: { access_token: 'mock-token' },
               profile: userToProfile(user),
               role: user.role,
               isLoading: false,
@@ -115,7 +115,7 @@ export function useAuth() {
             });
           }
         } catch {
-          localStorage.removeItem("auth_user_id");
+          localStorage.removeItem('auth_user_id');
           if (isMountedRef.current) {
             setState((prev) => ({ ...prev, isLoading: false }));
           }
@@ -145,7 +145,7 @@ export function useAuth() {
       `/users?email=${email}`,
     );
     if (existingUsers.length > 0) {
-      throw new Error("User already exists with this email");
+      throw new Error('User already exists with this email');
     }
 
     // Create new user
@@ -158,15 +158,15 @@ export function useAuth() {
     };
 
     const { data: createdUser } = await axiosInstance.post<ApiUser>(
-      "/users",
+      '/users',
       newUser,
     );
 
-    localStorage.setItem("auth_user_id", createdUser.id);
+    localStorage.setItem('auth_user_id', createdUser.id);
 
     setState({
       user: { id: createdUser.id, email: createdUser.email },
-      session: { access_token: "mock-token" },
+      session: { access_token: 'mock-token' },
       profile: userToProfile(createdUser),
       role: createdUser.role,
       isLoading: false,
@@ -182,15 +182,15 @@ export function useAuth() {
       `/users?email=${email}`,
     );
     if (users.length === 0) {
-      throw new Error("Invalid email or password");
+      throw new Error('Invalid email or password');
     }
 
     const user = users[0];
-    localStorage.setItem("auth_user_id", user.id);
+    localStorage.setItem('auth_user_id', user.id);
 
     setState({
       user: { id: user.id, email: user.email },
-      session: { access_token: "mock-token" },
+      session: { access_token: 'mock-token' },
       profile: userToProfile(user),
       role: user.role,
       isLoading: false,
@@ -208,11 +208,11 @@ export function useAuth() {
       );
       if (users.length > 0) {
         const user = users[0];
-        localStorage.setItem("auth_user_id", user.id);
+        localStorage.setItem('auth_user_id', user.id);
 
         setState({
           user: { id: user.id, email: user.email },
-          session: { access_token: "mock-token" },
+          session: { access_token: 'mock-token' },
           profile: userToProfile(user),
           role: user.role,
           isLoading: false,
@@ -221,12 +221,12 @@ export function useAuth() {
         return apiUserToUser(user);
       }
     } catch (error) {
-      throw new Error("Google sign in failed");
+      throw new Error('Google sign in failed');
     }
   };
 
   const signOut = async () => {
-    localStorage.removeItem("auth_user_id");
+    localStorage.removeItem('auth_user_id');
 
     setState({
       user: null,
@@ -239,7 +239,7 @@ export function useAuth() {
   };
 
   const refreshProfile = async () => {
-    const userId = localStorage.getItem("auth_user_id");
+    const userId = localStorage.getItem('auth_user_id');
     if (userId) {
       try {
         const { data: user } = await axiosInstance.get<ApiUser>(
@@ -250,7 +250,7 @@ export function useAuth() {
           profile: userToProfile(user),
         }));
       } catch (error) {
-        console.error("Failed to refresh profile", error);
+        console.error('Failed to refresh profile', error);
       }
     }
   };
