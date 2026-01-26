@@ -1,15 +1,15 @@
 export type EventCategory =
-  | "music"
-  | "technology"
-  | "sports"
-  | "art"
-  | "food"
-  | "business"
-  | "education"
-  | "health"
-  | "other";
+  | 'music'
+  | 'technology'
+  | 'sports'
+  | 'art'
+  | 'food'
+  | 'business'
+  | 'education'
+  | 'health'
+  | 'other';
 
-export type EventStatus = "draft" | "published" | "canceled" | "completed";
+export type EventStatus = 'draft' | 'published' | 'canceled' | 'completed';
 
 export interface TicketTier {
   id: string;
@@ -19,7 +19,7 @@ export interface TicketTier {
   price: number;
   quantity: number;
   sold: number;
-  benfits?: string[];
+  benefits?: string[];
 }
 
 export interface EventItem {
@@ -55,19 +55,19 @@ export interface Category {
 }
 
 export const EVENT_CATEGORIES: Category[] = [
-  { id: "cat-music", value: "music", label: "Music", icon: "🎵" },
-  { id: "cat-tech", value: "technology", label: "Technology", icon: "💻" },
-  { id: "cat-sports", value: "sports", label: "Sports", icon: "⚽" },
-  { id: "cat-art", value: "art", label: "Art & Culture", icon: "🎨" },
-  { id: "cat-food", value: "food", label: "Food & Drink", icon: "🍕" },
-  { id: "cat-biz", value: "business", label: "Business", icon: "💼" },
-  { id: "cat-edu", value: "education", label: "Education", icon: "📚" },
-  { id: "cat-health", value: "health", label: "Health & Wellness", icon: "🧘" },
-  { id: "cat-other", value: "other", label: "Other", icon: "✨" },
+  { id: 'cat-music', value: 'music', label: 'Music', icon: '🎵' },
+  { id: 'cat-tech', value: 'technology', label: 'Technology', icon: '💻' },
+  { id: 'cat-sports', value: 'sports', label: 'Sports', icon: '⚽' },
+  { id: 'cat-art', value: 'art', label: 'Art & Culture', icon: '🎨' },
+  { id: 'cat-food', value: 'food', label: 'Food & Drink', icon: '🍕' },
+  { id: 'cat-biz', value: 'business', label: 'Business', icon: '💼' },
+  { id: 'cat-edu', value: 'education', label: 'Education', icon: '📚' },
+  { id: 'cat-health', value: 'health', label: 'Health & Wellness', icon: '🧘' },
+  { id: 'cat-other', value: 'other', label: 'Other', icon: '✨' },
 ];
 
 export const EVENT_TYPES = [
-  { value: "all", label: "All Events" },
-  { value: "paid", label: "Paid Events" },
-  { value: "free", label: "Free Events" },
+  { value: 'all', label: 'All Events' },
+  { value: 'paid', label: 'Paid Events' },
+  { value: 'free', label: 'Free Events' },
 ] as const;
