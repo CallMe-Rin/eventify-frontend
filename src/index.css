@@ -46,6 +46,14 @@
 
   --color-gold: #e9ad03;
 
+  /* Transaction Status */
+  --color-status-waiting-payment: #f59e0b;
+  --color-status-waiting-confirmation: #3b82f6;
+  --color-status-done: #10b77f;
+  --color-status-rejected: #dc2828;
+  --color-status-expired: #7e7167;
+  --color-status-canceled: #ea580c;
+
   /* Borders */
   --border-radius: 1rem;
   --color-shadow: #000000;
@@ -261,5 +269,29 @@
   .no-scrollbar {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
+  }
+  /* Status badge utilities */
+  .status-waiting-payment {
+    @apply bg-gold/10 text-gold border-gold/30;
+  }
+
+  .status-waiting-confirmation {
+    @apply bg-blue-500/10 text-blue-600 border-blue-500/30;
+  }
+
+  .status-done {
+    @apply bg-primary/10 text-primary border-primary/30;
+  }
+
+  .status-rejected {
+    @apply bg-destructive/10 text-destructive border-destructive/30;
+  }
+
+  .status-expired {
+    @apply bg-muted text-muted-foreground border-muted;
+  }
+
+  .status-canceled {
+    @apply bg-muted text-muted-foreground border-muted;
   }
 }
