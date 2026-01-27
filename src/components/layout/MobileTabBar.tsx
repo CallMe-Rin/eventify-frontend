@@ -1,11 +1,11 @@
-import { Link, useLocation } from "react-router";
-import { Home, Compass, CalendarPlus } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Link, useLocation } from 'react-router';
+import { Home, Compass, CalendarPlus } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const tabs = [
-  { label: "Dashboard", icon: Home, href: "/" },
-  { label: "Create Event", icon: CalendarPlus, href: "/create-event" },
-  { label: "Discover", icon: Compass, href: "/events" },
+  { label: 'Dashboard', icon: Home, href: '/' },
+  { label: 'Create Event', icon: CalendarPlus, href: '/create-event' },
+  { label: 'Discover', icon: Compass, href: '/discover' },
 ];
 
 export default function MobileTabBar() {
@@ -23,10 +23,10 @@ export default function MobileTabBar() {
               key={tab.href}
               to={tab.href}
               className={cn(
-                "flex flex-1 flex-col items-center justify-center gap-1 text-xs font-medium transition-colors",
+                'flex flex-1 flex-col items-center justify-center gap-1 text-xs font-medium transition-colors',
                 isActive
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground',
               )}
             >
               <Icon className="h-5 w-5" />
