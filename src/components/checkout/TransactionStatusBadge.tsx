@@ -29,21 +29,21 @@ export function TransactionStatusBadge({
   size = 'md',
 }: TransactionStatusBadgeProps) {
   const sizeClasses = {
-    sm: 'text-xs px-2 py-0.5',
-    md: 'text-sm px-2.5 py-1',
-    lg: 'text-base px-3 py-1.5',
+    sm: 'sm:text-xs sm:px-2 sm:py-0.5',
+    md: 'sm:text-sm sm:px-2.5 sm:py-1',
+    lg: 'sm:text-base sm:px-3 sm:py-1.5',
   };
 
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 font-medium rounded-full border',
+        'inline-flex items-center gap-1.5 font-medium rounded-full sm:border',
         getStatusColor(status),
         sizeClasses[size],
       )}
     >
       {statusIcons[status]}
-      {getStatusLabel(status)}
+      <span className="hidden sm:inline">{getStatusLabel(status)}</span>
     </span>
   );
 }

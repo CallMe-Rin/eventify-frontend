@@ -29,28 +29,35 @@ export default function TransactionCard({
   );
 
   return (
-    <div className="bg-card border rounded-xl p-5 space-y-4">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex gap-4">
+    <div className="bg-card border rounded-xl p-3 sm:p-5 space-y-3 sm:space-y-4">
+      <div className="flex items-start justify-between gap-3 sm:gap-4">
+        {/* Event info */}
+        <div className="flex gap-3 sm:gap-4 min-w-0 flex-1">
           <img
             src={eventWithTiers.coverImage}
             alt={eventWithTiers.title}
-            className="w-20 h-20 rounded-lg object-cover"
+            className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg object-cover shrink-0"
           />
-          <div>
-            <h3 className="font-semibold">{eventWithTiers.title}</h3>
-            <p className="text-sm text-muted-foreground">
+          <div className="min-w-0 flex-1">
+            <h3 className="font-semibold text-base sm:text-base line-clamp-2">
+              {eventWithTiers.title}
+            </h3>
+            <p className="text-sm sm:text-sm text-muted-foreground truncate">
               {tier?.name} × {transaction.quantity}
             </p>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-              <Calendar className="size-3" />
-              <span>{formatDateTime(transaction.created_at)}</span>
+            <div className="flex items-center gap-2 text-sm sm:text-sm text-muted-foreground mt-1">
+              <Calendar className="size-3 shrink-0" />
+              <span className="truncate">
+                {formatDateTime(transaction.created_at)}
+              </span>
             </div>
           </div>
         </div>
-        <div className="text-right">
+
+        {/* Badge + Price */}
+        <div className="flex flex-col items-end text-right gap-2 shrink-0">
           <TransactionStatusBadge status={transaction.status} />
-          <p className="font-bold text-lg mt-2">
+          <p className="font-bold text-sm sm:text-lg whitespace-nowrap">
             {formatIDR(transaction.total_amount)}
           </p>
         </div>

@@ -1,7 +1,7 @@
-import { useState, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Upload, Image, X, Check, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { Upload, Image, X, Check, Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface PaymentProofUploadProps {
   onUpload: (url: string) => void;
@@ -17,8 +17,8 @@ export function PaymentProofUpload({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (file: File) => {
-    if (!file.type.startsWith("image/")) {
-      alert("Please upload an image file");
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file');
       return;
     }
 
@@ -61,7 +61,7 @@ export function PaymentProofUpload({
   const handleClear = () => {
     setPreview(null);
     if (inputRef.current) {
-      inputRef.current.value = "";
+      inputRef.current.value = '';
     }
   };
 
@@ -76,10 +76,10 @@ export function PaymentProofUpload({
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           className={cn(
-            "border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all",
+            'border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all',
             dragOver
-              ? "border-primary bg-accent/50"
-              : "border-muted-foreground/30 hover:border-primary/50 hover:bg-muted/50",
+              ? 'border-primary bg-accent/50'
+              : 'border-muted-foreground/30 hover:border-primary/50 hover:bg-muted/50',
           )}
         >
           <input
@@ -114,14 +114,14 @@ export function PaymentProofUpload({
           <div className="flex gap-2 mt-3">
             <Button
               variant="outline"
-              className="flex-1"
+              className="flex-1 rounded-xl"
               onClick={() => inputRef.current?.click()}
             >
               <Image className="size-4 mr-2" />
               Change Image
             </Button>
             <Button
-              className="flex-1"
+              className="flex-1 rounded-xl"
               onClick={handleUpload}
               disabled={isUploading}
             >

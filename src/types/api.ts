@@ -3,6 +3,7 @@ export * from './event';
 export * from './checkout';
 export * from './user';
 export * from './transaction';
+export * from './review';
 
 // Helper to format IDR currency
 export const formatIDR = (amount: number): string => {
@@ -32,7 +33,7 @@ export const formatEventTime = (date: string | Date): string => {
   }).format(new Date(date));
 };
 
-export function formatDateTime(dateString: string): string {
+export function formatDateTime(dateString: string | Date): string {
   if (!dateString) return 'Invalid date';
 
   const date = new Date(dateString);
@@ -42,11 +43,11 @@ export function formatDateTime(dateString: string): string {
     return 'Invalid date';
   }
 
-  return new Intl.DateTimeFormat('id-ID', {
+  return new Intl.DateTimeFormat('en-US', {
     weekday: 'short',
-    year: 'numeric',
     month: 'short',
     day: 'numeric',
+    year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
   }).format(date);
