@@ -1165,7 +1165,10 @@
       "price": 150000,
       "quantity": 100,
       "sold": 100,
-      "benefits": ["Priority entry", "Event merchandise"]
+      "benefits": [
+        "Priority entry",
+        "Event merchandise"
+      ]
     },
     {
       "id": "evt-001-regular",
@@ -1175,7 +1178,9 @@
       "price": 250000,
       "quantity": 300,
       "sold": 187,
-      "benefits": ["General admission"]
+      "benefits": [
+        "General admission"
+      ]
     },
     {
       "id": "evt-001-vip",
@@ -1185,7 +1190,11 @@
       "price": 750000,
       "quantity": 50,
       "sold": 23,
-      "benefits": ["Front row access", "Meet & greet", "Exclusive lounge"]
+      "benefits": [
+        "Front row access",
+        "Meet & greet",
+        "Exclusive lounge"
+      ]
     },
     {
       "id": "evt-002-ga",
@@ -1195,7 +1204,10 @@
       "price": 1200000,
       "quantity": 1000,
       "sold": 650,
-      "benefits": ["Access to all stages", "Beach zone access"]
+      "benefits": [
+        "Access to all stages",
+        "Beach zone access"
+      ]
     },
     {
       "id": "evt-002-vip",
@@ -1205,7 +1217,11 @@
       "price": 3500000,
       "quantity": 200,
       "sold": 145,
-      "benefits": ["Private bar", "Elevated viewing platform", "Backstage tour"]
+      "benefits": [
+        "Private bar",
+        "Elevated viewing platform",
+        "Backstage tour"
+      ]
     },
     {
       "id": "evt-003-free",
@@ -1215,7 +1231,10 @@
       "price": 0,
       "quantity": 500,
       "sold": 234,
-      "benefits": ["Networking session", "Pitch access"]
+      "benefits": [
+        "Networking session",
+        "Pitch access"
+      ]
     },
     {
       "id": "evt-004-shared",
@@ -1225,7 +1244,11 @@
       "price": 2800000,
       "quantity": 20,
       "sold": 12,
-      "benefits": ["Yoga sessions", "Healthy meals", "Shared villa"]
+      "benefits": [
+        "Yoga sessions",
+        "Healthy meals",
+        "Shared villa"
+      ]
     },
     {
       "id": "evt-004-private",
@@ -1249,7 +1272,10 @@
       "price": 0,
       "quantity": 5000,
       "sold": 3200,
-      "benefits": ["Access to all food stalls", "Live cooking demos"]
+      "benefits": [
+        "Access to all food stalls",
+        "Live cooking demos"
+      ]
     },
     {
       "id": "evt-006-standard",
@@ -1259,7 +1285,10 @@
       "price": 75000,
       "quantity": 2000,
       "sold": 890,
-      "benefits": ["Gallery access", "Digital art guide"]
+      "benefits": [
+        "Gallery access",
+        "Digital art guide"
+      ]
     },
     {
       "id": "evt-006-student",
@@ -1269,7 +1298,10 @@
       "price": 35000,
       "quantity": 500,
       "sold": 210,
-      "benefits": ["Gallery access", "Valid ID required"]
+      "benefits": [
+        "Gallery access",
+        "Valid ID required"
+      ]
     },
     {
       "id": "evt-007-full",
@@ -1279,7 +1311,11 @@
       "price": 900000,
       "quantity": 1000,
       "sold": 750,
-      "benefits": ["Race kit", "Finisher medal", "Timing chip"]
+      "benefits": [
+        "Race kit",
+        "Finisher medal",
+        "Timing chip"
+      ]
     },
     {
       "id": "evt-007-half",
@@ -1289,7 +1325,11 @@
       "price": 650000,
       "quantity": 1500,
       "sold": 1200,
-      "benefits": ["Race kit", "Finisher medal", "Refreshments"]
+      "benefits": [
+        "Race kit",
+        "Finisher medal",
+        "Refreshments"
+      ]
     },
     {
       "id": "evt-007-fun",
@@ -1299,7 +1339,10 @@
       "price": 400000,
       "quantity": 2000,
       "sold": 1850,
-      "benefits": ["Race kit", "Medal"]
+      "benefits": [
+        "Race kit",
+        "Medal"
+      ]
     },
     {
       "id": "evt-008-standard",
@@ -1323,7 +1366,10 @@
       "price": 1500000,
       "quantity": 500,
       "sold": 0,
-      "benefits": ["Conference Kit", "Lunch"]
+      "benefits": [
+        "Conference Kit",
+        "Lunch"
+      ]
     },
     {
       "id": "evt-010-pass",
@@ -1333,7 +1379,11 @@
       "price": 4500000,
       "quantity": 200,
       "sold": 0,
-      "benefits": ["Yoga classes", "Music concerts", "Shuttle service"]
+      "benefits": [
+        "Yoga classes",
+        "Music concerts",
+        "Shuttle service"
+      ]
     },
     {
       "id": "evt-011-early",
@@ -1343,7 +1393,9 @@
       "price": 75000,
       "quantity": 100,
       "sold": 45,
-      "benefits": ["Sticker pack"]
+      "benefits": [
+        "Sticker pack"
+      ]
     },
     {
       "id": "evt-011-normal",
@@ -1353,7 +1405,9 @@
       "price": 125000,
       "quantity": 300,
       "sold": 10,
-      "benefits": ["Entry only"]
+      "benefits": [
+        "Entry only"
+      ]
     },
     {
       "id": "evt-012-free",
@@ -1363,7 +1417,10 @@
       "price": 0,
       "quantity": 50,
       "sold": 30,
-      "benefits": ["Pizza", "Drinks"]
+      "benefits": [
+        "Pizza",
+        "Drinks"
+      ]
     },
     {
       "id": "evt-013-vip",
@@ -1373,7 +1430,10 @@
       "price": 300000,
       "quantity": 20,
       "sold": 15,
-      "benefits": ["Snack box", "Meet the Dalang"]
+      "benefits": [
+        "Snack box",
+        "Meet the Dalang"
+      ]
     },
     {
       "id": "evt-013-reg",
@@ -1383,7 +1443,9 @@
       "price": 100000,
       "quantity": 100,
       "sold": 50,
-      "benefits": ["Seat assignment"]
+      "benefits": [
+        "Seat assignment"
+      ]
     },
     {
       "id": "evt-014-day",
@@ -1393,7 +1455,9 @@
       "price": 150000,
       "quantity": 1000,
       "sold": 0,
-      "benefits": ["Stadium access"]
+      "benefits": [
+        "Stadium access"
+      ]
     },
     {
       "id": "evt-015-entry",
@@ -1403,7 +1467,9 @@
       "price": 50000,
       "quantity": 2000,
       "sold": 0,
-      "benefits": ["Tasting cup"]
+      "benefits": [
+        "Tasting cup"
+      ]
     },
     {
       "id": "evt-016-summit",
@@ -1413,7 +1479,10 @@
       "price": 2500000,
       "quantity": 150,
       "sold": 0,
-      "benefits": ["Networking dinner", "Workshops"]
+      "benefits": [
+        "Networking dinner",
+        "Workshops"
+      ]
     },
     {
       "id": "evt-017-run",
@@ -1423,7 +1492,11 @@
       "price": 250000,
       "quantity": 500,
       "sold": 320,
-      "benefits": ["Jersey", "Medal", "Glow sticks"]
+      "benefits": [
+        "Jersey",
+        "Medal",
+        "Glow sticks"
+      ]
     },
     {
       "id": "evt-018-workshop",
@@ -1433,7 +1506,11 @@
       "price": 350000,
       "quantity": 10,
       "sold": 8,
-      "benefits": ["Clay", "Firing fee", "Take home creation"]
+      "benefits": [
+        "Clay",
+        "Firing fee",
+        "Take home creation"
+      ]
     },
     {
       "id": "evt-019-free",
@@ -1443,7 +1520,9 @@
       "price": 0,
       "quantity": 200,
       "sold": 150,
-      "benefits": ["E-certificate"]
+      "benefits": [
+        "E-certificate"
+      ]
     },
     {
       "id": "evt-020-free",
@@ -1453,7 +1532,9 @@
       "price": 0,
       "quantity": 5000,
       "sold": 1200,
-      "benefits": ["Access to all stalls"]
+      "benefits": [
+        "Access to all stalls"
+      ]
     },
     {
       "id": "evt-021-spectator",
@@ -1463,7 +1544,9 @@
       "price": 50000,
       "quantity": 300,
       "sold": 0,
-      "benefits": ["Shaded seating"]
+      "benefits": [
+        "Shaded seating"
+      ]
     },
     {
       "id": "evt-021-competitor",
@@ -1473,7 +1556,10 @@
       "price": 500000,
       "quantity": 40,
       "sold": 0,
-      "benefits": ["Rash guard", "Insurance"]
+      "benefits": [
+        "Rash guard",
+        "Insurance"
+      ]
     },
     {
       "id": "evt-022-class",
@@ -1483,7 +1569,9 @@
       "price": 200000,
       "quantity": 40,
       "sold": 0,
-      "benefits": ["Printed guide"]
+      "benefits": [
+        "Printed guide"
+      ]
     },
     {
       "id": "evt-023-tic",
@@ -1493,7 +1581,9 @@
       "price": 250000,
       "quantity": 300,
       "sold": 0,
-      "benefits": ["Welcome drink"]
+      "benefits": [
+        "Welcome drink"
+      ]
     },
     {
       "id": "evt-024-charity",
@@ -1503,7 +1593,10 @@
       "price": 300000,
       "quantity": 1000,
       "sold": 0,
-      "benefits": ["T-shirt", "Donation receipt"]
+      "benefits": [
+        "T-shirt",
+        "Donation receipt"
+      ]
     },
     {
       "id": "evt-025-class",
@@ -1513,7 +1606,10 @@
       "price": 400000,
       "quantity": 15,
       "sold": 12,
-      "benefits": ["Equipment rental", "Snack"]
+      "benefits": [
+        "Equipment rental",
+        "Snack"
+      ]
     },
     {
       "id": "evt-026-free",
@@ -1523,7 +1619,9 @@
       "price": 0,
       "quantity": 20,
       "sold": 20,
-      "benefits": ["Legal advice"]
+      "benefits": [
+        "Legal advice"
+      ]
     },
     {
       "id": "evt-027-presale",
@@ -1533,7 +1631,9 @@
       "price": 100000,
       "quantity": 200,
       "sold": 0,
-      "benefits": ["Festival wristband"]
+      "benefits": [
+        "Festival wristband"
+      ]
     },
     {
       "id": "evt-028-tour",
@@ -1543,7 +1643,11 @@
       "price": 850000,
       "quantity": 12,
       "sold": 0,
-      "benefits": ["Private van", "All meals", "Guide"]
+      "benefits": [
+        "Private van",
+        "All meals",
+        "Guide"
+      ]
     },
     {
       "id": "evt-029-bootcamp",
@@ -1553,7 +1657,11 @@
       "price": 3500000,
       "quantity": 30,
       "sold": 0,
-      "benefits": ["Certification", "Lunch", "Materials"]
+      "benefits": [
+        "Certification",
+        "Lunch",
+        "Materials"
+      ]
     },
     {
       "id": "evt-030-session",
@@ -1563,7 +1671,9 @@
       "price": 120000,
       "quantity": 15,
       "sold": 8,
-      "benefits": ["Mat usage"]
+      "benefits": [
+        "Mat usage"
+      ]
     },
     {
       "id": "evt-031-invitation",
@@ -1573,7 +1683,10 @@
       "price": 1000000,
       "quantity": 100,
       "sold": 0,
-      "benefits": ["Catalog", "Dinner"]
+      "benefits": [
+        "Catalog",
+        "Dinner"
+      ]
     },
     {
       "id": "evt-032-free",
@@ -1583,7 +1696,9 @@
       "price": 0,
       "quantity": 2000,
       "sold": 0,
-      "benefits": ["Live music access"]
+      "benefits": [
+        "Live music access"
+      ]
     },
     {
       "id": "evt-033-gen",
@@ -1593,7 +1708,10 @@
       "price": 150000,
       "quantity": 1000,
       "sold": 450,
-      "benefits": ["Live stream access", "Recording access"]
+      "benefits": [
+        "Live stream access",
+        "Recording access"
+      ]
     },
     {
       "id": "evt-034-free",
@@ -1603,7 +1721,9 @@
       "price": 0,
       "quantity": 500,
       "sold": 480,
-      "benefits": ["Google Meet Link"]
+      "benefits": [
+        "Google Meet Link"
+      ]
     },
     {
       "id": "evt-035-single",
@@ -1613,7 +1733,9 @@
       "price": 75000,
       "quantity": 100,
       "sold": 20,
-      "benefits": ["Private YouTube Link"]
+      "benefits": [
+        "Private YouTube Link"
+      ]
     },
     {
       "id": "evt-036-donation",
@@ -1623,7 +1745,9 @@
       "price": 0,
       "quantity": 10000,
       "sold": 5000,
-      "benefits": ["Chat access"]
+      "benefits": [
+        "Chat access"
+      ]
     },
     {
       "id": "evt-037-dropin",
@@ -1633,7 +1757,10 @@
       "price": 50000,
       "quantity": 100,
       "sold": 85,
-      "benefits": ["Zoom Link", "Guided Audio"]
+      "benefits": [
+        "Zoom Link",
+        "Guided Audio"
+      ]
     }
   ],
   "reviews": [
@@ -1654,6 +1781,24 @@
       "rating": 4,
       "comment": "Great content, but the venue was a bit crowded.",
       "createdAt": "2025-03-21T14:30:00Z"
+    },
+    {
+      "id": "e69c",
+      "eventId": "evt-004",
+      "userId": "user-001",
+      "rating": 5,
+      "comment": "Very good very well",
+      "createdAt": "2026-01-27T04:08:20.034Z",
+      "updatedAt": "2026-01-27T04:08:20.034Z"
+    },
+    {
+      "id": "3b1e",
+      "eventId": "evt-002",
+      "userId": "user-001",
+      "rating": 5,
+      "comment": "This event was so good",
+      "createdAt": "2026-01-27T09:39:36.561Z",
+      "updatedAt": "2026-01-27T09:39:36.561Z"
     }
   ],
   "user-points": [

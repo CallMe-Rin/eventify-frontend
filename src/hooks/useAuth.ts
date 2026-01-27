@@ -83,7 +83,7 @@ function apiUserToUser(apiUser: ApiUser): User {
 
 export function useAuth() {
   const [state, setState] = useState<AuthState>({
-    user: null,
+    user: { id: 'user-001', email: 'john@example.com' },
     session: null,
     profile: null,
     role: 'customer',

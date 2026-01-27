@@ -326,7 +326,6 @@ export default function ReviewFormPage() {
                     type="submit"
                     className="flex-1 rounded-xl hover:cursor-pointer"
                     disabled={createReviewMutation.isPending}
-                    onClick={() => onSubmit}
                   >
                     {createReviewMutation.isPending ? (
                       <>
