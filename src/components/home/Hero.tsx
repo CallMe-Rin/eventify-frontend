@@ -1,18 +1,18 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search, ArrowRight, Sparkles } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Search, ArrowRight, Sparkles } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const heroImages = [
-  "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&q=80",
-  "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=1200&q=80",
-  "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200&q=80",
+  'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&q=80',
+  'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=1200&q=80',
+  'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200&q=80',
 ];
 
 export default function Hero() {
   const [currentImage, setCurrentImage] = useState(0);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -29,8 +29,8 @@ export default function Hero() {
           <div
             key={img}
             className={cn(
-              "absolute inset-0 transition-opacity duration-1000",
-              index === currentImage ? "opacity-20" : "opacity-0"
+              'absolute inset-0 transition-opacity duration-1000',
+              index === currentImage ? 'opacity-20' : 'opacity-0',
             )}
           >
             <img src={img} alt="" className="h-full w-full object-cover" />
@@ -72,7 +72,7 @@ export default function Hero() {
           {/* Subheadline */}
           <p
             className="mb-10 text-lg text-muted-foreground sm:text-xl animate-fade-in-up"
-            style={{ animationDelay: "0.1s" }}
+            style={{ animationDelay: '0.1s' }}
           >
             From electrifying concerts to inspiring conferences, discover events
             that match your passion. Book tickets instantly with just a few
@@ -82,7 +82,7 @@ export default function Hero() {
           {/* Search Bar */}
           <div
             className="mx-auto max-w-2xl animate-fade-in-up"
-            style={{ animationDelay: "0.2s" }}
+            style={{ animationDelay: '0.2s' }}
           >
             <div className="flex flex-col gap-3 rounded-2xl bg-card p-3 shadow-premium sm:flex-row sm:rounded-full">
               <div className="relative flex-1">
@@ -104,7 +104,7 @@ export default function Hero() {
             {/* Quick Filters */}
             <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
               <span className="text-sm text-muted-foreground">Popular:</span>
-              {["Music", "Tech", "Food", "Sports"].map((tag) => (
+              {['Music', 'Tech', 'Food', 'Sports'].map((tag) => (
                 <button
                   key={tag}
                   className="rounded-full bg-muted px-3 py-1 text-sm font-medium transition-colors hover:bg-primary hover:text-primary-foreground"
@@ -118,13 +118,13 @@ export default function Hero() {
           {/* Stats */}
           <div
             className="mt-16 grid grid-cols-2 gap-8 sm:grid-cols-4 animate-fade-in-up"
-            style={{ animationDelay: "0.3s" }}
+            style={{ animationDelay: '0.3s' }}
           >
             {[
-              { value: "10K+", label: "Events" },
-              { value: "500K+", label: "Tickets Sold" },
-              { value: "50+", label: "Cities" },
-              { value: "4.9", label: "Rating" },
+              { value: '10K+', label: 'Events' },
+              { value: '500K+', label: 'Tickets Sold' },
+              { value: '50+', label: 'Cities' },
+              { value: '4.9', label: 'Rating' },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-2xl font-bold text-primary sm:text-3xl">
@@ -146,10 +146,10 @@ export default function Hero() {
             key={index}
             onClick={() => setCurrentImage(index)}
             className={cn(
-              "h-2 rounded-full transition-all",
+              'h-2 rounded-full transition-all',
               index === currentImage
-                ? "w-8 bg-primary"
-                : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                ? 'w-8 bg-primary'
+                : 'w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50',
             )}
           />
         ))}

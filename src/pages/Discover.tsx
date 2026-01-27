@@ -28,6 +28,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
+import useDebounce from '@/hooks/useDebounce';
 import { useEventsWithTiers } from '@/hooks/useEvents';
 import { cn } from '@/lib/utils';
 import { EVENT_CATEGORIES, EVENT_TYPES, type EventCategory } from '@/types/api';
@@ -40,7 +41,8 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router';
 
 const ITEMS_PER_PAGE = 8;
 
@@ -68,6 +70,10 @@ const SORT_OPTIONS = [
 ];
 
 export default function DiscoverPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const urlSearch = searchParams.get('search') || '';
+
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('date_asc');
   const [selectedLocation, setSelectedLocation] = useState('All Locations');
@@ -76,7 +82,17 @@ export default function DiscoverPage() {
   );
   const [eventType, setEventType] = useState('all');
   const [onlineOnly, setOnlineOnly] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(urlSearch);
+  const [currentSearch, setCurrentSearch] = useState(urlSearch);
+  const debounce = useDebounce();
+
+  useEffect(() => {
+    if (currentSearch) {
+      setSearchParams({ search: currentSearch }, { replace: true });
+    } else {
+      setSearchParams({}, { replace: true });
+    }
+  }, [currentSearch, setSearchParams]);
 
   // Fetch data from API
   const {
@@ -101,6 +117,7 @@ export default function DiscoverPage() {
     setEventType('all');
     setOnlineOnly(false);
     setSearchQuery('');
+    setCurrentSearch('');
     setCurrentPage(1);
   };
 
@@ -109,15 +126,15 @@ export default function DiscoverPage() {
     selectedCategories.length > 0 ||
     eventType !== 'all' ||
     onlineOnly ||
-    searchQuery.length > 0;
+    currentSearch.length > 0;
 
   // Filter and sort events
   const filteredEvents = useMemo(() => {
     let filtered = [...events];
 
     // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
+    if (currentSearch) {
+      const query = currentSearch.toLowerCase();
       filtered = filtered.filter(
         (event) =>
           event.title.toLowerCase().includes(query) ||
@@ -182,7 +199,7 @@ export default function DiscoverPage() {
     return filtered;
   }, [
     events,
-    searchQuery,
+    currentSearch,
     selectedLocation,
     selectedCategories,
     eventType,
@@ -291,7 +308,12 @@ export default function DiscoverPage() {
                 onlineOnly={onlineOnly}
                 onOnlineOnlyChange={setOnlineOnly}
                 searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
+                onSearchChange={(value) => {
+                  setSearchQuery(value);
+                  debounce(() => {
+                    setCurrentSearch(value);
+                  }, 500);
+                }}
                 onClearFilters={clearFilters}
                 hasActiveFilters={hasActiveFilters}
               />
@@ -306,7 +328,10 @@ export default function DiscoverPage() {
                 {/* Mobile Filter Button */}
                 <Sheet>
                   <SheetTrigger asChild>
-                    <Button variant="outline" className="lg:hidden gap-2">
+                    <Button
+                      variant="outline"
+                      className="lg:hidden gap-2 rounded-xl"
+                    >
                       <SlidersHorizontal className="h-4 w-4" />
                       Filters
                       {hasActiveFilters && (
@@ -342,7 +367,12 @@ export default function DiscoverPage() {
                         onlineOnly={onlineOnly}
                         onOnlineOnlyChange={setOnlineOnly}
                         searchQuery={searchQuery}
-                        onSearchChange={setSearchQuery}
+                        onSearchChange={(value) => {
+                          setSearchQuery(value);
+                          debounce(() => {
+                            setCurrentSearch(value);
+                          }, 500);
+                        }}
                         onClearFilters={clearFilters}
                         hasActiveFilters={hasActiveFilters}
                       />
@@ -380,7 +410,7 @@ export default function DiscoverPage() {
                   Sort by:
                 </span>
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-[200px] bg-card rounded-xl">
+                  <SelectTrigger className="w-[200px] bg-card rounded-xl hover:cursor-pointer">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl p-1">
@@ -388,7 +418,7 @@ export default function DiscoverPage() {
                       <SelectItem
                         key={option.value}
                         value={option.value}
-                        className="rounded-xl"
+                        className="rounded-xl hover:cursor-pointer"
                       >
                         {option.label}
                       </SelectItem>
@@ -451,7 +481,11 @@ export default function DiscoverPage() {
                       Try adjusting your filters or search criteria to find more
                       events
                     </p>
-                    <Button onClick={clearFilters} variant="outline">
+                    <Button
+                      onClick={clearFilters}
+                      variant="outline"
+                      className="rounded-xl hover:cursor-pointer"
+                    >
                       Clear all filters
                     </Button>
                   </div>

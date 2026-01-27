@@ -1,18 +1,18 @@
-import { EVENT_CATEGORIES, EVENT_TYPES, type EventCategory } from "@/types/api";
-import { useState } from "react";
-import { Button } from "../ui/button";
-import { ChevronDown, RefreshCcw, Search } from "lucide-react";
-import { Label } from "../ui/label";
-import { Switch } from "../ui/switch";
+import { EVENT_CATEGORIES, EVENT_TYPES, type EventCategory } from '@/types/api';
+import { useState } from 'react';
+import { Button } from '../ui/button';
+import { ChevronDown, RefreshCcw, Search } from 'lucide-react';
+import { Label } from '../ui/label';
+import { Switch } from '../ui/switch';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "../ui/collapsible";
-import { Input } from "../ui/input";
-import { useLocations } from "@/hooks/useLocations";
-import { cn } from "@/lib/utils";
-import { Separator } from "../ui/separator";
+} from '../ui/collapsible';
+import { Input } from '../ui/input';
+import { useLocations } from '@/hooks/useLocations';
+import { cn } from '@/lib/utils';
+import { Separator } from '../ui/separator';
 
 interface FilterSidebarProps {
   selectedLocation: string;
@@ -59,17 +59,17 @@ export default function FilterSidebar({
     onOnlineOnlyChange(checked);
     if (checked) {
       // If switch turned ON, force location to Online
-      onLocationChange("Online");
+      onLocationChange('Online');
     } else {
       // If switch turned OFF, reset to All Locations
-      onLocationChange("All Locations");
+      onLocationChange('All Locations');
     }
   };
 
   // Handle specific Location Selection
   const handleLocationSelect = (locationName: string) => {
     onLocationChange(locationName);
-    if (locationName !== "Online") {
+    if (locationName !== 'Online') {
       onOnlineOnlyChange(false);
     }
   };
@@ -98,9 +98,19 @@ export default function FilterSidebar({
         </Label>
         <Switch
           id="online-events"
-          checked={onlineOnly || selectedLocation === "Online"}
+          checked={onlineOnly || selectedLocation === 'Online'}
           onCheckedChange={handleOnlineToggle}
         ></Switch>
+      </div>
+
+      <div className="relative mb-3">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Search events..."
+          className="pl-9 bg-background rounded-xl"
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
       </div>
 
       {/* Location */}
@@ -109,21 +119,12 @@ export default function FilterSidebar({
           Location
           <ChevronDown
             className={cn(
-              "h-5 w-5 transition-transform",
-              locationOpen && "rotate-180",
+              'h-5 w-5 transition-transform hover:cursor-pointer',
+              locationOpen && 'rotate-180',
             )}
           />
         </CollapsibleTrigger>
         <CollapsibleContent className="pt-2 space-y-1">
-          <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search Location"
-              className="pl-9 bg-background rounded-xl"
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-            />
-          </div>
           {locations.slice(0, 8).map((location) => (
             <button
               key={location.id}
@@ -131,10 +132,10 @@ export default function FilterSidebar({
                 handleLocationSelect(location.name);
               }}
               className={cn(
-                "block w-full rounded-full px-3 py-2 text-left text-sm transition-colors",
+                'block w-full rounded-full px-3 py-2 text-left text-sm transition-colors hover:cursor-pointer',
                 selectedLocation === location.name
-                  ? "bg-primary/10 text-primary font-medium"
-                  : "hover:bg-muted",
+                  ? 'bg-primary/10 text-primary font-medium'
+                  : 'hover:bg-muted',
               )}
             >
               {location.name}
@@ -152,8 +153,8 @@ export default function FilterSidebar({
           Event Type
           <ChevronDown
             className={cn(
-              "h-5 w-5 transition-transform",
-              typeOpen && "rotate-180",
+              'h-5 w-5 transition-transform hover:cursor-pointer',
+              typeOpen && 'rotate-180',
             )}
           />
         </CollapsibleTrigger>
@@ -165,10 +166,10 @@ export default function FilterSidebar({
                 onEventTypeChange(type.value);
               }}
               className={cn(
-                "block w-full rounded-full px-3 py-2 text-left text-sm transition-colors",
+                'block w-full rounded-full px-3 py-2 text-left text-sm transition-colors hover:cursor-pointer',
                 eventType === type.value
-                  ? "bg-primary/10 text-primary font-medium"
-                  : "hover:bg-muted",
+                  ? 'bg-primary/10 text-primary font-medium'
+                  : 'hover:bg-muted',
               )}
             >
               {type.label}
@@ -186,8 +187,8 @@ export default function FilterSidebar({
           Category
           <ChevronDown
             className={cn(
-              "h-5 w-5 transition-transform",
-              categoryOpen && "rotate-180",
+              'h-5 w-5 transition-transform hover:cursor-pointer',
+              categoryOpen && 'rotate-180',
             )}
           />
         </CollapsibleTrigger>
@@ -197,10 +198,10 @@ export default function FilterSidebar({
               key={category.value}
               onClick={() => onCategoryToggle(category.value)}
               className={cn(
-                "flex w-full items-center gap-2 rounded-full px-3 py-2 text-left text-sm transition-colors",
+                'flex w-full items-center gap-2 rounded-full px-3 py-2 text-left text-sm transition-colors hover:cursor-pointer',
                 selectedCategories.includes(category.value)
-                  ? "bg-primary/10 text-primary font-medium"
-                  : "hover:bg-muted",
+                  ? 'bg-primary/10 text-primary font-medium'
+                  : 'hover:bg-muted',
               )}
             >
               <span>{category.icon}</span>
