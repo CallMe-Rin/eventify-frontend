@@ -186,7 +186,7 @@ export default function ReviewFormPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="text-center">
-                <Button asChild>
+                <Button className="rounded-xl" asChild>
                   <Link to="/my-transactions">View My Transactions</Link>
                 </Button>
               </CardContent>
