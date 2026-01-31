@@ -6,11 +6,8 @@ import UserLayout from "@/components/layout/UserLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 /* ================= TYPES ================= */
 
@@ -19,7 +16,7 @@ type UserData = {
   name: string;
   email: string;
   phone: string;
-  birthDate: string;
+  bio: string;
   avatarUrl?: string;
 };
 
@@ -44,9 +41,7 @@ export default function EditProfileInformasi() {
     queryFn: fetchMockDB,
   });
 
-  const currentUser = data?.users.find(
-    (user) => user.id === CURRENT_USER_ID
-  );
+  const currentUser = data?.users.find((user) => user.id === CURRENT_USER_ID);
 
   /* ================= STATE ================= */
 
@@ -54,11 +49,10 @@ export default function EditProfileInformasi() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
+    fullName: "",
     email: "",
     phone: "",
-    birthDate: "",
+    bio: "",
   });
 
   /* ================= EFFECT ================= */
@@ -66,14 +60,11 @@ export default function EditProfileInformasi() {
   useEffect(() => {
     if (!currentUser) return;
 
-    const [firstName, ...lastNameParts] = currentUser.name.split(" ");
-
     setForm({
-      firstName,
-      lastName: lastNameParts.join(" "),
+      fullName: currentUser.name,
       email: currentUser.email,
       phone: currentUser.phone,
-      birthDate: currentUser.birthDate,
+      bio: currentUser.bio,
     });
 
     if (currentUser.avatarUrl) {
@@ -83,8 +74,13 @@ export default function EditProfileInformasi() {
 
   /* ================= HANDLERS ================= */
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,10 +98,10 @@ export default function EditProfileInformasi() {
   const handleSubmit = () => {
     const payload = {
       id: CURRENT_USER_ID,
-      name: `${form.firstName} ${form.lastName}`,
+      name: form.fullName.trim(),
       email: form.email,
       phone: form.phone,
-      // birthDate: form.birthDate,
+      bio: form.bio,
       avatar,
     };
 
@@ -125,17 +121,16 @@ export default function EditProfileInformasi() {
 
   return (
     <UserLayout>
-      <div className="max-w-4xl">
+      <div className="w-full">
         <h2 className="mb-6 text-lg font-semibold text-gray-800">
-          Informasi Personal
+          Organizer Information
         </h2>
 
         <div className="rounded-lg bg-white p-6 shadow-sm">
           {/* Avatar */}
-          <h3 className="mb-1 font-medium">Gambar Profil</h3>
+          <h3 className="mb-1 font-medium">Profile Picture</h3>
           <p className="mb-6 text-sm text-muted-foreground">
-            Avatar dan foto sampul adalah gambar pertama yang akan dilihat
-            di akun profilmu.
+            Your avatar is the first image people see on your profile.
           </p>
 
           <div className="mb-8 flex items-center gap-6">
@@ -149,7 +144,7 @@ export default function EditProfileInformasi() {
                 onClick={() => inputRef.current?.click()}
                 className="absolute inset-0 flex cursor-pointer items-center justify-center rounded-full bg-black/40 opacity-0 transition group-hover:opacity-100"
               >
-                <span className="text-sm text-white">Ganti</span>
+                <span className="text-sm text-white">Change</span>
               </div>
             </div>
 
@@ -162,25 +157,15 @@ export default function EditProfileInformasi() {
             />
           </div>
 
-          {/* Form */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {/* Form (1 Column) */}
+          <div className="flex flex-col gap-6">
             <div>
-              <Label className="mb-2">Nama Depan</Label>
+              <Label className="mb-2">Full Name</Label>
               <Input
-                name="firstName"
-                value={form.firstName}
+                name="fullName"
+                value={form.fullName}
                 onChange={handleChange}
-                placeholder="Nama depan"
-              />
-            </div>
-
-            <div>
-              <Label className="mb-2">Nama Belakang</Label>
-              <Input
-                name="lastName"
-                value={form.lastName}
-                onChange={handleChange}
-                placeholder="Nama belakang"
+                placeholder="Full name"
               />
             </div>
 
@@ -196,7 +181,7 @@ export default function EditProfileInformasi() {
             </div>
 
             <div>
-              <Label className="mb-2">Nomor Ponsel</Label>
+              <Label className="mb-2">Mobile Number</Label>
               <Input
                 name="phone"
                 value={form.phone}
@@ -205,15 +190,16 @@ export default function EditProfileInformasi() {
               />
             </div>
 
-            {/* <div>
-              <Label className="mb-2">Tanggal Lahir</Label>
-              <Input
-                type="date"
-                name="birthDate"
-                value={form.birthDate}
+            <div>
+              <Label className="mb-2">Bio</Label>
+              <Textarea
+                name="bio"
+                value={form.bio}
                 onChange={handleChange}
+                placeholder="Tell something about yourself..."
+                rows={4}
               />
-            </div> */}
+            </div>
           </div>
 
           {/* Submit */}
