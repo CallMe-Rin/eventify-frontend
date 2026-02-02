@@ -1,5 +1,5 @@
-import { Link } from "react-router";
-import { useState } from "react";
+import { Link, useNavigate } from 'react-router';
+import { useState } from 'react';
 import {
   CalendarPlus,
   Compass,
@@ -13,27 +13,37 @@ import {
   Ticket,
   User,
   X,
-} from "lucide-react";
-import { Input } from "../ui/input";
+} from 'lucide-react';
+import { Input } from '../ui/input';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { Button } from "../ui/button";
-import { cn } from "@/lib/utils";
+} from '../ui/dropdown-menu';
+import { Button } from '../ui/button';
+import { cn } from '@/lib/utils';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
+  const navigate = useNavigate();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchInput.trim()) {
+      navigate(`/discover?search=${encodeURIComponent(searchInput.trim())}`);
+      setIsSearchOpen(false);
+    }
+  };
 
   // Mock authentication state - will be replaced with better-auth later
-  const isAuthenticated = false;
+  const isAuthenticated = true;
   const user = {
-    name: "John Doe",
-    email: "john@example.com",
+    name: 'John Doe',
+    email: 'john@example.com',
   };
 
   return (
@@ -50,14 +60,19 @@ export default function Navbar() {
         </Link>
 
         {/* Search */}
-        <div className="relative flex-1 w-full mx-8 hidden md:block">
+        <form
+          onSubmit={handleSearch}
+          className="relative flex-1 w-full mx-8 hidden md:block"
+        >
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
             placeholder="Search events..."
-            className="w-full rounded-full border-muted bg-muted/50 pl-10 focus-visible:ring-primary"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="max-w-3xl rounded-full border-muted bg-muted/50 pl-10 focus-visible:ring-primary"
           />
-        </div>
+        </form>
 
         {/* Desktop Action */}
         <div className="hidden items-center gap-3 md:flex">
@@ -76,9 +91,9 @@ export default function Navbar() {
 
             {/* Discover Button */}
             <Button
-              variant="ghost"
+              variant="default"
               asChild
-              className="rounded-full cursor-pointer gap-2 px-4 hover:bg-transparent hover:text-primary transition-all active:scale-95"
+              className="rounded-full cursor-pointer gap-2 px-4 transition-all active:scale-95"
             >
               <Link to="/discover">
                 <Compass className="h-4 w-4" />
@@ -112,16 +127,16 @@ export default function Navbar() {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="rounded-lg">
+                <DropdownMenuItem className="rounded-lg hover:cursor-pointer">
                   <Ticket className="mr-2 h-4 w-4" />
                   My Tickets
                 </DropdownMenuItem>
-                <DropdownMenuItem className="rounded-lg">
+                <DropdownMenuItem className="rounded-lg hover:cursor-pointer">
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   Dashboard
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive focus:text-destructive rounded-lg">
+                <DropdownMenuItem className="text-destructive focus:text-destructive rounded-lg hover:cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
                 </DropdownMenuItem>
@@ -165,27 +180,29 @@ export default function Navbar() {
       {/* Mobile Search */}
       <div
         className={cn(
-          "overflow-hidden transition-all duration-300 md:hidden bg-background px-6",
+          'overflow-hidden transition-all duration-300 md:hidden bg-background px-6',
           isSearchOpen
-            ? "h-16 py-3 opacity-100"
-            : "h-0 opacity-0 pointer-events-none"
+            ? 'h-16 py-3 opacity-100'
+            : 'h-0 opacity-0 pointer-events-none',
         )}
       >
-        <div className="relative">
+        <form onSubmit={handleSearch} className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
             placeholder="Search events..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             className="w-full rounded-full border-muted bg-muted/50 pl-10 focus-visible:ring-primary"
           />
-        </div>
+        </form>
       </div>
 
       {/* Mobile Menu */}
       <div
         className={cn(
-          "absolute left-0 right-0 top-full overflow-hidden border-b bg-background transition-all duration-400 md:hidden",
-          isMenuOpen ? "h-auto border-border" : "h-0 border-transparent"
+          'absolute left-0 right-0 top-full overflow-hidden border-b bg-background transition-all duration-400 md:hidden',
+          isMenuOpen ? 'h-auto border-border' : 'h-0 border-transparent',
         )}
       >
         {/* Menu Body */}

@@ -1,9 +1,9 @@
-import FilterSidebar from "@/components/discover/FilterSidebar";
+import FilterSidebar from '@/components/discover/FilterSidebar';
 
-import EventCard from "@/components/home/EventCard";
-import Layout from "@/components/layout/Layout";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import EventCard from '@/components/home/EventCard';
+import Layout from '@/components/layout/Layout';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Pagination,
   PaginationContent,
@@ -12,25 +12,26 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
+} from '@/components/ui/pagination';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useEventsWithTiers } from "@/hooks/useEvents";
-import { cn } from "@/lib/utils";
-import { EVENT_CATEGORIES, EVENT_TYPES, type EventCategory } from "@/types/api";
+} from '@/components/ui/sheet';
+import { Skeleton } from '@/components/ui/skeleton';
+import useDebounce from '@/hooks/useDebounce';
+import { useEventsWithTiers } from '@/hooks/useEvents';
+import { cn } from '@/lib/utils';
+import { EVENT_CATEGORIES, EVENT_TYPES, type EventCategory } from '@/types/api';
 import {
   AlertCircle,
   Loader2,
@@ -39,44 +40,59 @@ import {
   SlidersHorizontal,
   Trash2,
   X,
-} from "lucide-react";
-import { useMemo, useState } from "react";
+} from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router';
 
 const ITEMS_PER_PAGE = 8;
 
 const SORT_OPTIONS = [
   {
-    value: "date_asc",
-    label: "Start Time (Soonest)",
+    value: 'date_asc',
+    label: 'Start Time (Soonest)',
   },
   {
-    value: "date_desc",
-    label: "Start Time (Latest)",
+    value: 'date_desc',
+    label: 'Start Time (Latest)',
   },
   {
-    value: "price_asc",
-    label: "Price (Low to High)",
+    value: 'price_asc',
+    label: 'Price (Low to High)',
   },
   {
-    value: "price_desc",
-    label: "Price (High to Low)",
+    value: 'price_desc',
+    label: 'Price (High to Low)',
   },
   {
-    value: "rating_desc",
-    label: "Rating (Highest)",
+    value: 'rating_desc',
+    label: 'Rating (Highest)',
   },
 ];
 
 export default function DiscoverPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const urlSearch = searchParams.get('search') || '';
+
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState("date_asc");
-  const [selectedLocation, setSelectedLocation] = useState("All Locations");
+  const [sortBy, setSortBy] = useState('date_asc');
+  const [selectedLocation, setSelectedLocation] = useState('All Locations');
   const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>(
     [],
   );
-  const [eventType, setEventType] = useState("all");
+  const [eventType, setEventType] = useState('all');
   const [onlineOnly, setOnlineOnly] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(urlSearch);
+  const [currentSearch, setCurrentSearch] = useState(urlSearch);
+  const debounce = useDebounce();
+
+  useEffect(() => {
+    if (currentSearch) {
+      setSearchParams({ search: currentSearch }, { replace: true });
+    } else {
+      setSearchParams({}, { replace: true });
+    }
+  }, [currentSearch, setSearchParams]);
 
   // Fetch data from API
   const {
@@ -96,28 +112,29 @@ export default function DiscoverPage() {
   };
 
   const clearFilters = () => {
-    setSelectedLocation("All Locations");
+    setSelectedLocation('All Locations');
     setSelectedCategories([]);
-    setEventType("all");
+    setEventType('all');
     setOnlineOnly(false);
-    setSearchQuery("");
+    setSearchQuery('');
+    setCurrentSearch('');
     setCurrentPage(1);
   };
 
   const hasActiveFilters =
-    selectedLocation !== "All Locations" ||
+    selectedLocation !== 'All Locations' ||
     selectedCategories.length > 0 ||
-    eventType !== "all" ||
+    eventType !== 'all' ||
     onlineOnly ||
-    searchQuery.length > 0;
+    currentSearch.length > 0;
 
   // Filter and sort events
   const filteredEvents = useMemo(() => {
     let filtered = [...events];
 
     // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
+    if (currentSearch) {
+      const query = currentSearch.toLowerCase();
       filtered = filtered.filter(
         (event) =>
           event.title.toLowerCase().includes(query) ||
@@ -127,7 +144,7 @@ export default function DiscoverPage() {
     }
 
     // Location filter
-    if (selectedLocation !== "All Locations") {
+    if (selectedLocation !== 'All Locations') {
       filtered = filtered.filter(
         (event) => event.location === selectedLocation,
       );
@@ -141,20 +158,20 @@ export default function DiscoverPage() {
     }
 
     // Event type filter
-    if (eventType === "paid") {
+    if (eventType === 'paid') {
       filtered = filtered.filter((event) => !event.isFree);
-    } else if (eventType === "free") {
+    } else if (eventType === 'free') {
       filtered = filtered.filter((event) => event.isFree);
     }
 
     // Sort
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case "date_asc":
+        case 'date_asc':
           return new Date(a.date).getTime() - new Date(b.date).getTime();
-        case "date_desc":
+        case 'date_desc':
           return new Date(b.date).getTime() - new Date(a.date).getTime();
-        case "price_asc": {
+        case 'price_asc': {
           const priceA = a.isFree
             ? 0
             : Math.min(...a.ticketTiers.map((t) => t.price));
@@ -163,7 +180,7 @@ export default function DiscoverPage() {
             : Math.min(...b.ticketTiers.map((t) => t.price));
           return priceA - priceB;
         }
-        case "price_desc": {
+        case 'price_desc': {
           const priceA = a.isFree
             ? 0
             : Math.min(...a.ticketTiers.map((t) => t.price));
@@ -172,7 +189,7 @@ export default function DiscoverPage() {
             : Math.min(...b.ticketTiers.map((t) => t.price));
           return priceB - priceA;
         }
-        case "rating_desc":
+        case 'rating_desc':
           return (b.averageRating || 0) - (a.averageRating || 0);
         default:
           return 0;
@@ -182,7 +199,7 @@ export default function DiscoverPage() {
     return filtered;
   }, [
     events,
-    searchQuery,
+    currentSearch,
     selectedLocation,
     selectedCategories,
     eventType,
@@ -226,22 +243,22 @@ export default function DiscoverPage() {
             <span className="text-sm text-muted-foreground">
               Active filters:
             </span>
-            {selectedLocation !== "All Locations" && (
+            {selectedLocation !== 'All Locations' && (
               <Badge variant="secondary" className="gap-1 pl-2">
                 {selectedLocation}
                 <button
-                  onClick={() => setSelectedLocation("All Locations")}
+                  onClick={() => setSelectedLocation('All Locations')}
                   className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"
                 >
                   <X className="h-3 w-3 hover:cursor-pointer" />
                 </button>
               </Badge>
             )}
-            {eventType !== "all" && (
+            {eventType !== 'all' && (
               <Badge variant="secondary" className="gap-1 pl-2">
                 {EVENT_TYPES.find((t) => t.value === eventType)?.label}
                 <button
-                  onClick={() => setEventType("all")}
+                  onClick={() => setEventType('all')}
                   className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"
                 >
                   <X className="h-3 w-3 hover:cursor-pointer" />
@@ -291,7 +308,12 @@ export default function DiscoverPage() {
                 onlineOnly={onlineOnly}
                 onOnlineOnlyChange={setOnlineOnly}
                 searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
+                onSearchChange={(value) => {
+                  setSearchQuery(value);
+                  debounce(() => {
+                    setCurrentSearch(value);
+                  }, 500);
+                }}
                 onClearFilters={clearFilters}
                 hasActiveFilters={hasActiveFilters}
               />
@@ -306,13 +328,16 @@ export default function DiscoverPage() {
                 {/* Mobile Filter Button */}
                 <Sheet>
                   <SheetTrigger asChild>
-                    <Button variant="outline" className="lg:hidden gap-2">
+                    <Button
+                      variant="outline"
+                      className="lg:hidden gap-2 rounded-xl"
+                    >
                       <SlidersHorizontal className="h-4 w-4" />
                       Filters
                       {hasActiveFilters && (
                         <Badge className="ml-1 h-5 w-5 rounded-full p-0 text-xs">
-                          {(selectedLocation !== "All Locations" ? 1 : 0) +
-                            (eventType !== "all" ? 1 : 0) +
+                          {(selectedLocation !== 'All Locations' ? 1 : 0) +
+                            (eventType !== 'all' ? 1 : 0) +
                             selectedCategories.length}
                         </Badge>
                       )}
@@ -342,7 +367,12 @@ export default function DiscoverPage() {
                         onlineOnly={onlineOnly}
                         onOnlineOnlyChange={setOnlineOnly}
                         searchQuery={searchQuery}
-                        onSearchChange={setSearchQuery}
+                        onSearchChange={(value) => {
+                          setSearchQuery(value);
+                          debounce(() => {
+                            setCurrentSearch(value);
+                          }, 500);
+                        }}
                         onClearFilters={clearFilters}
                         hasActiveFilters={hasActiveFilters}
                       />
@@ -358,16 +388,16 @@ export default function DiscoverPage() {
                     </span>
                   ) : (
                     <>
-                      Showing{" "}
+                      Showing{' '}
                       <span className="font-medium text-foreground">
                         {filteredEvents.length > 0
                           ? `${startItem} - ${endItem}`
-                          : "0"}
-                      </span>{" "}
-                      of{" "}
+                          : '0'}
+                      </span>{' '}
+                      of{' '}
                       <span className="font-medium text-foreground">
                         {filteredEvents.length}
-                      </span>{" "}
+                      </span>{' '}
                       events
                     </>
                   )}
@@ -380,7 +410,7 @@ export default function DiscoverPage() {
                   Sort by:
                 </span>
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-[200px] bg-card rounded-xl">
+                  <SelectTrigger className="w-[200px] bg-card rounded-xl hover:cursor-pointer">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl p-1">
@@ -388,7 +418,7 @@ export default function DiscoverPage() {
                       <SelectItem
                         key={option.value}
                         value={option.value}
-                        className="rounded-xl"
+                        className="rounded-xl hover:cursor-pointer"
                       >
                         {option.label}
                       </SelectItem>
@@ -451,7 +481,11 @@ export default function DiscoverPage() {
                       Try adjusting your filters or search criteria to find more
                       events
                     </p>
-                    <Button onClick={clearFilters} variant="outline">
+                    <Button
+                      onClick={clearFilters}
+                      variant="outline"
+                      className="rounded-xl hover:cursor-pointer"
+                    >
                       Clear all filters
                     </Button>
                   </div>
@@ -470,8 +504,8 @@ export default function DiscoverPage() {
                           setCurrentPage((p) => Math.max(1, p - 1))
                         }
                         className={cn(
-                          "cursor-pointer",
-                          currentPage === 1 && "pointer-events-none opacity-50",
+                          'cursor-pointer',
+                          currentPage === 1 && 'pointer-events-none opacity-50',
                         )}
                       />
                     </PaginationItem>
@@ -515,9 +549,9 @@ export default function DiscoverPage() {
                           setCurrentPage((p) => Math.min(totalPages, p + 1))
                         }
                         className={cn(
-                          "cursor-pointer",
+                          'cursor-pointer',
                           currentPage === totalPages &&
-                            "pointer-events-none opacity-50",
+                            'pointer-events-none opacity-50',
                         )}
                       />
                     </PaginationItem>
