@@ -4,7 +4,7 @@ import Layout from "@/components/layout/Layout";
 import { Calendar, Users, DollarSign, ChartColumn, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default function DashboardHome() {
+export default function OrganizerDashboardPage() {
   return (
     <Layout>
       <div className="min-h-screen flex flex-col bg-muted/30">
@@ -20,7 +20,7 @@ export default function DashboardHome() {
               </p>
             </div>
 
-            <Button className="rounded-full gap-2 bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 hover:scale-[1.03] active:scale-[0.97] shadow">
+            <Button className="rounded-full gap-2 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-[1.03] active:scale-[0.97] shadow">
               <Plus className="h-4 w-4" />
               Create Event
             </Button>
@@ -29,7 +29,7 @@ export default function DashboardHome() {
           {/* STATS */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             <Stat
-              icon={<Calendar className="h-6 w-6 " />}
+              icon={<Calendar className="h-6 w-6" />}
               title="Total Events"
               value="0"
               color="green"
@@ -59,15 +59,15 @@ export default function DashboardHome() {
             <h2 className="text-xl font-semibold mb-8 text-left">My Events</h2>
 
             <div className="flex flex-col items-center justify-center py-14">
-              <div className="h-16 w-16 rounded-full bg-emerald-100 flex items-center justify-center mb-6">
-                <Calendar className="h-7 w-7 text-emerald-500" />
+              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+                <Calendar className="h-7 w-7 text-primary" />
               </div>
 
               <p className="text-muted-foreground mb-6">
                 No events created yet
               </p>
 
-              <Button className="rounded-full gap-2 bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 hover:scale-[1.03] active:scale-[0.97] shadow">
+              <Button className="rounded-full gap-2 bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-[1.03] active:scale-[0.97] shadow">
                 <Plus className="h-4 w-4" />
                 Create Your First Event
               </Button>
@@ -91,7 +91,6 @@ function Stat({
   color: "blue" | "green" | "orange";
 }) {
   const colors = {
-
     blue: "bg-blue-100 text-blue-600",
     green: "bg-green-100 text-green-600",
     orange: "bg-orange-100 text-orange-600",

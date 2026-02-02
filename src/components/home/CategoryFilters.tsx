@@ -1,4 +1,4 @@
-import { EVENT_CATEGORIES, type EventCategory } from "@/types";
+import { EVENT_CATEGORIES, LOCATIONS, type EventCategory } from "@/types/api";
 import { cn } from "@/lib/utils";
 import {
   Select,
@@ -8,13 +8,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MapPin, Filter } from "lucide-react";
-import { LOCATIONS } from "../../data/mockEvents";
 
 interface CategoryFiltersProps {
   selectedCategory: EventCategory | "all";
   selectedLocation: string;
   onCategoryChange: (category: EventCategory | "all") => void;
   onLocationChange: (location: string) => void;
+  locations?: string[];
 }
 
 export default function CategoryFilters({
@@ -22,6 +22,7 @@ export default function CategoryFilters({
   selectedLocation,
   onCategoryChange,
   onLocationChange,
+  locations = LOCATIONS,
 }: CategoryFiltersProps) {
   return (
     <section className="border-b border-border bg-card/50 px-4 sm:px-0">
@@ -66,7 +67,7 @@ export default function CategoryFilters({
                 <SelectValue placeholder="Select location" />
               </SelectTrigger>
               <SelectContent className="rounded-2xl p-1">
-                {LOCATIONS.map((location) => (
+                {locations.map((location) => (
                   <SelectItem
                     key={location}
                     value={location}

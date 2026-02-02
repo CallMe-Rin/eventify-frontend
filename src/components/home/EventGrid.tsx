@@ -1,11 +1,11 @@
-import { type Event } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Calendar, Frown, ArrowRight } from "lucide-react";
 import { Link } from "react-router";
 import EventCard from "./EventCard";
+import type { EventWithTiers } from "@/types/api";
 
 interface EventGridProps {
-  events: Event[];
+  events: EventWithTiers[];
   title?: string;
   subtitle?: string;
   showViewAll?: boolean;

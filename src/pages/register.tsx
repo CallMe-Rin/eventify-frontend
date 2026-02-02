@@ -10,7 +10,7 @@ import {
 } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
-import { User, Users, Calendar, Mail, Lock, Ticket } from "lucide-react";
+import { User, Users, Calendar, Mail, Lock, Ticket, Code } from "lucide-react";
 
 export default function RegisterPage() {
   const [role, setRole] = useState<"user" | "organizer" | null>(null);
@@ -117,6 +117,19 @@ export default function RegisterPage() {
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input type="password" className="pl-9" />
+                </div>
+              </div>
+
+              {/* Code Refferal */}
+              <div className="space-y-2">
+                <Label>Referral Code</Label>
+                <div className="relative">
+                  <Code className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="text"
+                    placeholder="Enter referral code (optional)"
+                    className="pl-9"
+                  />
                 </div>
               </div>
 
