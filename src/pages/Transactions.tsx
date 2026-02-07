@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { useAuth } from '@/contexts/authContextValue';
+import { useAuth } from '@/hooks/useAuth';
 import { useTransactions } from '@/hooks/useTransactions';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Ticket } from 'lucide-react';

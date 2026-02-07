@@ -24,12 +24,17 @@ import {
 } from '../ui/dropdown-menu';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/useAuth';
+import { signOut } from '@/lib/auth-client';
+import { toast } from 'sonner';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const navigate = useNavigate();
+
+  const { user, isAuthenticated } = useAuth();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,12 +44,17 @@ export default function Navbar() {
     }
   };
 
-  // Mock authentication state - will be replaced with better-auth later
-  const isAuthenticated = true;
-  const user = {
-    name: 'John Doe',
-    email: 'john@example.com',
-  };
+  async function handleSignOut() {
+    try {
+      await signOut();
+      toast.success('Signed out successfully');
+      navigate('/');
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to sign out',
+      );
+    }
+  }
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/96 backdrop-blur supports-backdrop-filter:bg-background/60">
@@ -127,16 +137,29 @@ export default function Navbar() {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="rounded-lg hover:cursor-pointer">
-                  <Ticket className="mr-2 h-4 w-4" />
-                  My Tickets
+                <DropdownMenuItem
+                  asChild
+                  className="rounded-lg hover:cursor-pointer"
+                >
+                  <Link to="/transactions">
+                    <Ticket className="mr-2 h-4 w-4" />
+                    My Tickets
+                  </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="rounded-lg hover:cursor-pointer">
-                  <LayoutDashboard className="mr-2 h-4 w-4" />
-                  Dashboard
+                <DropdownMenuItem
+                  asChild
+                  className="rounded-lg hover:cursor-pointer"
+                >
+                  <Link to="/dashboard">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive focus:text-destructive rounded-lg hover:cursor-pointer">
+                <DropdownMenuItem
+                  onClick={handleSignOut}
+                  className="text-destructive focus:text-destructive rounded-lg hover:cursor-pointer"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
                 </DropdownMenuItem>
@@ -221,11 +244,12 @@ export default function Navbar() {
                   variant="outline"
                   size="lg"
                   className="flex-1 rounded-full"
+                  asChild
                 >
-                  Register
+                  <Link to="/register">Register</Link>
                 </Button>
-                <Button size="lg" className="flex-1 rounded-full">
-                  Log In
+                <Button size="lg" className="flex-1 rounded-full" asChild>
+                  <Link to="/login">Log In</Link>
                 </Button>
               </div>
             </div>
@@ -237,14 +261,16 @@ export default function Navbar() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-foreground">
-                    {user.name}
+                    {user?.name}
                   </h2>
-                  <p className="text-sm text-muted-foreground">{user.email}</p>
+                  <p className="text-sm text-muted-foreground">{user?.email}</p>
                 </div>
               </div>
-              <Button className="w-full rounded-full">
-                <LayoutDashboard className="h-4 w-4 mr-2" />
-                Go to Dashboard
+              <Button className="w-full rounded-full" asChild>
+                <Link to="/dashboard">
+                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                  Go to Dashboard
+                </Link>
               </Button>
             </div>
           )}
@@ -263,10 +289,13 @@ export default function Navbar() {
               Become an Event Creator
             </button>
 
-            <button className="flex w-full items-center gap-4 rounded-lg px-3 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted">
+            <Link
+              to="/discover"
+              className="flex w-full items-center gap-4 rounded-lg px-3 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+            >
               <Search className="h-5 w-5 text-muted-foreground" />
               Discover Events
-            </button>
+            </Link>
 
             <button className="flex w-full items-center gap-4 rounded-lg px-3 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted">
               <Info className="h-5 w-5 text-muted-foreground" />
@@ -283,7 +312,10 @@ export default function Navbar() {
           {isAuthenticated && (
             <>
               <div className="border-t border-border mt-2 mb-0">
-                <button className="flex w-full items-center gap-4 rounded-lg px-3 pt-4 mb-0 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10">
+                <button
+                  onClick={handleSignOut}
+                  className="flex w-full items-center gap-4 rounded-lg px-3 pt-4 mb-0 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
+                >
                   <LogOut className="h-5 w-5" />
                   Sign Out
                 </button>

@@ -13,7 +13,7 @@ import Layout from '@/components/layout/Layout';
 
 import { useCheckout } from '@/hooks/useCheckout';
 import { usePriceCalculation } from '@/hooks/usePriceCalculation';
-import { useAuthContext } from '@/hooks/useAuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import * as checkoutApi from '@/api/checkout';
 import * as eventsApi from '@/api/events';
 import { formatIDR } from '@/types/api';
@@ -33,10 +33,9 @@ export default function CheckoutPage() {
   const quantityParam = searchParams.get('quantity');
   const quantity = Math.max(1, Math.min(100, Number(quantityParam) || 1));
 
-  // Get authenticated user from context
-  const auth = useAuthContext();
-  const userId = auth?.profile?.id;
-  const isAuthenticated = auth?.isAuthenticated;
+  // Get authenticated user from better-auth
+  const { profile, isAuthenticated, isLoading: authLoading } = useAuth();
+  const userId = profile?.id;
 
   // Confirmation dialog state
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -82,7 +81,7 @@ export default function CheckoutPage() {
   });
 
   const isLoading =
-    auth?.isLoading ||
+    authLoading ||
     eventLoading ||
     tiersLoading ||
     checkout.pointsLoading ||
