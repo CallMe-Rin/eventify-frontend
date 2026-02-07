@@ -1,15 +1,15 @@
-import { Link } from "react-router";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Star, Users, ArrowRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Link } from 'react-router';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Calendar, MapPin, Star, Users, ArrowRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   formatEventDate,
   formatEventTime,
   formatIDR,
   type EventWithTiers,
   EVENT_CATEGORIES,
-} from "@/types/api";
+} from '@/types/api';
 
 interface EventCardProps {
   event: EventWithTiers;
@@ -17,13 +17,15 @@ interface EventCardProps {
 }
 
 export default function EventCard({ event, featured = false }: EventCardProps) {
-  const categoryInfo = EVENT_CATEGORIES.find((c) => c.value === event.category);
+  const categoryInfo = EVENT_CATEGORIES.find(
+    (c) => c.value === event.categoryId,
+  );
   const lowestPrice = event.isFree
     ? 0
     : Math.min(...event.ticketTiers.map((t) => t.price));
   const totalTickets = event.ticketTiers.reduce(
     (sum, t) => sum + t.quantity,
-    0
+    0,
   );
   const soldTickets = event.ticketTiers.reduce((sum, t) => sum + t.sold, 0);
   const availableTickets = totalTickets - soldTickets;
@@ -37,23 +39,23 @@ export default function EventCard({ event, featured = false }: EventCardProps) {
     <Link
       to={`/events/${event.id}`}
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-2xl bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-premium-xl",
-        featured ? "md:flex-row" : ""
+        'group relative flex flex-col overflow-hidden rounded-2xl bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-premium-xl',
+        featured ? 'md:flex-row' : '',
       )}
     >
       {/* Image */}
       <div
         className={cn(
-          "relative overflow-hidden",
-          featured ? "md:w-1/2" : "aspect-16/10"
+          'relative overflow-hidden',
+          featured ? 'md:w-1/2' : 'aspect-16/10',
         )}
       >
         <img
           src={event.coverImage}
           alt={event.title}
           className={cn(
-            "h-full w-full object-cover transition-transform duration-500 group-hover:scale-105",
-            featured ? "aspect-16/10 md:aspect-auto" : ""
+            'h-full w-full object-cover transition-transform duration-500 group-hover:scale-105',
+            featured ? 'aspect-16/10 md:aspect-auto' : '',
           )}
         />
 
@@ -98,7 +100,7 @@ export default function EventCard({ event, featured = false }: EventCardProps) {
       </div>
 
       {/* Content */}
-      <div className={cn("flex flex-1 flex-col p-4", featured ? "md:p-6" : "")}>
+      <div className={cn('flex flex-1 flex-col p-4', featured ? 'md:p-6' : '')}>
         {/* Date */}
         <div className="mb-2 flex items-center gap-2 text-sm text-primary">
           <Calendar className="h-4 w-4" />
@@ -111,8 +113,8 @@ export default function EventCard({ event, featured = false }: EventCardProps) {
         {/* Title */}
         <h3
           className={cn(
-            "mb-2 font-bold leading-tight transition-colors group-hover:text-primary",
-            featured ? "text-xl md:text-2xl" : "text-lg"
+            'mb-2 font-bold leading-tight transition-colors group-hover:text-primary',
+            featured ? 'text-xl md:text-2xl' : 'text-lg',
           )}
         >
           {event.title}
@@ -129,7 +131,7 @@ export default function EventCard({ event, featured = false }: EventCardProps) {
         <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
           <MapPin className="h-4 w-4 shrink-0" />
           <span className="truncate">
-            {event.venue}, {event.location}
+            {event.venue}, {event.locationId}
           </span>
         </div>
 

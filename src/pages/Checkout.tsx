@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -24,6 +24,7 @@ import { ConfirmationDialog } from '@/components/checkout/ConfirmationDialog';
 import CheckoutSkeleton from '@/components/checkout/CheckoutSkeleton';
 
 export default function CheckoutPage() {
+  const hasRedirected = useRef(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -88,12 +89,14 @@ export default function CheckoutPage() {
     !userId;
 
   useEffect(() => {
-    // Only run auth check after loading is complete
-    if (!isLoading && !isAuthenticated) {
+    // Wait for auth to fully load before checking
+    if (isLoading || hasRedirected.current) return;
+
+    if (!isAuthenticated) {
       const returnUrl = `/checkout?eventId=${eventId}&ticketTierId=${ticketTierId}&quantity=${quantity}`;
       localStorage.setItem('redirectAfterLogin', returnUrl);
       toast.error('Please sign in to proceed with checkout');
-      navigate('/login');
+      navigate('/login', { replace: true });
     }
   }, [isLoading, isAuthenticated, eventId, ticketTierId, quantity, navigate]);
 
@@ -140,14 +143,11 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
     try {
       await checkoutApi.createTransaction(
-        userId!,
         eventId!,
         ticketTierId!,
         quantity,
-        priceCalculation.finalPayable,
-        priceCalculation.couponDiscount,
         priceCalculation.pointsUsed,
-        checkout.appliedCoupon?.id,
+        checkout.appliedCoupon?.code,
       );
 
       if (priceCalculation.cashbackEarned > 0) {
@@ -245,7 +245,7 @@ export default function CheckoutPage() {
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                     <MapPin className="size-4" />
                     <span>
-                      {event.venue}, {event.location}
+                      {event.venue}, {event.locationId}
                     </span>
                   </div>
                 </div>

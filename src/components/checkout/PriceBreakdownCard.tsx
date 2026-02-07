@@ -159,7 +159,7 @@ export function PriceBreakdownCard({
                   <span className="font-medium">{voucher.code}</span>
                   <span className="text-sm">
                     (-
-                    {voucher.discountType === 'percentage'
+                    {voucher.discountType === 'PERCENTAGE'
                       ? `${voucher.discountValue}%`
                       : formatIDR(voucher.discountValue)}
                     )
@@ -217,9 +217,9 @@ export function PriceBreakdownCard({
                   <span className="font-medium">{coupon.code}</span>
                   <span className="text-sm">
                     (-
-                    {coupon.discount_type === 'percentage'
-                      ? `${coupon.discount_value}%`
-                      : formatIDR(coupon.discount_value)}
+                    {coupon.discountType === 'PERCENTAGE'
+                      ? `${coupon.discountValue}%`
+                      : formatIDR(coupon.discountValue)}
                     )
                   </span>
                 </div>

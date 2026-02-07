@@ -9,7 +9,7 @@ interface UseCountdownReturn {
 }
 
 export function useCountdown(
-  expiresAt: string,
+  expiresAt: string | Date,
   onExpire?: () => void,
 ): UseCountdownReturn {
   const [timeLeft, setTimeLeft] = useState<number>(() => {

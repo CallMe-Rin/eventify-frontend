@@ -1,56 +1,64 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginFormSchema, type LoginFormSchema } from '@/types/login';
-import { authClient } from '@/lib/auth-client';
-import { toast } from 'sonner';
 import { useNavigate } from 'react-router';
-import { useState } from 'react';
+import { signIn } from '@/lib/auth-client';
+import { toast } from 'sonner';
+import { z } from 'zod';
+
+const loginSchema = z.object({
+  email: z.email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 export function useLoginForm() {
-  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const form = useForm<LoginFormSchema>({
-    resolver: zodResolver(loginFormSchema),
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
       password: '',
     },
   });
 
-  async function onSubmit(data: LoginFormSchema) {
-    setIsLoading(true);
-
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      const response = await authClient.signIn.email({
+      const result = await signIn.email({
         email: data.email,
         password: data.password,
       });
 
-      // Check if signIn returned an error
-      if (response.error) {
+      if (result.error) {
         form.setError('root', {
-          message: response.error.message || 'Invalid credentials',
+          message: result.error.message || 'Invalid credentials',
         });
-        toast.error(response.error.message || 'Login failed');
         return;
       }
 
-      // Success
-      toast.success('Login successful!');
-      navigate('/');
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Login failed';
-      form.setError('root', { message: errorMessage });
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
+      // Success - handle redirect
+      toast.success('Welcome back!');
+
+      // Check for saved redirect URL
+      const redirectUrl = localStorage.getItem('redirectAfterLogin');
+
+      if (redirectUrl) {
+        localStorage.removeItem('redirectAfterLogin');
+        navigate(redirectUrl, { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
+    } catch (error) {
+      form.setError('root', {
+        message: error instanceof Error ? error.message : 'Login failed',
+      });
     }
-  }
+  };
 
   return {
     form,
     onSubmit,
-    isLoading,
+    isLoading: form.formState.isSubmitting,
   };
 }

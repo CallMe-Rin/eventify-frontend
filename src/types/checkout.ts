@@ -8,18 +8,24 @@ export type PaymentMethod =
   | 'paylater'
   | 'qris';
 
+export type DiscountType = 'PERCENTAGE' | 'FIXED';
+
+// Coupon Interface - matches backend CouponResponse
 export interface DiscountCoupon {
   id: string;
   code: string;
-  discount_type: 'percentage' | 'fixed';
-  discount_value: number;
-  min_purchase?: number;
-  max_discount?: number;
-  valid_from: string;
-  valid_until: string;
-  usage_limit?: number;
-  used_count: number;
-  is_referral?: boolean;
+  discountType: DiscountType;
+  discountValue: number;
+  minPurchase: number;
+  maxDiscount?: number;
+  usageLimit: number;
+  usedCount: number;
+  validFrom: string | Date;
+  validUntil: string | Date;
+  isActive: boolean;
+  eventId?: string;
+  createdAt: string | Date;
+  updatedAt: string | Date;
 }
 
 export interface CheckoutCart {
@@ -53,29 +59,6 @@ export interface PriceCalculation {
   cashbackEarned: number;
 }
 
-// export interface Transaction {
-//   id: string;
-//   userId: string;
-//   eventId: string;
-//   ticketTierId: string;
-//   quantity: number;
-//   totalAmount: number;
-//   discountAmount: number;
-//   pointsUsed: number;
-//   couponId?: string;
-//   status:
-//     | 'waiting_payment'
-//     | 'admin_confirm'
-//     | 'done'
-//     | 'rejected'
-//     | 'expired'
-//     | 'canceled';
-//   paymentProofUrl?: string;
-//   expiresAt: string;
-//   createdAt: string;
-//   updatedAt: string;
-// }
-
 export interface CheckoutResponse {
   transaction: Transaction;
   cashbackPoints?: number;
@@ -97,7 +80,7 @@ export interface Voucher {
   code: string;
   eventId: string;
   organizerId: string;
-  discountType: 'percentage' | 'fixed';
+  discountType: DiscountType;
   discountValue: number;
   minPurchase?: number;
   maxDiscount?: number;

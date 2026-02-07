@@ -18,14 +18,14 @@ export default function TransactionCard({
   isUploading,
 }: TransactionCardProps) {
   const { data: eventWithTiers, isLoading } = useEventWithTiers(
-    transaction.event_id,
+    transaction.eventId,
   );
 
   if (isLoading) return <TransactionCardSkeleton />;
   if (!eventWithTiers) return null;
 
   const tier = eventWithTiers.ticketTiers.find(
-    (t) => t.id === transaction.ticket_tier_id,
+    (t) => t.id === transaction.ticketTierId,
   );
 
   return (
@@ -48,7 +48,7 @@ export default function TransactionCard({
             <div className="flex items-center gap-2 text-sm sm:text-sm text-muted-foreground mt-1">
               <Calendar className="size-3 shrink-0" />
               <span className="truncate">
-                {formatDateTime(transaction.created_at)}
+                {formatDateTime(transaction.createdAt)}
               </span>
             </div>
           </div>
@@ -58,16 +58,16 @@ export default function TransactionCard({
         <div className="flex flex-col items-end text-right gap-2 shrink-0">
           <TransactionStatusBadge status={transaction.status} />
           <p className="font-bold text-sm sm:text-lg whitespace-nowrap">
-            {formatIDR(transaction.total_amount)}
+            {formatIDR(transaction.totalAmount)}
           </p>
         </div>
       </div>
 
-      {transaction.status === 'waiting_payment' && transaction.expires_at && (
+      {transaction.status === 'WAITING_PAYMENT' && transaction.expiresAt && (
         <div className="border-t pt-4 space-y-4">
           {/* Validate expiresAt is a valid date string */}
-          {!isNaN(new Date(transaction.expires_at).getTime()) ? (
-            <CountdownTimer expiresAt={transaction.expires_at} />
+          {!isNaN(new Date(transaction.expiresAt).getTime()) ? (
+            <CountdownTimer expiresAt={transaction.expiresAt} />
           ) : (
             <div className="text-sm text-muted-foreground">
               Invalid expiration date
@@ -80,7 +80,7 @@ export default function TransactionCard({
         </div>
       )}
 
-      {transaction.status === 'waiting_confirmation' && (
+      {transaction.status === 'WAITING_CONFIRMATION' && (
         <div className="border-t pt-4 space-y-3">
           <div className="bg-blue-50 text-blue-700 px-4 py-3 rounded-lg text-sm">
             Payment proof submitted. Waiting for organizer confirmation.

@@ -260,7 +260,7 @@ export default function EventDetailPage() {
     );
   }
 
-  const category = EVENT_CATEGORIES.find((c) => c.value === event?.category);
+  const category = EVENT_CATEGORIES.find((c) => c.value === event?.categoryId);
 
   return (
     <Layout>
@@ -292,7 +292,7 @@ export default function EventDetailPage() {
                 <div className="flex items-center gap-2">
                   <MapPin className="h-5 w-5 text-primary" />
                   <span>
-                    {event?.venue}, {event?.location}
+                    {event?.venue}, {event?.locationId}
                   </span>
                 </div>
 
@@ -513,7 +513,7 @@ export default function EventDetailPage() {
                       <div className="flex gap-3 items-start text-sm">
                         <MapPin className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                         <span>
-                          {event?.venue}, {event?.location}
+                          {event?.venue}, {event?.locationId}
                         </span>
                       </div>
                       <div className="flex gap-3 items-start text-sm">

@@ -138,7 +138,7 @@ export default function DiscoverPage() {
       filtered = filtered.filter(
         (event) =>
           event.title.toLowerCase().includes(query) ||
-          event.shortDescription.toLowerCase().includes(query) ||
+          event.shortDescription?.toLowerCase().includes(query) ||
           event.venue.toLowerCase().includes(query),
       );
     }
@@ -146,14 +146,14 @@ export default function DiscoverPage() {
     // Location filter
     if (selectedLocation !== 'All Locations') {
       filtered = filtered.filter(
-        (event) => event.location === selectedLocation,
+        (event) => event.locationId === selectedLocation,
       );
     }
 
     // Category filter
     if (selectedCategories.length > 0) {
       filtered = filtered.filter((event) =>
-        selectedCategories.includes(event.category),
+        selectedCategories.includes(event.category.value),
       );
     }
 

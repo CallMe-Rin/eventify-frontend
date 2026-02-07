@@ -6,7 +6,7 @@ interface RegisterPayload {
   email: string;
   password: string;
   name: string;
-  role: 'customer' | 'organizer';
+  role: 'CUSTOMER' | 'ORGANIZER';
 }
 
 interface LoginPayload {
@@ -22,16 +22,13 @@ export function useAuthMutations() {
           email: payload.email,
           password: payload.password,
           name: payload.name,
-          // Pass role as additional data
           callbackURL: '/',
         },
         {
           onRequest: (ctx) => {
-            // Add role to request body
-            ctx.body = {
-              ...ctx.body,
-              role: payload.role,
-            };
+            const bodyObj = JSON.parse(ctx.body as string);
+            bodyObj.role = payload.role;
+            ctx.body = JSON.stringify(bodyObj);
           },
         },
       );

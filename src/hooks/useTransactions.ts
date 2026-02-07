@@ -1,26 +1,31 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { Transaction, TransactionStatus } from '@/types/api';
+import type { TransactionStatus, CreateTransactionRequest } from '@/types/api';
 import {
   fetchTransactions,
-  createTransactionApi,
-  updateTransactionApi,
-  uploadPaymentProofApi,
+  createTransaction,
+  updateTransactionStatus,
+  uploadPaymentProof,
+  acceptTransaction,
+  rejectTransaction,
+  cancelTransaction,
 } from '@/api/transactions';
 
-export function useTransactions(user_id?: string, event_id?: string) {
+export function useTransactions(params?: {
+  status?: TransactionStatus;
+  eventId?: string;
+}) {
   const queryClient = useQueryClient();
 
   const { data: transactions = [], isLoading } = useQuery({
-    queryKey: ['transactions', user_id, event_id],
-    queryFn: () => fetchTransactions({ user_id, event_id }),
+    queryKey: ['transactions', params],
+    queryFn: () => fetchTransactions(params),
   });
 
   const createTransactionMutation = useMutation({
-    mutationFn: createTransactionApi,
+    mutationFn: (request: CreateTransactionRequest) =>
+      createTransaction(request),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
-      queryClient.invalidateQueries({ queryKey: ['ticketTiers'] });
-      queryClient.invalidateQueries({ queryKey: ['users'] });
     },
   });
 
@@ -28,16 +33,12 @@ export function useTransactions(user_id?: string, event_id?: string) {
     mutationFn: ({
       transactionId,
       status,
-      additionalData,
     }: {
       transactionId: string;
       status: TransactionStatus;
-      additionalData?: Partial<Transaction>;
-    }) => updateTransactionApi(transactionId, status, additionalData),
+    }) => updateTransactionStatus(transactionId, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
-      queryClient.invalidateQueries({ queryKey: ['ticketTiers'] });
-      queryClient.invalidateQueries({ queryKey: ['users'] });
     },
   });
 
@@ -48,7 +49,29 @@ export function useTransactions(user_id?: string, event_id?: string) {
     }: {
       transactionId: string;
       proofUrl: string;
-    }) => uploadPaymentProofApi(transactionId, proofUrl),
+    }) => uploadPaymentProof(transactionId, proofUrl),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    },
+  });
+
+  const acceptMutation = useMutation({
+    mutationFn: (transactionId: string) => acceptTransaction(transactionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: (args: { transactionId: string; reason?: string }) =>
+      rejectTransaction(args.transactionId, args.reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    },
+  });
+
+  const cancelMutation = useMutation({
+    mutationFn: (transactionId: string) => cancelTransaction(transactionId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
     },
@@ -61,15 +84,13 @@ export function useTransactions(user_id?: string, event_id?: string) {
     updateTransactionStatus: (
       transactionId: string,
       status: TransactionStatus,
-      additionalData?: Partial<Transaction>,
-    ) =>
-      updateStatusMutation.mutateAsync({
-        transactionId,
-        status,
-        additionalData,
-      }),
+    ) => updateStatusMutation.mutateAsync({ transactionId, status }),
     uploadPaymentProof: (transactionId: string, proofUrl: string) =>
       uploadProofMutation.mutateAsync({ transactionId, proofUrl }),
+    acceptTransaction: acceptMutation.mutateAsync,
+    rejectTransaction: (transactionId: string, reason?: string) =>
+      rejectMutation.mutateAsync({ transactionId, reason }),
+    cancelTransaction: cancelMutation.mutateAsync,
     isCreating: createTransactionMutation.isPending,
     isUpdating: updateStatusMutation.isPending,
   };
