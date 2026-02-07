@@ -1,14 +1,14 @@
-import { type ReactNode } from "react";
-import { AlertCircle } from "lucide-react";
-import { useAuthContext } from "@/hooks/useAuthContext";
-import { Button } from "@/components/ui/button";
+import { type ReactNode } from 'react';
+import { AlertCircle } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/button';
 
 /**
  * CheckoutProtected component that enforces customer role requirement
  * Displays an error message if user is not a customer
  */
 export function CheckoutProtected({ children }: { children: ReactNode }) {
-  const { isAuthenticated, role, isLoading } = useAuthContext();
+  const { isAuthenticated, role, isLoading } = useAuth();
 
   // Show nothing while loading
   if (isLoading) {
@@ -16,7 +16,7 @@ export function CheckoutProtected({ children }: { children: ReactNode }) {
   }
 
   // If organizer, show error message
-  if (isAuthenticated && role === "organizer") {
+  if (isAuthenticated && role === 'organizer') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
         <div className="w-full max-w-md">
@@ -34,7 +34,7 @@ export function CheckoutProtected({ children }: { children: ReactNode }) {
             </p>
 
             <Button
-              onClick={() => (window.location.href = "/dashboard")}
+              onClick={() => (window.location.href = '/dashboard')}
               className="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-full"
             >
               Go to Organizer Dashboard

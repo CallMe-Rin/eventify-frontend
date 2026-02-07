@@ -1,7 +1,6 @@
-import { type ReactNode } from "react";
-import { Navigate, useLocation } from "react-router";
-import { useAuthContext } from "@/hooks/useAuthContext";
-import type { AppRole } from "@/hooks/useAuth";
+import { type ReactNode } from 'react';
+import { Navigate, useLocation } from 'react-router';
+import { useAuth, type AppRole } from '@/hooks/useAuth';
 
 interface RoleBasedRouteProps {
   children: ReactNode;
@@ -19,9 +18,9 @@ interface RoleBasedRouteProps {
 export function RoleBasedRoute({
   children,
   allowedRoles,
-  fallbackPath = "/login",
+  fallbackPath = '/login',
 }: RoleBasedRouteProps) {
-  const { isAuthenticated, role, isLoading } = useAuthContext();
+  const { isAuthenticated, role, isLoading } = useAuth();
   const location = useLocation();
 
   // Show nothing while loading auth state

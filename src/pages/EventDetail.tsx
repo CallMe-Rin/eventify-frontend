@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { SocialIcon } from 'react-social-icons';
 import { useEventWithTiers } from '@/hooks/useEvents';
-import { useAuthContext } from '@/hooks/useAuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { EVENT_CATEGORIES, formatIDR } from '@/types/api';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -35,8 +35,7 @@ export default function EventDetailPage() {
   const [activeTab, setActiveTab] = useState('description');
 
   // Get authenticated user
-  const auth = useAuthContext();
-  const isAuthenticated = auth?.isAuthenticated;
+  const { isAuthenticated, role } = useAuth();
 
   // Fetch event from API
   const {
@@ -60,7 +59,7 @@ export default function EventDetailPage() {
     }
 
     // Check if user is organizer
-    if (auth?.role === 'organizer') {
+    if (role === 'organizer') {
       toast.error(
         'Organizers cannot purchase tickets. Please use a customer account.',
       );
