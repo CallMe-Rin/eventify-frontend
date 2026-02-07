@@ -13,7 +13,7 @@ export async function fetchCurrentUser() {
 export async function fetchUserPoints(userId: string): Promise<number> {
   try {
     const { data } = await axiosInstance.get<{ data: UserPoints[] }>(
-      '/api/user-points',
+      '/api/users/current',
       { params: { userId } },
     );
     const points = Array.isArray(data) ? data : data.data || [];
@@ -29,7 +29,7 @@ export async function fetchUserCoupons(
 ): Promise<DiscountCoupon[]> {
   try {
     const { data } = await axiosInstance.get<{ data: DiscountCoupon[] }>(
-      '/api/user-coupons',
+      '/api/coupons',
       { params: { userId } },
     );
     const coupons = data.data || [];

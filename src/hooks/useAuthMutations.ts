@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { signUp, signIn } from '@/lib/auth-client';
+import { signUp, signIn, authClient } from '@/lib/auth-client';
 import { toast } from 'sonner';
 
 interface RegisterPayload {
@@ -33,15 +33,15 @@ export function useAuthMutations() {
         },
       );
 
-      if (error) {
-        throw new Error(error.message || 'Registration failed');
-      }
-
+      if (error) throw new Error(error.message);
       return data;
     },
-    onSuccess: () => {
+
+    onSuccess: async () => {
+      await authClient.getSession();
       toast.success('Account created successfully!');
     },
+
     onError: (error: Error) => {
       toast.error(error.message);
     },
@@ -61,7 +61,8 @@ export function useAuthMutations() {
 
       return data;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await authClient.getSession();
       toast.success('Welcome back!');
     },
     onError: (error: Error) => {

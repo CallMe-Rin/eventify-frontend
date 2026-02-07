@@ -17,13 +17,12 @@ type UserWithRole = {
 export function useAuth() {
   const { data: session, isPending, error } = useSession();
 
-  // Extract user from better-auth session
-  const user = (session?.user as UserWithRole | undefined) ?? null;
+  const user: UserWithRole | undefined = session?.user
+    ? { ...session.user }
+    : undefined;
 
-  // Extract role
   const role = user?.role ?? null;
 
-  // Create profile object for backward compatibility
   const profile = user
     ? {
         id: user.id,

@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router';
-import { signIn } from '@/lib/auth-client';
+import { authClient, signIn } from '@/lib/auth-client';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
@@ -31,16 +31,15 @@ export function useLoginForm() {
       });
 
       if (result.error) {
-        form.setError('root', {
-          message: result.error.message || 'Invalid credentials',
-        });
+        form.setError('root', { message: result.error.message });
         return;
       }
 
-      // Success - handle redirect
+      // 🔥 FORCE SESSION SYNC
+      await authClient.getSession();
+
       toast.success('Welcome back!');
 
-      // Check for saved redirect URL
       const redirectUrl = localStorage.getItem('redirectAfterLogin');
 
       if (redirectUrl) {

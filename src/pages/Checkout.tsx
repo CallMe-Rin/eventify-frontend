@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -24,7 +24,6 @@ import { ConfirmationDialog } from '@/components/checkout/ConfirmationDialog';
 import CheckoutSkeleton from '@/components/checkout/CheckoutSkeleton';
 
 export default function CheckoutPage() {
-  const hasRedirected = useRef(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -35,7 +34,7 @@ export default function CheckoutPage() {
   const quantity = Math.max(1, Math.min(100, Number(quantityParam) || 1));
 
   // Get authenticated user from better-auth
-  const { profile, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { profile, isLoading: authLoading } = useAuth();
   const userId = profile?.id;
 
   // Confirmation dialog state
@@ -87,18 +86,6 @@ export default function CheckoutPage() {
     tiersLoading ||
     checkout.pointsLoading ||
     !userId;
-
-  useEffect(() => {
-    // Wait for auth to fully load before checking
-    if (isLoading || hasRedirected.current) return;
-
-    if (!isAuthenticated) {
-      const returnUrl = `/checkout?eventId=${eventId}&ticketTierId=${ticketTierId}&quantity=${quantity}`;
-      localStorage.setItem('redirectAfterLogin', returnUrl);
-      toast.error('Please sign in to proceed with checkout');
-      navigate('/login', { replace: true });
-    }
-  }, [isLoading, isAuthenticated, eventId, ticketTierId, quantity, navigate]);
 
   // Format date range
   const formatDateRange = () => {

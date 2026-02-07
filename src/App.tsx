@@ -9,11 +9,11 @@ import HomePage from './pages/Home';
 import EventDetailPage from './pages/EventDetail';
 import DashboardHome from './pages/OrganizerDashboard';
 import DiscoverPage from './pages/Discover';
-import LoginPage from './pages/Login';
-import RegisterPage from './pages/Register';
 import CheckoutPage from './pages/Checkout';
 import TransactionsPage from './pages/Transactions';
 import ReviewFormPage from './pages/Review';
+import LoginPage from './pages/login';
+import RegisterPage from './pages/register';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -42,26 +42,29 @@ export default function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/events/:id" element={<EventDetailPage />} />
+
               <Route
                 path="/checkout"
                 element={
-                  <RoleBasedRoute allowedRoles={['customer']}>
+                  <RoleBasedRoute allowedRoles={['CUSTOMER']}>
                     <CheckoutProtected>
                       <CheckoutPage />
                     </CheckoutProtected>
                   </RoleBasedRoute>
                 }
               />
+
               <Route
                 path="/events/:eventId/checkout"
                 element={
-                  <RoleBasedRoute allowedRoles={['customer']}>
+                  <RoleBasedRoute allowedRoles={['CUSTOMER']}>
                     <CheckoutProtected>
                       <CheckoutPage />
                     </CheckoutProtected>
                   </RoleBasedRoute>
                 }
               />
+
               <Route path="/dashboard" element={<DashboardHome />} />
               <Route path="/discover" element={<DiscoverPage />} />
               <Route path="/transactions" element={<TransactionsPage />} />

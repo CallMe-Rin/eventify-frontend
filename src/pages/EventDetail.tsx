@@ -49,25 +49,39 @@ export default function EventDetailPage() {
 
   // Handle Buy Ticket click with auth and role guard
   const handleBuyTicket = (ticketTierId: string) => {
-    if (!isAuthenticated) {
-      toast.error('Please sign in to purchase tickets');
-      // Store the intended destination for post-login redirect
-      const returnUrl = `/checkout?eventId=${id}&ticketTierId=${ticketTierId}&quantity=1`;
-      localStorage.setItem('redirectAfterLogin', returnUrl);
-      navigate('/login', { state: { from: { pathname: returnUrl } } });
+    if (!id) {
+      toast.error('Invalid event');
       return;
     }
 
-    // Check if user is organizer
-    if (role === 'organizer') {
+    const params = new URLSearchParams({
+      eventId: id,
+      ticketTierId,
+      quantity: '1',
+    });
+
+    const checkoutUrl = `/checkout?${params.toString()}`;
+
+    if (!isAuthenticated) {
+      toast.error('Please sign in to purchase tickets');
+      localStorage.setItem('redirectAfterLogin', checkoutUrl);
+      navigate('/login', { state: { from: { pathname: checkoutUrl } } });
+      return;
+    }
+
+    if (!role) {
+      toast.error('Loading user info, please try again');
+      return;
+    }
+
+    if (role === 'ORGANIZER') {
       toast.error(
         'Organizers cannot purchase tickets. Please use a customer account.',
       );
       return;
     }
 
-    // Navigate to checkout with search params
-    navigate(`/checkout?eventId=${id}&ticketTierId=${ticketTierId}&quantity=1`);
+    navigate(checkoutUrl);
   };
 
   // Handle group Buy Ticket (select first tier in group)
