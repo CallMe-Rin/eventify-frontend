@@ -82,7 +82,7 @@ export default function ReviewFormPage() {
         description: 'Please login to submit reviews.',
         position: 'bottom-right',
       });
-    } else if (role !== 'customer') {
+    } else if (role !== 'CUSTOMER') {
       navigate('/');
       toast.warning('Access Denied', {
         description: 'Only customers can submit reviews.',

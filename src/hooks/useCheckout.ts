@@ -44,7 +44,8 @@ export function useCheckout({
   // Fetch user points
   const { data: userPoints = 0, isLoading: pointsLoading } = useQuery({
     queryKey: ['user-points', userId],
-    queryFn: () => checkoutApi.fetchUserPoints(userId),
+    queryFn: () => checkoutApi.fetchUserPoints(), //
+    enabled: !!userId,
   });
 
   // Validate coupon mutation

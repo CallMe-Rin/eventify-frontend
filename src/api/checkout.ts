@@ -1,7 +1,6 @@
 import { axiosInstance } from '@/lib/axiosInstance';
 import type { DiscountCoupon, CheckoutResponse } from '@/types/api';
 import type { CreateTransactionRequest } from '@/types/api';
-import type { UserPoints } from '@/types/user';
 
 // Fetch current user profile (requires auth)
 export async function fetchCurrentUser() {
@@ -10,15 +9,22 @@ export async function fetchCurrentUser() {
 }
 
 // Fetch user points (requires auth)
-export async function fetchUserPoints(userId: string): Promise<number> {
+export async function fetchUserPoints(): Promise<number> {
   try {
-    const { data } = await axiosInstance.get<{ data: UserPoints[] }>(
-      '/api/users/current',
-      { params: { userId } },
-    );
-    const points = Array.isArray(data) ? data : data.data || [];
-    return points.reduce((sum, point) => sum + point.amount, 0);
-  } catch {
+    const { data } = await axiosInstance.get<{
+      data: {
+        id: string;
+        name: string;
+        email: string;
+        points: number;
+      };
+    }>('/api/users/current');
+
+    // Extract points directly from user object
+    const user = data.data || data;
+    return user.points || 0;
+  } catch (error) {
+    console.error('Failed to fetch user points:', error);
     return 0;
   }
 }
@@ -158,7 +164,7 @@ export async function updateUserPoints(
   }
 }
 
-// Validate coupon for checkout (legacy helper function)
+// Validate coupon for checkout
 export async function validateCouponForCheckout(
   couponCode: string,
   cartAmount: number,
