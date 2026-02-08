@@ -28,10 +28,12 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useCategories } from '@/hooks/useCategories';
 import useDebounce from '@/hooks/useDebounce';
 import { useEventsWithTiers } from '@/hooks/useEvents';
+import { useLocations } from '@/hooks/useLocations';
 import { cn } from '@/lib/utils';
-import { EVENT_CATEGORIES, EVENT_TYPES, type EventCategory } from '@/types/api';
+import { EVENT_TYPES, type EventCategory } from '@/types/api';
 import {
   AlertCircle,
   Loader2,
@@ -85,6 +87,10 @@ export default function DiscoverPage() {
   const [searchQuery, setSearchQuery] = useState(urlSearch);
   const [currentSearch, setCurrentSearch] = useState(urlSearch);
   const debounce = useDebounce();
+
+  const { data: categories = [] } = useCategories();
+
+  const { getLocationName } = useLocations();
 
   useEffect(() => {
     if (currentSearch) {
@@ -228,7 +234,7 @@ export default function DiscoverPage() {
 
   return (
     <Layout>
-      <div className="container mx-auto 2xl:px-35 py-8">
+      <div className="container mx-auto 2xl:px-20 py-8">
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Discover Events</h1>
@@ -267,7 +273,7 @@ export default function DiscoverPage() {
             )}
             {selectedCategories.map((cat: EventCategory) => (
               <Badge key={cat} variant="secondary" className="gap-1 pl-2">
-                {EVENT_CATEGORIES.find((c) => c.value === cat)?.label}
+                {categories.find((c) => c.id === cat)?.label}
                 <button
                   onClick={() => toggleCategory(cat)}
                   className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"
@@ -466,7 +472,11 @@ export default function DiscoverPage() {
                 {paginatedEvents.length > 0 ? (
                   <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                     {paginatedEvents.map((event) => (
-                      <EventCard key={event.id} event={event} />
+                      <EventCard
+                        key={event.id}
+                        event={event}
+                        locationName={getLocationName(event.locationId)}
+                      />
                     ))}
                   </div>
                 ) : (

@@ -47,7 +47,7 @@ export default function EventGrid({
   const [featuredEvent, ...gridEvents] = events;
 
   return (
-    <section className="container mx-auto py-12 px-4 2xl:px-35">
+    <section className="max-w-7xl mx-auto py-12 px-4">
       {/* Header */}
       <div className="mb-8 flex items-end justify-between">
         <div>
@@ -62,7 +62,7 @@ export default function EventGrid({
             className="hidden gap-2 sm:inline-flex rounded-full"
             asChild
           >
-            <Link to="/events">
+            <Link to="/discover">
               View All
               <ArrowRight className="h-4 w-4" />
             </Link>

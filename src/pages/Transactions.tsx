@@ -12,7 +12,7 @@ export default function TransactionsPage() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 2xl:px-35 bg-background py-6">
+      <div className="max-w-7xl mx-auto px-4 bg-background py-6">
         <header>
           <div className="container flex items-center gap-2 h-16">
             <Link to="/">

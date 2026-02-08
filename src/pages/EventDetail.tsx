@@ -299,7 +299,7 @@ export default function EventDetailPage() {
             <div className="absolute inset-0 bg-black/70 backdrop-blur-xl" />
           </div>
 
-          <div className="container mx-auto px-4 2xl:px-35 py-16 relative z-10">
+          <div className="max-w-7xl mx-auto px-4 py-16 relative z-10">
             <div className="max-w-3xl space-y-6">
               <Button
                 variant="ghost"
@@ -338,7 +338,7 @@ export default function EventDetailPage() {
         </div>
 
         {/* Main Content Area */}
-        <div className="container mx-auto px-4 2xl:px-35">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-[1fr_400px] gap-12">
             {/* Left Column: Sections */}
             <div className="relative">
