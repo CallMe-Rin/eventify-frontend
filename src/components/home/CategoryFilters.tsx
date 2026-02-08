@@ -26,7 +26,7 @@ export default function CategoryFilters({
 }: CategoryFiltersProps) {
   return (
     <section className="border-b border-border bg-card/50 px-4 sm:px-0">
-      <div className="container mx-auto 2xl:px-35 py-6">
+      <div className="max-w-7xl mx-auto py-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           {/* Category Pills */}
           <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar lg:pb-0">

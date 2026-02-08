@@ -1,4 +1,4 @@
-import { EVENT_CATEGORIES, EVENT_TYPES, type EventCategory } from '@/types/api';
+import { EVENT_TYPES, type EventCategory } from '@/types/api';
 import { useState } from 'react';
 import { Button } from '../ui/button';
 import { ChevronDown, RefreshCcw, Search } from 'lucide-react';
@@ -13,6 +13,7 @@ import { Input } from '../ui/input';
 import { useLocations } from '@/hooks/useLocations';
 import { cn } from '@/lib/utils';
 import { Separator } from '../ui/separator';
+import { useCategories } from '@/hooks/useCategories';
 
 interface FilterSidebarProps {
   selectedLocation: string;
@@ -52,7 +53,9 @@ export default function FilterSidebar({
   const [typeOpen, setTypeOpen] = useState(true);
   const [categoryOpen, setCategoryOpen] = useState(true);
 
-  const { data: locations = [] } = useLocations();
+  const { locations = [] } = useLocations();
+  const { data: categories = [], isPending: isCategoriesLoading } =
+    useCategories();
 
   // Handle the Online Switch Toggle
   const handleOnlineToggle = (checked: boolean) => {
@@ -100,6 +103,7 @@ export default function FilterSidebar({
           id="online-events"
           checked={onlineOnly || selectedLocation === 'Online'}
           onCheckedChange={handleOnlineToggle}
+          className="hover:cursor-pointer"
         ></Switch>
       </div>
 
@@ -193,18 +197,25 @@ export default function FilterSidebar({
           />
         </CollapsibleTrigger>
         <CollapsibleContent className="pt-2 space-y-1">
-          {EVENT_CATEGORIES.map((category) => (
+          {isCategoriesLoading && (
+            <p className="text-sm text-muted-foreground px-2 py-1">
+              Loading...
+            </p>
+          )}
+
+          {categories.map((category) => (
             <button
-              key={category.value}
-              onClick={() => onCategoryToggle(category.value)}
+              key={category.id}
+              onClick={() => onCategoryToggle(category.id as EventCategory)}
               className={cn(
                 'flex w-full items-center gap-2 rounded-full px-3 py-2 text-left text-sm transition-colors hover:cursor-pointer',
-                selectedCategories.includes(category.value)
+                selectedCategories.includes(category.id as EventCategory)
                   ? 'bg-primary/10 text-primary font-medium'
                   : 'hover:bg-muted',
               )}
             >
-              <span>{category.icon}</span>
+              {/* Optional icon if DB has icon field */}
+              {category.icon && <span>{category.icon}</span>}
               <span>{category.label}</span>
             </button>
           ))}

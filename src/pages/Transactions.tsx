@@ -1,4 +1,4 @@
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { useTransactions } from '@/hooks/useTransactions';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Ticket } from 'lucide-react';
@@ -8,22 +8,23 @@ import Layout from '@/components/layout/Layout';
 
 export default function TransactionsPage() {
   const { transactions, uploadPaymentProof, isLoading } = useTransactions();
+  const navigate = useNavigate();
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 bg-background">
+      <div className="max-w-7xl mx-auto px-4 bg-background py-6">
         <header>
           <div className="container flex items-center gap-2 h-16">
             <Link to="/">
               <Button
                 variant="ghost"
-                size="icon"
-                className="hover:cursor-pointer hover:bg-primary/10 hover:rounded-xl hover:text-primary"
+                onClick={() => navigate(-1)}
+                className="p-0 gap-1 rounded-full hover:bg-secondary hover:cursor-pointer"
               >
-                <ArrowLeft className="size-5" />
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
               </Button>
             </Link>
-            <h1 className="font-semibold text-lg">My Transactions</h1>
           </div>
         </header>
 

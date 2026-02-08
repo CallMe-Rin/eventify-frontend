@@ -24,7 +24,7 @@ export default function FeaturedCategories() {
 
   return (
     <section className="bg-muted/30 py-16">
-      <div className="container px-4 2xl:px-35 mx-auto">
+      <div className="max-w-7xl px-4 mx-auto">
         <div className="mb-10 text-center">
           <h2 className="mb-3 text-2xl font-bold tracking-tight sm:text-3xl">
             Browse by Category

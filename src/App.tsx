@@ -14,6 +14,7 @@ import TransactionsPage from './pages/Transactions';
 import ReviewFormPage from './pages/Review';
 import LoginPage from './pages/login';
 import RegisterPage from './pages/register';
+import ScrollToTop from './components/layout/ScrollToTop';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,6 +38,7 @@ export default function App() {
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ScrollToTop />
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
