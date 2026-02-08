@@ -10,7 +10,7 @@ type UserWithRole = {
   email: string;
   emailVerified: boolean;
   name: string;
-  image?: string | null;
+  avatarUrl?: string | null;
   role?: UserRole;
 };
 

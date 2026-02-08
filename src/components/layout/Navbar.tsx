@@ -23,8 +23,9 @@ import {
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { signOut } from '@/lib/auth-client';
+import { signOut, useSession } from '@/lib/auth-client';
 import { toast } from 'sonner';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -34,6 +35,8 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const { user, isAuthenticated } = useAuth();
+  const { data } = useSession();
+  console.log('SESSION USER', data?.user);
 
   const handleLoginClick = () => {
     localStorage.setItem(
@@ -106,7 +109,7 @@ export default function Navbar() {
             <Button
               variant="ghost"
               asChild
-              className="rounded-full cursor-pointer gap-2 px-4 hover:bg-transparent hover:text-primary transition-all active:scale-95"
+              className="rounded-full cursor-pointer gap-2 px-4 hover:text-primary transition-all active:scale-95"
             >
               <Link to="/create-event">
                 {/* <CalendarPlus className="h-4 w-4" /> */}
@@ -138,13 +141,23 @@ export default function Navbar() {
                   size="icon"
                   className="relative h-9 w-9 rounded-full"
                 >
-                  <User className="h-5 w-5" />
+                  <Avatar>
+                    <AvatarImage src={user.avatarUrl} alt={user.name} />
+                    <AvatarFallback>
+                      <User className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl">
                 <div className="flex items-center gap-2 p-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                    <User className="h-4 w-4 text-primary" />
+                    <Avatar>
+                      <AvatarImage src={user.avatarUrl} alt={user.name} />
+                      <AvatarFallback>
+                        <User className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium">{user.name}</span>

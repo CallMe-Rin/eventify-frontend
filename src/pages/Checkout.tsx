@@ -209,8 +209,7 @@ export default function CheckoutPage() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
-        {/* Breadcrumb */}
+      <div className="container mx-auto px-4 2xl:px-35 py-8">
         <div className="mb-2">
           <Button
             variant="ghost"

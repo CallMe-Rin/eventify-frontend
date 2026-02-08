@@ -52,7 +52,7 @@ export default function Footer() {
             <ul className="space-y-3 text-sm">
               <li>
                 <Link
-                  to="/events"
+                  to="/login"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   Login
@@ -60,7 +60,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/categories"
+                  to="/discover"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   Discover
@@ -68,7 +68,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/events?filter=today"
+                  to="/contact-us"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   Contact Us
@@ -76,7 +76,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/events?filter=free"
+                  to="/terms-and-conditions"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   Terms and Conditions
@@ -84,7 +84,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/events?filter=today"
+                  to="/privacy"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   Security & Privacy
@@ -99,7 +99,7 @@ export default function Footer() {
             <ul className="space-y-3 text-sm">
               <li>
                 <Link
-                  to="/create-event"
+                  to="/discover"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   Jakarta
@@ -107,7 +107,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/pricing"
+                  to="/discover"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   Bandung
@@ -115,7 +115,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/resources"
+                  to="/discover"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   Yogyakarta
@@ -123,7 +123,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/resources"
+                  to="/discover"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   Surabaya
@@ -131,7 +131,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/resources"
+                  to="/discover"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   Solo
@@ -139,7 +139,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/resources"
+                  to="/discover"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   Medan
@@ -147,7 +147,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/resources"
+                  to="/discover"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   Bali
@@ -155,7 +155,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/resources"
+                  to="/discover"
                   className="text-muted-foreground hover:text-foreground"
                 >
                   All Locations

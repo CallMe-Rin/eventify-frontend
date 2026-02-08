@@ -29,11 +29,13 @@ import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCategories } from '@/hooks/useCategories';
 import { formatIDR } from '@/types';
+import { useLocations } from '@/hooks/useLocations';
 
 export default function EventDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('description');
+  const { getLocationName } = useLocations();
 
   // Get authenticated user
   const { isAuthenticated, role } = useAuth();
@@ -285,8 +287,6 @@ export default function EventDetailPage() {
     );
   }
 
-  // const category = EVENT_CATEGORIES.find((c) => c.value === event?.categoryId);
-
   return (
     <Layout>
       <div className="min-h-screen bg-background pb-20">
@@ -299,7 +299,7 @@ export default function EventDetailPage() {
             <div className="absolute inset-0 bg-black/70 backdrop-blur-xl" />
           </div>
 
-          <div className="container mx-auto px-4 py-16 relative z-10">
+          <div className="container mx-auto px-4 2xl:px-35 py-16 relative z-10">
             <div className="max-w-3xl space-y-6">
               <Button
                 variant="ghost"
@@ -317,7 +317,10 @@ export default function EventDetailPage() {
                 <div className="flex items-center gap-2">
                   <MapPin className="h-5 w-5 text-primary" />
                   <span>
-                    {event?.venue}, {event?.locationId}
+                    {event?.venue},{' '}
+                    {event?.locationId
+                      ? getLocationName(event.locationId)
+                      : 'Location TBA'}
                   </span>
                 </div>
 
@@ -335,7 +338,7 @@ export default function EventDetailPage() {
         </div>
 
         {/* Main Content Area */}
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 2xl:px-35">
           <div className="grid lg:grid-cols-[1fr_400px] gap-12">
             {/* Left Column: Sections */}
             <div className="relative">
@@ -538,7 +541,10 @@ export default function EventDetailPage() {
                       <div className="flex gap-3 items-start text-sm">
                         <MapPin className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                         <span>
-                          {event?.venue}, {event?.locationId}
+                          {event?.venue},{' '}
+                          {event?.locationId
+                            ? getLocationName(event.locationId)
+                            : 'Location TBA'}
                         </span>
                       </div>
                       <div className="flex gap-3 items-start text-sm">

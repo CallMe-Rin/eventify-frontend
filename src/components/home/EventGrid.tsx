@@ -3,6 +3,7 @@ import { Calendar, Frown, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router';
 import EventCard from './EventCard';
 import type { EventWithTiers } from '@/types/api';
+import { useLocations } from '@/hooks/useLocations';
 
 interface EventGridProps {
   events: EventWithTiers[];
@@ -19,6 +20,8 @@ export default function EventGrid({
   showViewAll = true,
   emptyMessage = 'No events found',
 }: EventGridProps) {
+  const { getLocationName } = useLocations();
+
   if (events.length === 0) {
     return (
       <section className="container mx-auto py-12 px-4 sm:px-0">
@@ -70,7 +73,11 @@ export default function EventGrid({
       {/* Featured Event */}
       {featuredEvent && (
         <div className="mb-8">
-          <EventCard event={featuredEvent} featured />
+          <EventCard
+            event={featuredEvent}
+            featured
+            locationName={getLocationName(featuredEvent.locationId)}
+          />
         </div>
       )}
 
@@ -78,7 +85,11 @@ export default function EventGrid({
       {gridEvents.length > 0 && (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {gridEvents.map((event) => (
-            <EventCard key={event.id} event={event} />
+            <EventCard
+              key={event.id}
+              event={event}
+              locationName={getLocationName(event.locationId)}
+            />
           ))}
         </div>
       )}

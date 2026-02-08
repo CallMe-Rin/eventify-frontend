@@ -14,9 +14,14 @@ import {
 interface EventCardProps {
   event: EventWithTiers;
   featured?: boolean;
+  locationName?: string;
 }
 
-export default function EventCard({ event, featured = false }: EventCardProps) {
+export default function EventCard({
+  event,
+  featured = false,
+  locationName,
+}: EventCardProps) {
   const categoryInfo = EVENT_CATEGORIES.find(
     (c) => c.value === event.categoryId,
   );
@@ -33,7 +38,7 @@ export default function EventCard({ event, featured = false }: EventCardProps) {
     availableTickets < totalTickets * 0.1 && availableTickets > 0;
   const isSoldOut = availableTickets === 0;
 
-  console.log(lowestPrice);
+  const displayLocation = locationName || event.locationId;
 
   return (
     <Link
@@ -131,7 +136,7 @@ export default function EventCard({ event, featured = false }: EventCardProps) {
         <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
           <MapPin className="h-4 w-4 shrink-0" />
           <span className="truncate">
-            {event.venue}, {event.locationId}
+            {event.venue}, {displayLocation}
           </span>
         </div>
 
