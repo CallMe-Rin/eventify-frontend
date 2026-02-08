@@ -1,6 +1,7 @@
 import { useAuth } from '@/hooks/useAuth';
 import { useEvent } from '@/hooks/useEvents';
 import { useCheckExistingReview, useCreateReview } from '@/hooks/useReviews';
+import { useTransactions } from '@/hooks/useTransactions';
 import { reviewFormSchema, type ReviewFormData } from '@/types/review';
 import { Link, useNavigate, useParams } from 'react-router';
 import { Controller, useForm } from 'react-hook-form';
@@ -48,6 +49,12 @@ export default function ReviewFormPage() {
     error: eventError,
   } = useEvent(eventId || '');
 
+  // Fetch user transactions for this event
+  const { transactions } = useTransactions({ eventId });
+
+  // Find a completed transaction for this event
+  const completedTransaction = transactions.find((tx) => tx.status === 'DONE');
+
   // Check if user already reviewed this event
   const { data: existingReview, isLoading: checkingReview } =
     useCheckExistingReview(eventId || '', user?.id || '');
@@ -75,7 +82,7 @@ export default function ReviewFormPage() {
         description: 'Please login to submit reviews.',
         position: 'bottom-right',
       });
-    } else if (role !== 'customer') {
+    } else if (role !== 'CUSTOMER') {
       navigate('/');
       toast.warning('Access Denied', {
         description: 'Only customers can submit reviews.',
@@ -86,12 +93,11 @@ export default function ReviewFormPage() {
 
   // Handle form submission
   async function onSubmit(data: ReviewFormData) {
-    if (!eventId || !user) return;
+    if (!eventId || !completedTransaction) return;
 
     try {
       await createReviewMutation.mutateAsync({
-        eventId,
-        userId: user.id,
+        transactionId: completedTransaction.id,
         rating: data.rating,
         comment: data.comment.trim(),
       });
@@ -105,7 +111,10 @@ export default function ReviewFormPage() {
       navigate('/transactions');
     } catch (error) {
       toast.error('Error', {
-        description: 'Failed to submit review. Please try again.',
+        description:
+          error instanceof Error
+            ? error.message
+            : 'Failed to submit review. Please try again.',
         position: 'bottom-right',
       });
     }
@@ -162,6 +171,33 @@ export default function ReviewFormPage() {
     );
   }
 
+  // No completed transaction state
+  if (!completedTransaction) {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-background">
+          <div className="container max-w-2xl mx-auto px-4 py-8">
+            <Link
+              to="/transactions"
+              className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Transactions
+            </Link>
+            <Alert variant="destructive">
+              <AlertCircle className="w-4 h-4" />
+              <AlertTitle>Cannot Submit Review</AlertTitle>
+              <AlertDescription>
+                You must have a completed transaction for this event to submit a
+                review.
+              </AlertDescription>
+            </Alert>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   // Already reviewed state
   if (existingReview) {
     return (
@@ -169,7 +205,7 @@ export default function ReviewFormPage() {
         <div className="min-h-screen bg-background">
           <div className="container max-w-2xl mx-auto px-4 py-8">
             <Link
-              to="/my-transactions"
+              to="/transactions"
               className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -187,7 +223,7 @@ export default function ReviewFormPage() {
               </CardHeader>
               <CardContent className="text-center">
                 <Button className="rounded-xl" asChild>
-                  <Link to="/my-transactions">View My Transactions</Link>
+                  <Link to="/transactions">View My Transactions</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -205,7 +241,7 @@ export default function ReviewFormPage() {
         <div className="min-h-screen bg-background">
           <div className="container max-w-2xl mx-auto px-4 py-8">
             <Link
-              to="/my-transactions"
+              to="/transactions"
               className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -232,7 +268,7 @@ export default function ReviewFormPage() {
         <div className="container max-w-2xl mx-auto px-4 py-8">
           {/* Back Link */}
           <Link
-            to="/my-transactions"
+            to="/transactions"
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -339,7 +375,7 @@ export default function ReviewFormPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => navigate('/my-transactions')}
+                    onClick={() => navigate('/transactions')}
                     disabled={createReviewMutation.isPending}
                     className="rounded-xl hover:cursor-pointer hover:bg-destructive/20 hover:text-destructive hover:border-destructive/20"
                   >

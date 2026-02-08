@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import type { DiscountCoupon, PriceCalculation } from "@/types/checkout";
+import { useMemo } from 'react';
+import type { DiscountCoupon, PriceCalculation } from '@/types/checkout';
 
 interface UsePriceCalculationProps {
   basePrice: number;
@@ -27,15 +27,15 @@ export function usePriceCalculation({
     if (appliedCoupon) {
       let discount = 0;
 
-      if (appliedCoupon.discount_type === "percentage") {
-        discount = Math.floor((basePrice * appliedCoupon.discount_value) / 100);
-      } else if (appliedCoupon.discount_type === "fixed") {
-        discount = appliedCoupon.discount_value;
+      if (appliedCoupon.discountType === 'PERCENTAGE') {
+        discount = Math.floor((basePrice * appliedCoupon.discountValue) / 100);
+      } else if (appliedCoupon.discountType === 'FIXED') {
+        discount = appliedCoupon.discountValue;
       }
 
       // Cap discount with max_discount if set
-      if (appliedCoupon.max_discount) {
-        discount = Math.min(discount, appliedCoupon.max_discount);
+      if (appliedCoupon.maxDiscount) {
+        discount = Math.min(discount, appliedCoupon.maxDiscount);
       }
 
       calculation.couponDiscount = discount;

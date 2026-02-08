@@ -8,7 +8,7 @@ import { useAuthMutations } from '@/hooks/useAuthMutations';
 
 const registerFormSchema = z
   .object({
-    role: z.enum(['customer', 'organizer'], {
+    role: z.enum(['CUSTOMER', 'ORGANIZER'], {
       message: 'Please select a role',
     }),
     name: z
@@ -33,7 +33,7 @@ export const useRegisterForm = () => {
   const { isAuthenticated } = useAuth();
   const { registerMutation } = useAuthMutations();
   const [selectedRole, setSelectedRole] = useState<
-    'customer' | 'organizer' | null
+    'CUSTOMER' | 'ORGANIZER' | null
   >(null);
 
   const form = useForm<RegisterFormSchema>({
@@ -84,7 +84,7 @@ export const useRegisterForm = () => {
     onSubmit,
     isLoading: registerMutation.isPending,
     selectedRole,
-    setSelectedRole: (role: 'customer' | 'organizer') => {
+    setSelectedRole: (role: 'CUSTOMER' | 'ORGANIZER') => {
       setSelectedRole(role);
       form.setValue('role', role);
     },

@@ -1,11 +1,11 @@
-import { useState, useCallback } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useState, useCallback } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import type {
   DiscountCoupon,
   AttendeeInfo,
   PaymentMethod,
-} from "@/types/checkout";
-import * as checkoutApi from "@/api/checkout";
+} from '@/types/checkout';
+import * as checkoutApi from '@/api/checkout';
 
 interface UseCheckoutProps {
   userId: string;
@@ -22,20 +22,20 @@ export function useCheckout({
 
   // Attendee info state
   const [attendeeInfo, setAttendeeInfo] = useState<AttendeeInfo>({
-    fullName: "",
-    email: "",
-    phoneNumber: "",
+    fullName: '',
+    email: '',
+    phoneNumber: '',
   });
 
   // Payment method state
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
-    useState<PaymentMethod>("credit-card");
+    useState<PaymentMethod>('credit-card');
 
   // Coupon state
   const [appliedCoupon, setAppliedCoupon] = useState<DiscountCoupon | null>(
     null,
   );
-  const [couponCode, setCouponCode] = useState("");
+  const [couponCode, setCouponCode] = useState('');
   const [couponError, setCouponError] = useState<string | null>(null);
 
   // Points state
@@ -43,8 +43,9 @@ export function useCheckout({
 
   // Fetch user points
   const { data: userPoints = 0, isLoading: pointsLoading } = useQuery({
-    queryKey: ["user-points", userId],
-    queryFn: () => checkoutApi.fetchUserPoints(userId),
+    queryKey: ['user-points', userId],
+    queryFn: () => checkoutApi.fetchUserPoints(), //
+    enabled: !!userId,
   });
 
   // Validate coupon mutation
@@ -53,26 +54,26 @@ export function useCheckout({
     onSuccess: (coupon) => {
       // Validate expiration
       const now = new Date();
-      const validFrom = new Date(coupon.valid_from);
-      const validUntil = new Date(coupon.valid_until);
+      const validFrom = new Date(coupon.validFrom);
+      const validUntil = new Date(coupon.validUntil);
 
       if (now < validFrom || now > validUntil) {
-        setCouponError("Coupon has expired or not yet valid");
+        setCouponError('Coupon has expired or not yet valid');
         setAppliedCoupon(null);
         return;
       }
 
       // Check usage limit
-      if (coupon.usage_limit && coupon.used_count >= coupon.usage_limit) {
-        setCouponError("Coupon usage limit reached");
+      if (coupon.usageLimit && coupon.usedCount >= coupon.usageLimit) {
+        setCouponError('Coupon usage limit reached');
         setAppliedCoupon(null);
         return;
       }
 
       // Check minimum purchase
-      if (coupon.min_purchase && basePrice < coupon.min_purchase) {
+      if (coupon.minPurchase && basePrice < coupon.minPurchase) {
         setCouponError(
-          `Minimum purchase of ${coupon.min_purchase} required for this coupon`,
+          `Minimum purchase of ${coupon.minPurchase} required for this coupon`,
         );
         setAppliedCoupon(null);
         return;
@@ -80,11 +81,11 @@ export function useCheckout({
 
       setAppliedCoupon(coupon);
       setCouponError(null);
-      setCouponCode("");
+      setCouponCode('');
     },
     onError: (error) => {
       setCouponError(
-        error instanceof Error ? error.message : "Invalid coupon code",
+        error instanceof Error ? error.message : 'Invalid coupon code',
       );
       setAppliedCoupon(null);
     },
@@ -94,7 +95,7 @@ export function useCheckout({
   const applyCoupon = useCallback(
     (code: string) => {
       if (!code.trim()) {
-        setCouponError("Please enter a coupon code");
+        setCouponError('Please enter a coupon code');
         return;
       }
       validateCouponMutation.mutate(code.trim().toUpperCase());
@@ -105,7 +106,7 @@ export function useCheckout({
   // Remove coupon handler
   const removeCoupon = useCallback(() => {
     setAppliedCoupon(null);
-    setCouponCode("");
+    setCouponCode('');
     setCouponError(null);
   }, []);
 

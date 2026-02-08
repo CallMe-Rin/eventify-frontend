@@ -11,21 +11,36 @@ export const reviewFormSchema = z.object({
 
 export type ReviewFormData = z.infer<typeof reviewFormSchema>;
 
-// Review Interface
+// Review Interface - matches backend ReviewResponse
 export interface Review {
   id: string;
   eventId: string;
   userId: string;
+  transactionId: string;
   rating: number;
-  comment: string;
-  createdAt: string;
-  updatedAt: string;
+  comment: string | null;
+  createdAt: string | Date;
+  user?: {
+    name: string | null;
+  };
 }
 
-// Create Review Request
+// Create Review Request  - matches backend CreateReviewRequest
 export interface CreateReviewRequest {
-  eventId: string;
-  userId: string;
+  transactionId: string;
   rating: number;
-  comment: string;
+  comment?: string;
+}
+
+// Event Reviews Response with pagination
+export interface EventReviewsResponse {
+  reviews: Review[];
+  averageRating: number;
+  totalReviews: number;
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }

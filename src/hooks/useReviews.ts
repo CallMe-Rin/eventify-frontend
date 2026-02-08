@@ -1,55 +1,23 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { axiosInstance } from '@/lib/axiosInstance';
-import type { Review, CreateReviewRequest } from '@/types/api';
-
-// Query Keys
-export const reviewKeys = {
-  all: ['reviews'] as const,
-  lists: () => [...reviewKeys.all, 'list'] as const,
-  byEvent: (eventId: string) => [...reviewKeys.all, 'event', eventId] as const,
-  byUser: (userId: string) => [...reviewKeys.all, 'user', userId] as const,
-};
-
-// API Functions
-async function fetchReviewsByEvent(eventId: string): Promise<Review[]> {
-  const response = await axiosInstance.get<Review[]>('/reviews', {
-    params: { eventId },
-  });
-  return response.data;
-}
-
-async function fetchReviewsByUser(userId: string): Promise<Review[]> {
-  const response = await axiosInstance.get<Review[]>('/reviews', {
-    params: { userId },
-  });
-  return response.data;
-}
-
-async function createReview(data: CreateReviewRequest): Promise<Review> {
-  const review: Omit<Review, 'id'> = {
-    ...data,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-  const response = await axiosInstance.post<Review>('/reviews', review);
-  return response.data;
-}
-
-async function checkExistingReview(
-  eventId: string,
-  userId: string,
-): Promise<Review | null> {
-  const response = await axiosInstance.get<Review[]>('/reviews', {
-    params: { eventId, userId },
-  });
-  return response.data.length > 0 ? response.data[0] : null;
-}
+import type { CreateReviewRequest } from '@/types/api';
+import {
+  reviewKeys,
+  fetchReviewsByEvent,
+  fetchReviewsByUser,
+  createReview,
+  checkExistingReview,
+  deleteReview,
+} from '@/api/reviews';
 
 // Query Hooks
-export function useGetReviewsByEvent(eventId: string) {
+export function useGetReviewsByEvent(
+  eventId: string,
+  page: number = 1,
+  limit: number = 10,
+) {
   return useQuery({
     queryKey: reviewKeys.byEvent(eventId),
-    queryFn: () => fetchReviewsByEvent(eventId),
+    queryFn: () => fetchReviewsByEvent(eventId, page, limit),
     enabled: !!eventId,
     staleTime: 5 * 60 * 1000,
   });
@@ -77,13 +45,26 @@ export function useCreateReview() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createReview,
+    mutationFn: (data: CreateReviewRequest) => createReview(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: reviewKeys.byEvent(data.eventId),
       });
       queryClient.invalidateQueries({
         queryKey: reviewKeys.byUser(data.userId),
+      });
+    },
+  });
+}
+
+export function useDeleteReview() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (reviewId: string) => deleteReview(reviewId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: reviewKeys.all,
       });
     },
   });

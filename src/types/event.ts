@@ -1,48 +1,55 @@
+// Event Status from Prisma schema
+export type EventStatus = 'DRAFT' | 'PUBLISHED' | 'CANCELLED' | 'COMPLETED';
+
+// Event Category from Prisma schema
 export type EventCategory =
-  | 'music'
-  | 'technology'
-  | 'sports'
-  | 'art'
-  | 'food'
-  | 'business'
-  | 'education'
-  | 'health'
-  | 'other';
+  | 'TECHNOLOGY'
+  | 'MUSIC'
+  | 'BUSINESS'
+  | 'HEALTH'
+  | 'FOOD'
+  | 'ART'
+  | 'SPORTS'
+  | 'EDUCATION';
 
-export type EventStatus = 'draft' | 'published' | 'canceled' | 'completed';
-
+// Ticket Tier - matches backend TicketTierResponse
 export interface TicketTier {
   id: string;
   eventId: string;
   name: string;
-  description?: string;
+  description: string;
   price: number;
   quantity: number;
   sold: number;
-  benefits?: string[];
+  benefits: string[];
 }
 
+// Event Item - matches backend EventResponse
 export interface EventItem {
   id: string;
   title: string;
   description: string;
-  shortDescription: string;
+  shortDescription?: string;
   coverImage: string;
   images: string[];
-  category: EventCategory;
-  location: string;
+  categoryId: string;
+  category: {
+    value: EventCategory;
+  };
+  locationId: string;
   venue: string;
-  date: Date;
-  endDate?: string | null;
+  date: string | Date;
+  endDate?: string | Date;
   organizerId: string;
   isFree: boolean;
   status: EventStatus;
-  averageRating?: number;
-  totalReviews?: number;
-  createdAt: Date;
-  updatedAt: Date;
+  averageRating: number;
+  totalReviews: number;
+  createdAt: string | Date;
+  updatedAt: string | Date;
 }
 
+// Event with Ticket Tiers
 export interface EventWithTiers extends EventItem {
   ticketTiers: TicketTier[];
 }
@@ -55,15 +62,14 @@ export interface Category {
 }
 
 export const EVENT_CATEGORIES: Category[] = [
-  { id: 'cat-music', value: 'music', label: 'Music', icon: '🎵' },
-  { id: 'cat-tech', value: 'technology', label: 'Technology', icon: '💻' },
-  { id: 'cat-sports', value: 'sports', label: 'Sports', icon: '⚽' },
-  { id: 'cat-art', value: 'art', label: 'Art & Culture', icon: '🎨' },
-  { id: 'cat-food', value: 'food', label: 'Food & Drink', icon: '🍕' },
-  { id: 'cat-biz', value: 'business', label: 'Business', icon: '💼' },
-  { id: 'cat-edu', value: 'education', label: 'Education', icon: '📚' },
-  { id: 'cat-health', value: 'health', label: 'Health & Wellness', icon: '🧘' },
-  { id: 'cat-other', value: 'other', label: 'Other', icon: '✨' },
+  { id: 'cat-music', value: 'MUSIC', label: 'Music', icon: '🎵' },
+  { id: 'cat-tech', value: 'TECHNOLOGY', label: 'Technology', icon: '💻' },
+  { id: 'cat-sports', value: 'SPORTS', label: 'Sports', icon: '⚽' },
+  { id: 'cat-art', value: 'ART', label: 'Art & Culture', icon: '🎨' },
+  { id: 'cat-food', value: 'FOOD', label: 'Food & Drink', icon: '🍕' },
+  { id: 'cat-biz', value: 'BUSINESS', label: 'Business', icon: '💼' },
+  { id: 'cat-edu', value: 'EDUCATION', label: 'Education', icon: '📚' },
+  { id: 'cat-health', value: 'HEALTH', label: 'Health & Wellness', icon: '🧘' },
 ];
 
 export const EVENT_TYPES = [

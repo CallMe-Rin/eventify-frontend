@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -34,7 +34,7 @@ export default function CheckoutPage() {
   const quantity = Math.max(1, Math.min(100, Number(quantityParam) || 1));
 
   // Get authenticated user from better-auth
-  const { profile, isAuthenticated, isLoading: authLoading } = useAuth();
+  const { profile, isLoading: authLoading } = useAuth();
   const userId = profile?.id;
 
   // Confirmation dialog state
@@ -87,16 +87,6 @@ export default function CheckoutPage() {
     checkout.pointsLoading ||
     !userId;
 
-  useEffect(() => {
-    // Only run auth check after loading is complete
-    if (!isLoading && !isAuthenticated) {
-      const returnUrl = `/checkout?eventId=${eventId}&ticketTierId=${ticketTierId}&quantity=${quantity}`;
-      localStorage.setItem('redirectAfterLogin', returnUrl);
-      toast.error('Please sign in to proceed with checkout');
-      navigate('/login');
-    }
-  }, [isLoading, isAuthenticated, eventId, ticketTierId, quantity, navigate]);
-
   // Format date range
   const formatDateRange = () => {
     if (!event) return '';
@@ -140,14 +130,11 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
     try {
       await checkoutApi.createTransaction(
-        userId!,
         eventId!,
         ticketTierId!,
         quantity,
-        priceCalculation.finalPayable,
-        priceCalculation.couponDiscount,
         priceCalculation.pointsUsed,
-        checkout.appliedCoupon?.id,
+        checkout.appliedCoupon?.code,
       );
 
       if (priceCalculation.cashbackEarned > 0) {
@@ -245,7 +232,7 @@ export default function CheckoutPage() {
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                     <MapPin className="size-4" />
                     <span>
-                      {event.venue}, {event.location}
+                      {event.venue}, {event.locationId}
                     </span>
                   </div>
                 </div>

@@ -1,5 +1,4 @@
 import { Link } from 'react-router';
-import { useAuth } from '@/hooks/useAuth';
 import { useTransactions } from '@/hooks/useTransactions';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Ticket } from 'lucide-react';
@@ -8,10 +7,7 @@ import TransactionCard from '@/components/checkout/TransactionCard';
 import Layout from '@/components/layout/Layout';
 
 export default function TransactionsPage() {
-  const { user } = useAuth();
-  const { transactions, uploadPaymentProof, isLoading } = useTransactions(
-    user?.id,
-  );
+  const { transactions, uploadPaymentProof, isLoading } = useTransactions();
 
   return (
     <Layout>

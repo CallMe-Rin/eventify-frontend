@@ -1,121 +1,100 @@
-import axios from 'axios';
+import { axiosInstance } from '@/lib/axiosInstance';
 import type { Transaction, TransactionStatus } from '@/types/api';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import type { CreateTransactionRequest } from '@/types/api';
 
 interface FetchTransactionsParams {
-  user_id?: string;
-  event_id?: string;
+  status?: TransactionStatus;
+  eventId?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  page?: number;
+  limit?: number;
 }
 
+// Fetch user transactions (requires auth)
 export async function fetchTransactions(
-  params: FetchTransactionsParams,
+  params?: FetchTransactionsParams,
 ): Promise<Transaction[]> {
-  const queryParams = new URLSearchParams();
-  if (params.user_id) queryParams.append('user_id', params.user_id);
-  if (params.event_id) queryParams.append('event_id', params.event_id);
-
-  const { data } = await axios.get<Transaction[]>(
-    `${API_URL}/transactions?${queryParams.toString()}`,
+  const { data } = await axiosInstance.get<{ data: Transaction[] }>(
+    '/api/transactions',
+    { params },
   );
-  return data;
+  return Array.isArray(data) ? data : data.data || [];
 }
 
-export async function createTransactionApi(
-  transaction: Omit<Transaction, 'id' | 'created_at' | 'expires_at'>,
+// Create transaction (requires auth)
+export async function createTransaction(
+  request: CreateTransactionRequest,
 ): Promise<Transaction> {
-  const now = new Date();
-  const expiresAt = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-
-  const payload = {
-    ...transaction,
-    created_at: now.toISOString(),
-    expires_at: expiresAt.toISOString(),
-  };
-
-  const { data } = await axios.post<Transaction>(
-    `${API_URL}/transactions`,
-    payload,
+  const { data } = await axiosInstance.post<{ data: Transaction }>(
+    '/api/transactions',
+    request,
   );
-
-  // Update ticket tier sold count
-  if (transaction.ticket_tier_id) {
-    const { data: tier } = await axios.get(
-      `${API_URL}/ticketTiers/${transaction.ticket_tier_id}`,
-    );
-    await axios.patch(`${API_URL}/ticketTiers/${transaction.ticket_tier_id}`, {
-      sold: tier.sold + transaction.quantity,
-    });
-  }
-
-  // Deduct user points
-  if (transaction.points_used > 0) {
-    const { data: user } = await axios.get(
-      `${API_URL}/users/${transaction.user_id}`,
-    );
-    await axios.patch(`${API_URL}/users/${transaction.user_id}`, {
-      points: user.points - transaction.points_used,
-    });
-  }
-
-  return data;
+  return data.data || data;
 }
 
-export async function updateTransactionApi(
+// Update transaction status (requires auth, organizer for accepting/rejecting)
+export async function updateTransactionStatus(
   transactionId: string,
   status: TransactionStatus,
-  additionalData?: Partial<Transaction>,
 ): Promise<Transaction> {
-  const { data: oldTransaction } = await axios.get<Transaction>(
-    `${API_URL}/transactions/${transactionId}`,
+  const { data } = await axiosInstance.patch<{ data: Transaction }>(
+    `/api/transactions/${transactionId}/status`,
+    { status },
   );
-
-  const payload = {
-    ...additionalData,
-    status,
-  };
-
-  // Handle rollback for canceled/expired/rejected
-  if (
-    ['expired', 'rejected', 'canceled'].includes(status) &&
-    !['expired', 'rejected', 'canceled'].includes(oldTransaction.status)
-  ) {
-    // Restore ticket seats
-    const { data: tier } = await axios.get(
-      `${API_URL}/ticketTiers/${oldTransaction.ticket_tier_id}`,
-    );
-    await axios.patch(
-      `${API_URL}/ticketTiers/${oldTransaction.ticket_tier_id}`,
-      {
-        sold: tier.sold - oldTransaction.quantity,
-      },
-    );
-
-    // Refund points
-    if (oldTransaction.points_used > 0) {
-      const { data: user } = await axios.get(
-        `${API_URL}/users/${oldTransaction.user_id}`,
-      );
-      await axios.patch(`${API_URL}/users/${oldTransaction.user_id}`, {
-        points: user.points + oldTransaction.points_used,
-      });
-    }
-  }
-
-  const { data } = await axios.patch<Transaction>(
-    `${API_URL}/transactions/${transactionId}`,
-    payload,
-  );
-
-  return data;
+  return data.data || data;
 }
 
-export async function uploadPaymentProofApi(
+// Upload payment proof (requires auth)
+export async function uploadPaymentProof(
   transactionId: string,
   proofUrl: string,
 ): Promise<Transaction> {
-  return updateTransactionApi(transactionId, 'waiting_confirmation', {
-    payment_proof_url: proofUrl,
-    paid_at: new Date().toISOString(),
+  const { data } = await axiosInstance.post<{ data: Transaction }>(
+    `/api/transactions/${transactionId}/upload-proof`,
+    { proofUrl },
+  );
+  return data.data || data;
+}
+
+// Accept transaction (requires auth, organizer only)
+export async function acceptTransaction(
+  transactionId: string,
+): Promise<Transaction> {
+  const { data } = await axiosInstance.patch<{ data: Transaction }>(
+    `/api/transactions/${transactionId}/accept`,
+  );
+  return data.data || data;
+}
+
+// Reject transaction (requires auth, organizer only)
+export async function rejectTransaction(
+  transactionId: string,
+  rejectionReason?: string,
+): Promise<Transaction> {
+  const { data } = await axiosInstance.patch<{ data: Transaction }>(
+    `/api/transactions/${transactionId}/reject`,
+    { rejectionReason },
+  );
+  return data.data || data;
+}
+
+// Cancel transaction (requires auth)
+export async function cancelTransaction(
+  transactionId: string,
+): Promise<Transaction> {
+  const { data } = await axiosInstance.patch<{ data: Transaction }>(
+    `/api/transactions/${transactionId}/cancel`,
+  );
+  return data.data || data;
+}
+
+// Get organizer transactions (requires auth, organizer only)
+export async function getOrganizerTransactions(
+  params?: FetchTransactionsParams,
+) {
+  const { data } = await axiosInstance.get('/api/organizer/transactions', {
+    params,
   });
+  return data.data || [];
 }

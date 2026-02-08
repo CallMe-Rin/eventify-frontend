@@ -8,12 +8,12 @@ export function useCheckoutButtonState() {
   const { isAuthenticated, role, isLoading } = useAuth();
 
   const isCheckoutDisabled =
-    isLoading || !isAuthenticated || role !== 'customer';
+    isLoading || !isAuthenticated || role !== 'CUSTOMER';
 
   const checkoutDisabledReason = (() => {
     if (isLoading) return 'Loading...';
     if (!isAuthenticated) return 'Sign in to checkout';
-    if (role !== 'customer') return 'Only customers can checkout';
+    if (role !== 'CUSTOMER') return 'Only customers can checkout';
     return null;
   })();
 

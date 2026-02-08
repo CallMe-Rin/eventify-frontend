@@ -30,10 +30,10 @@ export default function HomePage() {
   const filteredEvents = useMemo(() => {
     return events.filter((event) => {
       const categoryMatch =
-        selectedCategory === 'all' || event.category === selectedCategory;
+        selectedCategory === 'all' || event.categoryId === selectedCategory;
       const locationMatch =
         selectedLocation === 'All Locations' ||
-        event.location === selectedLocation;
+        event.locationId === selectedLocation;
       return categoryMatch && locationMatch;
     });
   }, [events, selectedCategory, selectedLocation]);

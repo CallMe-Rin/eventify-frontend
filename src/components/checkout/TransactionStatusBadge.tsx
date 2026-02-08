@@ -16,12 +16,12 @@ interface TransactionStatusBadgeProps {
 }
 
 const statusIcons: Record<TransactionStatus, React.ReactNode> = {
-  waiting_payment: <Clock className="size-3.5" />,
-  waiting_confirmation: <HourglassIcon className="size-3.5" />,
-  done: <CheckCircle2 className="size-3.5" />,
-  rejected: <XCircle className="size-3.5" />,
-  expired: <AlertTriangle className="size-3.5" />,
-  canceled: <Ban className="size-3.5" />,
+  WAITING_PAYMENT: <Clock className="size-3.5" />,
+  WAITING_CONFIRMATION: <HourglassIcon className="size-3.5" />,
+  DONE: <CheckCircle2 className="size-3.5" />,
+  REJECTED: <XCircle className="size-3.5" />,
+  EXPIRED: <AlertTriangle className="size-3.5" />,
+  CANCELED: <Ban className="size-3.5" />,
 };
 
 export function TransactionStatusBadge({

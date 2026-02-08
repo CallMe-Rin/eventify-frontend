@@ -114,7 +114,7 @@ export default function RegisterPage() {
                       type="button"
                       onClick={() => {
                         setSelectedRole('customer');
-                        setValue('role', 'customer', { shouldValidate: true });
+                        setValue('role', 'CUSTOMER', { shouldValidate: true });
                       }}
                       className={`rounded-xl border-2 p-4 text-center transition hover:cursor-pointer hover:bg-secondary/40 ${
                         selectedRole === 'customer'
@@ -138,7 +138,7 @@ export default function RegisterPage() {
                       type="button"
                       onClick={() => {
                         setSelectedRole('organizer');
-                        setValue('role', 'organizer', { shouldValidate: true });
+                        setValue('role', 'ORGANIZER', { shouldValidate: true });
                       }}
                       className={`rounded-xl border-2 p-4 text-center transition hover:cursor-pointer hover:bg-secondary/40 ${
                         selectedRole === 'organizer'
