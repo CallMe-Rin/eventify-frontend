@@ -1,18 +1,18 @@
-import { EVENT_CATEGORIES, LOCATIONS, type EventCategory } from "@/types/api";
-import { cn } from "@/lib/utils";
+import { EVENT_CATEGORIES, LOCATIONS, type EventCategory } from '@/types/api';
+import { cn } from '@/lib/utils';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { MapPin, Filter } from "lucide-react";
+} from '@/components/ui/select';
+import { MapPin, Filter } from 'lucide-react';
 
 interface CategoryFiltersProps {
-  selectedCategory: EventCategory | "all";
+  selectedCategory: EventCategory | 'all';
   selectedLocation: string;
-  onCategoryChange: (category: EventCategory | "all") => void;
+  onCategoryChange: (category: EventCategory | 'all') => void;
   onLocationChange: (location: string) => void;
   locations?: string[];
 }
@@ -26,17 +26,17 @@ export default function CategoryFilters({
 }: CategoryFiltersProps) {
   return (
     <section className="border-b border-border bg-card/50 px-4 sm:px-0">
-      <div className="container mx-auto py-6">
+      <div className="container mx-auto 2xl:px-35 py-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           {/* Category Pills */}
           <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar lg:pb-0">
             <button
-              onClick={() => onCategoryChange("all")}
+              onClick={() => onCategoryChange('all')}
               className={cn(
-                "flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all",
-                selectedCategory === "all"
-                  ? "bg-primary text-primary-foreground shadow-md"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                'flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all hover:cursor-pointer',
+                selectedCategory === 'all'
+                  ? 'bg-primary text-primary-foreground shadow-md'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground',
               )}
             >
               <Filter className="h-4 w-4" />
@@ -47,10 +47,10 @@ export default function CategoryFilters({
                 key={category.value}
                 onClick={() => onCategoryChange(category.value)}
                 className={cn(
-                  "flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all",
+                  'flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all hover:cursor-pointer',
                   selectedCategory === category.value
-                    ? "bg-primary text-primary-foreground shadow-md"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground',
                 )}
               >
                 <span>{category.icon}</span>
@@ -63,7 +63,7 @@ export default function CategoryFilters({
           <div className="flex shrink-0 items-center gap-2">
             <MapPin className="h-4 w-4 text-muted-foreground" />
             <Select value={selectedLocation} onValueChange={onLocationChange}>
-              <SelectTrigger className="w-48 rounded-full border-muted bg-muted/50">
+              <SelectTrigger className="w-48 rounded-full border-muted bg-muted/50 hover:cursor-pointer">
                 <SelectValue placeholder="Select location" />
               </SelectTrigger>
               <SelectContent className="rounded-2xl p-1">
@@ -71,7 +71,7 @@ export default function CategoryFilters({
                   <SelectItem
                     key={location}
                     value={location}
-                    className="rounded-lg"
+                    className="rounded-lg hover:cursor-pointer"
                   >
                     {location}
                   </SelectItem>

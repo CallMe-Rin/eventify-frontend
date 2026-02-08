@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router';
+import { useEffect, useState } from 'react';
+import { useSearchParams, useNavigate, useLocation } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import {
   Loader2,
@@ -26,6 +26,7 @@ import CheckoutSkeleton from '@/components/checkout/CheckoutSkeleton';
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
 
   // Extract eventId and ticketTierId from URL search params
   const eventId = searchParams.get('eventId');
@@ -43,18 +44,28 @@ export default function CheckoutPage() {
   // Form state
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (!authLoading && !profile) {
+      localStorage.setItem(
+        'redirectAfterLogin',
+        location.pathname + location.search,
+      );
+      navigate('/login', { replace: true });
+    }
+  }, [authLoading, profile, location, navigate]);
+
   // Fetch event details
   const { data: event, isLoading: eventLoading } = useQuery({
     queryKey: ['event', eventId || ''],
     queryFn: () => eventsApi.fetchEventById(eventId || ''),
-    enabled: !!eventId && !!userId,
+    enabled: !!eventId,
   });
 
   // Fetch ticket tiers
   const { data: ticketTiers, isLoading: tiersLoading } = useQuery({
     queryKey: ['ticket-tiers', eventId || ''],
     queryFn: () => eventsApi.fetchTicketTiersByEventId(eventId || ''),
-    enabled: !!eventId && !!userId,
+    enabled: !!eventId,
   });
 
   // Find the selected ticket tier from fetched tiers

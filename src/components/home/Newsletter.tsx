@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Mail, ArrowRight, CheckCircle } from "lucide-react";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Mail, ArrowRight, CheckCircle } from 'lucide-react';
 
 export default function Newsletter() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {

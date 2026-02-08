@@ -33,9 +33,7 @@ export interface EventItem {
   coverImage: string;
   images: string[];
   categoryId: string;
-  category: {
-    value: EventCategory;
-  };
+  category: EventCategory;
   locationId: string;
   venue: string;
   date: string | Date;

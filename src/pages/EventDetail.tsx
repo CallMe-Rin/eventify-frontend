@@ -25,9 +25,10 @@ import {
 import { SocialIcon } from 'react-social-icons';
 import { useEventWithTiers } from '@/hooks/useEvents';
 import { useAuth } from '@/hooks/useAuth';
-import { EVENT_CATEGORIES, formatIDR } from '@/types/api';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useCategories } from '@/hooks/useCategories';
+import { formatIDR } from '@/types';
 
 export default function EventDetailPage() {
   const { id } = useParams();
@@ -44,6 +45,13 @@ export default function EventDetailPage() {
     isError,
     refetch,
   } = useEventWithTiers(id || '');
+
+  // Fetch category from API
+  const { data: categories } = useCategories();
+
+  const categoryId = event?.categoryId;
+
+  const eventCategory = categories?.find((c) => c.id === categoryId) ?? null;
 
   const [openTiers, setOpenTiers] = useState<Record<string, boolean>>({});
 
@@ -93,6 +101,8 @@ export default function EventDetailPage() {
 
   // Auto-update active tab on scroll
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+
     const handleScroll = () => {
       const sections = ['description', 'tickets', 'terms'];
       const scrollPosition = window.scrollY + 100;
@@ -114,8 +124,9 @@ export default function EventDetailPage() {
     };
 
     window.addEventListener('scroll', handleScroll);
+
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [id]);
 
   // Group tiers by category
   const groupedTiers = useMemo(() => {
@@ -274,7 +285,7 @@ export default function EventDetailPage() {
     );
   }
 
-  const category = EVENT_CATEGORIES.find((c) => c.value === event?.categoryId);
+  // const category = EVENT_CATEGORIES.find((c) => c.value === event?.categoryId);
 
   return (
     <Layout>
@@ -316,7 +327,7 @@ export default function EventDetailPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Ticket className="h-5 w-5 text-primary" />
-                  <span>{category?.label}</span>
+                  <span>{eventCategory?.label}</span>
                 </div>
               </div>
             </div>
@@ -338,7 +349,7 @@ export default function EventDetailPage() {
                   <button
                     key={tab.id}
                     onClick={() => scrollToSection(tab.id)}
-                    className={`py-4 text-sm font-semibold border-b-2 transition-all ${
+                    className={`py-4 text-sm font-semibold border-b-2 transition-all hover:cursor-pointer ${
                       activeTab === tab.id
                         ? 'border-primary text-primary'
                         : 'border-transparent text-muted-foreground hover:text-primary'
@@ -536,7 +547,7 @@ export default function EventDetailPage() {
                       </div>
                       <div className="flex gap-3 items-start text-sm">
                         <Ticket className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                        <span>{category?.label}</span>
+                        <span>{eventCategory?.label}</span>
                       </div>
                     </div>
                   </div>

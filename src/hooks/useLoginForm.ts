@@ -1,6 +1,5 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from 'react-router';
 import { authClient, signIn } from '@/lib/auth-client';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -13,8 +12,6 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export function useLoginForm() {
-  const navigate = useNavigate();
-
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -35,11 +32,11 @@ export function useLoginForm() {
         return;
       }
 
-      // 🔥 FORCE SESSION SYNC
       await authClient.getSession();
 
-      toast.success('Welcome back!');
+      toast.success('Login success!');
 
+      /*
       const redirectUrl = localStorage.getItem('redirectAfterLogin');
 
       if (redirectUrl) {
@@ -48,6 +45,7 @@ export function useLoginForm() {
       } else {
         navigate('/', { replace: true });
       }
+        */
     } catch (error) {
       form.setError('root', {
         message: error instanceof Error ? error.message : 'Login failed',

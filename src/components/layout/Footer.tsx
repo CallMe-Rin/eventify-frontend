@@ -1,5 +1,5 @@
-import { Facebook, Instagram, Ticket, Twitter, Youtube } from "lucide-react";
-import { Link } from "react-router";
+import { Facebook, Instagram, Ticket, Twitter, Youtube } from 'lucide-react';
+import { Link } from 'react-router';
 
 export default function Footer() {
   return (
