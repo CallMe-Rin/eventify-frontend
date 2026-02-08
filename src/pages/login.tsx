@@ -17,15 +17,28 @@ import {
   FieldGroup,
   FieldLabel,
 } from '@/components/ui/field';
+import { useSession } from '@/lib/auth-client';
+import { useNavigate } from 'react-router';
+import { useEffect } from 'react';
 
 export default function LoginPage() {
   const { form, onSubmit, isLoading } = useLoginForm();
+  const { data: session, isPending } = useSession();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = form;
   const rootError = errors.root?.message;
+
+  useEffect(() => {
+    if (!isPending && session) {
+      const redirectUrl = localStorage.getItem('redirectAfterLogin') || '/';
+      localStorage.removeItem('redirectAfterLogin');
+      navigate(redirectUrl, { replace: true });
+    }
+  }, [session, isPending, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">

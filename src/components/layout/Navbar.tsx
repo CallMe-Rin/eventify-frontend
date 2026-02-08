@@ -1,8 +1,6 @@
-import { Link, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { useState } from 'react';
 import {
-  CalendarPlus,
-  Compass,
   HelpCircle,
   Info,
   LayoutDashboard,
@@ -32,9 +30,26 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchInput, setSearchInput] = useState('');
+  const location = useLocation();
   const navigate = useNavigate();
 
   const { user, isAuthenticated } = useAuth();
+
+  const handleLoginClick = () => {
+    localStorage.setItem(
+      'redirectAfterLogin',
+      location.pathname + location.search,
+    );
+    navigate('/login');
+  };
+
+  const handleRegisterClick = () => {
+    localStorage.setItem(
+      'redirectAfterLogin',
+      location.pathname + location.search,
+    );
+    navigate('/register');
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,7 +95,7 @@ export default function Navbar() {
             placeholder="Search events..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="max-w-3xl rounded-full border-muted bg-muted/50 pl-10 focus-visible:ring-primary"
+            className="max-w-full rounded-full border bg-muted/50 pl-10 focus-visible:ring-primary py-5"
           />
         </form>
 
@@ -94,20 +109,22 @@ export default function Navbar() {
               className="rounded-full cursor-pointer gap-2 px-4 hover:bg-transparent hover:text-primary transition-all active:scale-95"
             >
               <Link to="/create-event">
-                <CalendarPlus className="h-4 w-4" />
-                <span className="text-sm font-medium">Create Event</span>
+                {/* <CalendarPlus className="h-4 w-4" /> */}
+                <span className="text-sm font-bold text-primary">
+                  Create Event
+                </span>
               </Link>
             </Button>
 
             {/* Discover Button */}
             <Button
-              variant="default"
+              variant="ghost"
               asChild
               className="rounded-full cursor-pointer gap-2 px-4 transition-all active:scale-95"
             >
               <Link to="/discover">
-                <Compass className="h-4 w-4" />
-                <span className="text-sm font-medium">Discover</span>
+                {/* <Compass className="h-4 w-4" /> */}
+                <span className="text-sm font-bold text-primary">Discover</span>
               </Link>
             </Button>
           </nav>
@@ -167,11 +184,25 @@ export default function Navbar() {
             </DropdownMenu>
           ) : (
             <>
-              <Button variant="outline" className="rounded-full" asChild>
-                <Link to="/login">Sign In</Link>
+              <Button
+                variant="ghost"
+                className="rounded-full font-bold"
+                asChild
+                onClick={handleLoginClick}
+              >
+                <Link to="/login" className="text-primary">
+                  Login
+                </Link>
               </Button>
-              <Button className="rounded-full" asChild>
-                <Link to="/register">Get Started</Link>
+              <Button
+                variant="ghost"
+                className="rounded-full font-bold"
+                asChild
+                onClick={handleRegisterClick}
+              >
+                <Link to="/register" className="text-primary">
+                  Sign Up
+                </Link>
               </Button>
             </>
           )}

@@ -153,7 +153,7 @@ export default function DiscoverPage() {
     // Category filter
     if (selectedCategories.length > 0) {
       filtered = filtered.filter((event) =>
-        selectedCategories.includes(event.category.value),
+        selectedCategories.includes(event.categoryId as EventCategory),
       );
     }
 
@@ -228,7 +228,7 @@ export default function DiscoverPage() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto 2xl:px-35 py-8">
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Discover Events</h1>
@@ -484,7 +484,7 @@ export default function DiscoverPage() {
                     <Button
                       onClick={clearFilters}
                       variant="outline"
-                      className="rounded-xl hover:cursor-pointer"
+                      className="rounded-full hover:cursor-pointer"
                     >
                       Clear all filters
                     </Button>

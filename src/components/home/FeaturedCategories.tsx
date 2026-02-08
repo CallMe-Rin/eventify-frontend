@@ -1,22 +1,22 @@
-import { Link } from "react-router";
-import { ArrowRight } from "lucide-react";
-import { EVENT_CATEGORIES } from "@/types/api";
+import { Link } from 'react-router';
+import { ArrowRight } from 'lucide-react';
+import { EVENT_CATEGORIES } from '@/types/api';
 
 const categoryImages: Record<string, string> = {
   music:
-    "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&q=80",
+    'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&q=80',
   technology:
-    "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80",
+    'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80',
   sports:
-    "https://images.unsplash.com/photo-1585032083927-c7b26d6c1d07?w=400&q=80",
-  art: "https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=400&q=80",
-  food: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80",
+    'https://images.unsplash.com/photo-1585032083927-c7b26d6c1d07?w=400&q=80',
+  art: 'https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=400&q=80',
+  food: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80',
   business:
-    "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&q=80",
+    'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&q=80',
   education:
-    "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&q=80",
+    'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&q=80',
   health:
-    "https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=400&q=80",
+    'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=400&q=80',
 };
 
 export default function FeaturedCategories() {
@@ -24,7 +24,7 @@ export default function FeaturedCategories() {
 
   return (
     <section className="bg-muted/30 py-16">
-      <div className="container px-4 sm:px-0 mx-auto">
+      <div className="container px-4 2xl:px-35 mx-auto">
         <div className="mb-10 text-center">
           <h2 className="mb-3 text-2xl font-bold tracking-tight sm:text-3xl">
             Browse by Category

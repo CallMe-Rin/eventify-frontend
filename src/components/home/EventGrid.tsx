@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { Calendar, Frown, ArrowRight } from "lucide-react";
-import { Link } from "react-router";
-import EventCard from "./EventCard";
-import type { EventWithTiers } from "@/types/api";
+import { Button } from '@/components/ui/button';
+import { Calendar, Frown, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router';
+import EventCard from './EventCard';
+import type { EventWithTiers } from '@/types/api';
 
 interface EventGridProps {
   events: EventWithTiers[];
@@ -14,10 +14,10 @@ interface EventGridProps {
 
 export default function EventGrid({
   events,
-  title = "Upcoming Events",
+  title = 'Upcoming Events',
   subtitle,
   showViewAll = true,
-  emptyMessage = "No events found",
+  emptyMessage = 'No events found',
 }: EventGridProps) {
   if (events.length === 0) {
     return (
@@ -31,7 +31,7 @@ export default function EventGrid({
             Try adjusting your filters or search terms to find what you're
             looking for.
           </p>
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2 rounded-full">
             <Calendar className="h-4 w-4" />
             Browse All Events
           </Button>
@@ -44,7 +44,7 @@ export default function EventGrid({
   const [featuredEvent, ...gridEvents] = events;
 
   return (
-    <section className="container mx-auto py-12 px-4 sm:px-0">
+    <section className="container mx-auto py-12 px-4 2xl:px-35">
       {/* Header */}
       <div className="mb-8 flex items-end justify-between">
         <div>

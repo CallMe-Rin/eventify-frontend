@@ -55,7 +55,7 @@ export default function HomePage() {
 
       {/* Loading State */}
       {isEventsLoading && (
-        <section className="container mx-auto py-16">
+        <section className="container mx-auto px-4 2xl:px-35 py-16">
           <div className="mb-8">
             <Skeleton className="h-8 w-48 mb-2 bg-secondary" />
             <Skeleton className="h-5 w-64 bg-secondary" />
@@ -76,7 +76,7 @@ export default function HomePage() {
       {/* Error State */}
       {isEventsError && !isEventsLoading && (
         <section className="container mx-auto py-16">
-          <div className="flex flex-col items-center justify-center rounded-2xl border bg-card py-16 px-4 text-center">
+          <div className="flex flex-col items-center justify-center rounded-2xl border bg-card py-16 px-4 2xl:px-35 text-center">
             <div className="mb-4 rounded-full bg-destructive/10 p-4">
               <AlertCircle className="h-8 w-8 text-destructive" />
             </div>
