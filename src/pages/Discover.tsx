@@ -74,31 +74,51 @@ const SORT_OPTIONS = [
 export default function DiscoverPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const urlSearch = searchParams.get('search') || '';
-
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('date_asc');
-  const [selectedLocation, setSelectedLocation] = useState('All Locations');
-  const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>(
-    [],
+
+  const [selectedLocation, setSelectedLocation] = useState(
+    searchParams.get('location') || 'All Locations',
   );
-  const [eventType, setEventType] = useState('all');
-  const [onlineOnly, setOnlineOnly] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(urlSearch);
-  const [currentSearch, setCurrentSearch] = useState(urlSearch);
+  const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>(
+    (searchParams.get('category')?.split(',') as EventCategory[])?.filter(
+      Boolean,
+    ) || [],
+  );
+  const [eventType, setEventType] = useState(searchParams.get('type') || 'all');
+  const [onlineOnly, setOnlineOnly] = useState(
+    searchParams.get('online') === 'true',
+  );
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get('search') || '',
+  );
+  const [currentSearch, setCurrentSearch] = useState(
+    searchParams.get('search') || '',
+  );
+
   const debounce = useDebounce();
-
   const { data: categories = [] } = useCategories();
-
   const { getLocationName } = useLocations();
 
   useEffect(() => {
-    if (currentSearch) {
-      setSearchParams({ search: currentSearch }, { replace: true });
-    } else {
-      setSearchParams({}, { replace: true });
-    }
-  }, [currentSearch, setSearchParams]);
+    const params: Record<string, string> = {};
+    if (currentSearch) params.search = currentSearch;
+    if (selectedLocation !== 'All Locations')
+      params.location = selectedLocation;
+    if (selectedCategories.length > 0)
+      params.category = selectedCategories.join(',');
+    if (eventType !== 'all') params.type = eventType;
+    if (onlineOnly) params.online = 'true';
+
+    setSearchParams(params, { replace: true });
+  }, [
+    currentSearch,
+    selectedLocation,
+    selectedCategories,
+    eventType,
+    onlineOnly,
+    setSearchParams,
+  ]);
 
   // Fetch data from API
   const {
@@ -170,6 +190,12 @@ export default function DiscoverPage() {
       filtered = filtered.filter((event) => event.isFree);
     }
 
+    if (onlineOnly) {
+      filtered = filtered.filter((event) =>
+        event.venue.toLowerCase().includes('online'),
+      );
+    }
+
     // Sort
     filtered.sort((a, b) => {
       switch (sortBy) {
@@ -209,6 +235,7 @@ export default function DiscoverPage() {
     selectedLocation,
     selectedCategories,
     eventType,
+    onlineOnly,
     sortBy,
   ]);
 
@@ -251,9 +278,12 @@ export default function DiscoverPage() {
             </span>
             {selectedLocation !== 'All Locations' && (
               <Badge variant="secondary" className="gap-1 pl-2">
-                {selectedLocation}
+                {getLocationName(selectedLocation) || selectedLocation}
                 <button
-                  onClick={() => setSelectedLocation('All Locations')}
+                  onClick={() => {
+                    setSelectedLocation('All Locations');
+                    setOnlineOnly(false);
+                  }}
                   className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"
                 >
                   <X className="h-3 w-3 hover:cursor-pointer" />
