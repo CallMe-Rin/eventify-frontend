@@ -20,6 +20,7 @@ const registerFormSchema = z
       .string()
       .min(8, { message: 'Password must be at least 8 characters' }),
     confirmPassword: z.string(),
+    referredBy: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
@@ -43,6 +44,7 @@ export const useRegisterForm = () => {
       email: '',
       password: '',
       confirmPassword: '',
+      referredBy: '',
     },
     resolver: zodResolver(registerFormSchema),
   });
@@ -61,6 +63,7 @@ export const useRegisterForm = () => {
         email: data.email.trim(),
         password: data.password,
         role: data.role,
+        referredBy: data.referredBy || null,
       },
       {
         onSuccess: () => {
