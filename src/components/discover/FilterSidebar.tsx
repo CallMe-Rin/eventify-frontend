@@ -57,12 +57,14 @@ export default function FilterSidebar({
   const { data: categories = [], isPending: isCategoriesLoading } =
     useCategories();
 
+  const onlineLocation = locations.find((l) => l.name === 'Online');
+
   // Handle the Online Switch Toggle
   const handleOnlineToggle = (checked: boolean) => {
     onOnlineOnlyChange(checked);
-    if (checked) {
+    if (checked && onlineLocation) {
       // If switch turned ON, force location to Online
-      onLocationChange('Online');
+      onLocationChange(onlineLocation.id);
     } else {
       // If switch turned OFF, reset to All Locations
       onLocationChange('All Locations');
@@ -70,9 +72,9 @@ export default function FilterSidebar({
   };
 
   // Handle specific Location Selection
-  const handleLocationSelect = (locationName: string) => {
-    onLocationChange(locationName);
-    if (locationName !== 'Online') {
+  const handleLocationSelect = (locationId: string) => {
+    onLocationChange(locationId);
+    if (onlineLocation && locationId !== onlineLocation.id) {
       onOnlineOnlyChange(false);
     }
   };
@@ -101,7 +103,10 @@ export default function FilterSidebar({
         </Label>
         <Switch
           id="online-events"
-          checked={onlineOnly || selectedLocation === 'Online'}
+          checked={
+            onlineOnly ||
+            (onlineLocation && selectedLocation === onlineLocation.id)
+          }
           onCheckedChange={handleOnlineToggle}
           className="hover:cursor-pointer"
         ></Switch>
@@ -129,22 +134,25 @@ export default function FilterSidebar({
           />
         </CollapsibleTrigger>
         <CollapsibleContent className="pt-2 space-y-1">
-          {locations.slice(0, 8).map((location) => (
-            <button
-              key={location.id}
-              onClick={() => {
-                handleLocationSelect(location.name);
-              }}
-              className={cn(
-                'block w-full rounded-full px-3 py-2 text-left text-sm transition-colors hover:cursor-pointer',
-                selectedLocation === location.name
-                  ? 'bg-primary/10 text-primary font-medium'
-                  : 'hover:bg-muted',
-              )}
-            >
-              {location.name}
-            </button>
-          ))}
+          {locations
+            .filter((loc) => loc.id !== onlineLocation?.id)
+            .slice(0, 8)
+            .map((location) => (
+              <button
+                key={location.id}
+                onClick={() => {
+                  handleLocationSelect(location.id);
+                }}
+                className={cn(
+                  'block w-full rounded-full px-3 py-2 text-left text-sm transition-colors hover:cursor-pointer',
+                  selectedLocation === location.id
+                    ? 'bg-primary/10 text-primary font-medium'
+                    : 'hover:bg-muted',
+                )}
+              >
+                {location.name}
+              </button>
+            ))}
         </CollapsibleContent>
       </Collapsible>
 
