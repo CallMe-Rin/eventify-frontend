@@ -23,7 +23,7 @@ export default function HomePage() {
     isPending: isEventsLoading,
     isError: isEventsError,
     refetch: refetchEvents,
-  } = useEventsWithTiers();
+  } = useEventsWithTiers(9);
 
   const { locations } = useLocations();
 
@@ -75,7 +75,7 @@ export default function HomePage() {
 
       {/* Error State */}
       {isEventsError && !isEventsLoading && (
-        <section className="container mx-auto py-16">
+        <section className="max-w-7xl mx-auto py-16">
           <div className="flex flex-col items-center justify-center rounded-2xl border bg-card py-16 px-4 max-w-7xl text-center">
             <div className="mb-4 rounded-full bg-destructive/10 p-4">
               <AlertCircle className="h-8 w-8 text-destructive" />

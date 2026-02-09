@@ -17,9 +17,18 @@ export const ticketTierKeys = {
 };
 
 // Fetch all events (public endpoint)
-export async function fetchEvents(): Promise<EventItem[]> {
+export async function fetchEvents(params?: {
+  limit?: number;
+  page?: number;
+}): Promise<EventItem[]> {
   const { data } = await axiosInstance.get<{ data: EventItem[] }>(
     '/api/events',
+    {
+      params: {
+        limit: params?.limit || 100,
+        ...params,
+      },
+    },
   );
   return Array.isArray(data) ? data : data.data || [];
 }
@@ -55,8 +64,10 @@ export async function searchEvents(
 }
 
 // Fetch events with tiers (combines event and ticket tier data)
-export async function fetchEventsWithTiers(): Promise<EventWithTiers[]> {
-  const events = await fetchEvents();
+export async function fetchEventsWithTiers(
+  limit?: number,
+): Promise<EventWithTiers[]> {
+  const events = await fetchEvents({ limit: limit ?? 100 });
   // Events from backend already include ticket tiers in the response
   return events as EventWithTiers[];
 }

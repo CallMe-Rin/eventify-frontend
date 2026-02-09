@@ -106,7 +106,7 @@ export default function DiscoverPage() {
     isPending: isEventsLoading,
     isError: isEventsError,
     refetch: refetchEvents,
-  } = useEventsWithTiers();
+  } = useEventsWithTiers(100);
 
   const toggleCategory = (category: EventCategory) => {
     setSelectedCategories((prev) =>

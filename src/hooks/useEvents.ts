@@ -4,21 +4,21 @@ import {
   fetchEventWithTiers,
   fetchEvents,
   fetchEventsWithTiers,
-} from "@/api/events";
-import { useQuery } from "@tanstack/react-query";
+} from '@/api/events';
+import { useQuery } from '@tanstack/react-query';
 
 export function useEvents() {
   return useQuery({
     queryKey: eventKeys.list(),
-    queryFn: fetchEvents,
+    queryFn: () => fetchEvents(),
     staleTime: 1000 * 60 * 5,
   });
 }
 
-export function useEventsWithTiers() {
+export function useEventsWithTiers(limit?: number) {
   return useQuery({
-    queryKey: [...eventKeys.lists(), "with-tiers"],
-    queryFn: fetchEventsWithTiers,
+    queryKey: [...eventKeys.lists(), 'with-tiers', limit],
+    queryFn: () => fetchEventsWithTiers(limit),
     staleTime: 1000 * 60 * 5,
   });
 }
@@ -34,7 +34,7 @@ export function useEvent(id: string) {
 
 export function useEventWithTiers(id: string) {
   return useQuery({
-    queryKey: [...eventKeys.detail(id), "with-tiers"],
+    queryKey: [...eventKeys.detail(id), 'with-tiers'],
     queryFn: () => fetchEventWithTiers(id),
     enabled: !!id,
     staleTime: 1000 * 60 * 5,
