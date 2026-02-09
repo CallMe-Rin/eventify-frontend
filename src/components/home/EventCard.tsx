@@ -8,8 +8,8 @@ import {
   formatEventTime,
   formatIDR,
   type EventWithTiers,
-  EVENT_CATEGORIES,
 } from '@/types/api';
+import { useCategories } from '@/hooks/useCategories';
 
 interface EventCardProps {
   event: EventWithTiers;
@@ -22,9 +22,12 @@ export default function EventCard({
   featured = false,
   locationName,
 }: EventCardProps) {
-  const categoryInfo = EVENT_CATEGORIES.find(
-    (c) => c.value === event.categoryId,
+  const { data: categories, isLoading } = useCategories();
+
+  const categoryInfo = categories?.find(
+    (c) => c.id === event.categoryId || c.value === event.categoryId,
   );
+
   const lowestPrice = event.isFree
     ? 0
     : Math.min(...event.ticketTiers.map((t) => t.price));
@@ -91,7 +94,14 @@ export default function EventCard({
             variant="secondary"
             className="bg-background/80 backdrop-blur-sm"
           >
-            {categoryInfo?.icon} {categoryInfo?.label}
+            {isLoading ? (
+              <span className="h-4 w-12 animate-pulse bg-muted rounded" />
+            ) : (
+              <>
+                {/* Note: Ensure your API Category type has an 'icon' or map it locally */}
+                {categoryInfo?.icon || categoryInfo?.label || 'Event'}
+              </>
+            )}
           </Badge>
         </div>
 

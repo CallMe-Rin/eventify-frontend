@@ -1,26 +1,38 @@
 import { Link } from 'react-router';
-import { ArrowRight } from 'lucide-react';
-import { EVENT_CATEGORIES } from '@/types/api';
+import { ArrowRight, Loader2 } from 'lucide-react';
+import { useCategories } from '@/hooks/useCategories';
 
 const categoryImages: Record<string, string> = {
-  music:
+  cat_music:
     'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&q=80',
-  technology:
+  cat_tech:
     'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&q=80',
-  sports:
+  cat_sports:
     'https://images.unsplash.com/photo-1585032083927-c7b26d6c1d07?w=400&q=80',
-  art: 'https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=400&q=80',
-  food: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80',
-  business:
+  cat_art:
+    'https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=400&q=80',
+  cat_food:
+    'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80',
+  cat_business:
     'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&q=80',
-  education:
+  cat_education:
     'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=400&q=80',
-  health:
+  cat_health:
     'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=400&q=80',
 };
 
 export default function FeaturedCategories() {
-  const featuredCategories = EVENT_CATEGORIES.slice(0, 6);
+  const { data: categories = [], isLoading } = useCategories();
+
+  const featuredCategories = categories.slice(0, 6);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-48 items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <section className="bg-muted/30 py-16">
@@ -37,14 +49,14 @@ export default function FeaturedCategories() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {featuredCategories.map((category) => (
             <Link
-              key={category.value}
-              to={`/events?category=${category.value}`}
+              key={category.id}
+              to={`/discover?category=${category.id}`}
               className="group relative overflow-hidden rounded-2xl"
             >
               {/* Background Image */}
               <div className="aspect-2/1 overflow-hidden">
                 <img
-                  src={categoryImages[category.value] || categoryImages.music}
+                  src={categoryImages[category.id] || categoryImages.cat_music}
                   alt={category.label}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />

@@ -23,7 +23,7 @@ import {
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
-import { signOut, useSession } from '@/lib/auth-client';
+import { signOut } from '@/lib/auth-client';
 import { toast } from 'sonner';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
@@ -35,8 +35,6 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const { user, isAuthenticated } = useAuth();
-  const { data } = useSession();
-  console.log('SESSION USER', data?.user);
 
   const handleLoginClick = () => {
     localStorage.setItem(
