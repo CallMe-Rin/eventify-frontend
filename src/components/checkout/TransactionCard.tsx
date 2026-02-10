@@ -4,7 +4,9 @@ import { TransactionCardSkeleton } from './TransactionCardSkeleton';
 import { CountdownTimer } from './CountdownTimer';
 import { PaymentProofUpload } from './PaymentProofUpload';
 import { TransactionStatusBadge } from './TransactionStatusBadge';
-import { Calendar } from 'lucide-react';
+import { Calendar, Star } from 'lucide-react';
+import { Link } from 'react-router';
+import { Button } from '../ui/button';
 
 interface TransactionCardProps {
   transaction: Transaction;
@@ -87,15 +89,30 @@ export default function TransactionCard({
           </div>
 
           {/* Show uploaded proof */}
-          {transaction.payment_proof_url && (
+          {transaction.proofUrl && (
             <div className="relative rounded-lg overflow-hidden border">
               <img
-                src={transaction.payment_proof_url}
+                src={transaction.proofUrl}
                 alt="Payment proof"
                 className="w-full h-auto max-h-48 object-contain bg-muted"
               />
             </div>
           )}
+        </div>
+      )}
+
+      {/* Transaction Done Section */}
+      {transaction.status === 'DONE' && (
+        <div className="border-t pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-sm text-muted-foreground">
+            How was your experience at this event?
+          </p>
+          <Button variant="default" className="rounded-2xl">
+            <Star className="size-4" />
+            <Link to={`/reviews?transactionId=${transaction.id}`}>
+              Write a Review
+            </Link>
+          </Button>
         </div>
       )}
     </div>

@@ -1,5 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
-import { signUp, signIn, authClient } from '@/lib/auth-client';
+import { signIn, authClient } from '@/lib/auth-client';
+import { axiosInstance } from '@/lib/axiosInstance';
 import { toast } from 'sonner';
 
 interface RegisterPayload {
@@ -7,6 +8,7 @@ interface RegisterPayload {
   password: string;
   name: string;
   role: 'CUSTOMER' | 'ORGANIZER';
+  referredBy?: string | null;
 }
 
 interface LoginPayload {
@@ -17,33 +19,43 @@ interface LoginPayload {
 export function useAuthMutations() {
   const registerMutation = useMutation({
     mutationFn: async (payload: RegisterPayload) => {
-      const { data, error } = await signUp.email(
-        {
-          email: payload.email,
-          password: payload.password,
-          name: payload.name,
-          callbackURL: '/',
-        },
-        {
-          onRequest: (ctx) => {
-            const bodyObj = JSON.parse(ctx.body as string);
-            bodyObj.role = payload.role;
-            ctx.body = JSON.stringify(bodyObj);
-          },
-        },
-      );
+      // Register with custom endpoint (includes referral code generation)
+      const registerResponse = await axiosInstance.post('/api/auth/register', {
+        email: payload.email,
+        password: payload.password,
+        name: payload.name,
+        role: payload.role,
+        referredBy: payload.referredBy || null,
+      });
 
-      if (error) throw new Error(error.message);
-      return data;
+      // Sign in immediately to set session cookie
+      const { data: signInData, error: signInError } = await signIn.email({
+        email: payload.email,
+        password: payload.password,
+        callbackURL: '/',
+      });
+
+      if (signInError) {
+        throw new Error(
+          signInError.message ||
+            'Registration successful but sign-in failed. Please sign in manually.',
+        );
+      }
+
+      return {
+        user: registerResponse.data.data.user,
+        session: signInData,
+      };
     },
 
     onSuccess: async () => {
+      // Refresh session
       await authClient.getSession();
       toast.success('Account created successfully!');
     },
 
     onError: (error: Error) => {
-      toast.error(error.message);
+      toast.error(error.message || 'Registration failed');
     },
   });
 

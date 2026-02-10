@@ -17,6 +17,7 @@ import {
   Loader2,
   Mail,
   Calendar,
+  Share2,
 } from 'lucide-react';
 import {
   Field,
@@ -171,7 +172,7 @@ export default function RegisterPage() {
                     <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     <Input
                       {...register('name')}
-                      placeholder="John Doe"
+                      placeholder="Your Name"
                       className="pl-10 rounded-xl"
                     />
                   </div>
@@ -188,7 +189,7 @@ export default function RegisterPage() {
                     <Input
                       {...register('email')}
                       type="email"
-                      placeholder="john@example.com"
+                      placeholder="email@example.com"
                       className="pl-10 rounded-xl"
                     />
                   </div>
@@ -228,6 +229,22 @@ export default function RegisterPage() {
                   </div>
                 </FieldContent>
                 <FieldError>{errors.confirmPassword?.message}</FieldError>
+              </Field>
+
+              {/* REFERRAL */}
+              <Field>
+                <FieldLabel>{`Referral Code (Optional)`}</FieldLabel>
+                <FieldContent>
+                  <div className="relative">
+                    <Share2 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                    <Input
+                      {...register('referredBy')}
+                      placeholder="Referral Code"
+                      className="pl-10 rounded-xl"
+                    />
+                  </div>
+                </FieldContent>
+                <FieldError>{errors.referredBy?.message}</FieldError>
               </Field>
 
               <Button
