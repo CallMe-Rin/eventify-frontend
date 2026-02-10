@@ -74,12 +74,11 @@ export interface PriceBreakdown {
   total: number;
 }
 
-// Voucher Interface (Organizer-specific)
+// Voucher Interface (Organizer specific, event specific coupons)
 export interface Voucher {
   id: string;
   code: string;
   eventId: string;
-  organizerId: string;
   discountType: DiscountType;
   discountValue: number;
   minPurchase?: number;
@@ -88,4 +87,7 @@ export interface Voucher {
   usedCount: number;
   validFrom: string;
   validUntil: string;
+  isActive: boolean;
 }
+
+export type VoucherCoupon = DiscountCoupon & { eventId: string };
