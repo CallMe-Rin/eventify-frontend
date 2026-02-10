@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { PriceBreakdown, Voucher, DiscountCoupon } from '@/types/api';
+import type { PriceBreakdown, DiscountCoupon } from '@/types/api';
 import { formatIDR } from '@/types/api';
 import {
   Coins,
@@ -28,13 +28,13 @@ interface PriceBreakdownCardProps {
   userPoints: number;
   pointsToUse: number;
   onPointsChange: (points: number) => void;
-  // Voucher
-  voucher: Voucher | null;
+  // Voucher (event specific coupon)
+  voucher: DiscountCoupon | null;
   voucherError: string | null;
   onApplyVoucher: (code: string) => void;
   onRemoveVoucher: () => void;
   isVoucherLoading?: boolean;
-  // Coupon
+  // Coupon (general coupon)
   coupon: DiscountCoupon | null;
   couponError: string | null;
   onApplyCoupon: (code: string) => void;

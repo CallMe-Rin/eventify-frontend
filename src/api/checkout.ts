@@ -183,3 +183,81 @@ export async function validateCouponForCheckout(
     };
   }
 }
+
+// Fetch voucher by code (vouchers are event specific coupons)
+export async function fetchVoucherByCode(
+  code: string,
+  eventId: string,
+): Promise<DiscountCoupon> {
+  try {
+    const { data } = await axiosInstance.get<{ data: DiscountCoupon[] }>(
+      '/api/coupons',
+      { params: { code: code.toUpperCase() } },
+    );
+    const coupons = Array.isArray(data) ? data : data.data || [];
+
+    if (coupons.length === 0) {
+      throw new Error('Voucher not found');
+    }
+
+    const voucher = coupons[0];
+
+    // Vouchers must be event specific
+    if (!voucher.eventId) {
+      throw new Error('Invalid voucher - not event specific');
+    }
+
+    // Voucher must match the event
+    if (voucher.eventId !== eventId) {
+      throw new Error('This voucher is not valid for this event');
+    }
+
+    return voucher;
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : 'Voucher not found or invalid';
+    throw new Error(message);
+  }
+}
+
+// Validate voucher (event specific coupon)
+export async function validateVoucher(
+  voucherCode: string,
+  eventId: string,
+  amount: number,
+): Promise<{
+  isValid: boolean;
+  voucher?: DiscountCoupon;
+  discountAmount?: number;
+  message?: string;
+}> {
+  try {
+    const { data } = await axiosInstance.post('/api/coupons/validate', {
+      couponCode: voucherCode.toUpperCase(),
+      eventId,
+      amount,
+    });
+
+    if (data.data) {
+      // Ensure it's event specific (voucher requirement)
+      if (!data.data.coupon.eventId) {
+        return {
+          isValid: false,
+          message: 'Invalid voucher - not event-specific',
+        };
+      }
+
+      return {
+        isValid: true,
+        voucher: data.data.coupon,
+        discountAmount: data.data.discountAmount,
+      };
+    }
+    return { isValid: false };
+  } catch (error) {
+    return {
+      isValid: false,
+      message: error instanceof Error ? error.message : 'Invalid voucher',
+    };
+  }
+}

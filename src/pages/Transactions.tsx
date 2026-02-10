@@ -61,7 +61,7 @@ export default function TransactionsPage() {
               <p className="text-muted-foreground mb-4">
                 Start by browsing events and booking tickets
               </p>
-              <Link to="/">
+              <Link to="/discover">
                 <Button className="rounded-full">Browse Events</Button>
               </Link>
             </div>

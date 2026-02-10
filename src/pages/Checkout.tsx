@@ -81,11 +81,13 @@ export default function CheckoutPage() {
     userId: userId || '',
     quantity,
     ticketPrice: selectedTicketTier?.price || 0,
+    eventId: eventId || undefined,
   });
 
   // Price calculation
   const priceCalculation = usePriceCalculation({
     basePrice,
+    appliedVoucher: checkout.appliedVoucher,
     appliedCoupon: checkout.appliedCoupon,
     pointsUsed: checkout.pointsUsed,
     maxPointsAvailable: checkout.userPoints,
@@ -133,19 +135,27 @@ export default function CheckoutPage() {
 
   // Handle checkout submission
   const handleCheckout = async () => {
-    if (priceCalculation.finalPayable === 0 && !checkout.appliedCoupon) {
+    if (
+      priceCalculation.finalPayable === 0 &&
+      !checkout.appliedCoupon &&
+      !checkout.appliedVoucher
+    ) {
       toast.error('Invalid checkout state');
       return;
     }
 
     setIsSubmitting(true);
     try {
+      // Use voucher code if applied, otherwise use coupon code
+      const discountCode =
+        checkout.appliedVoucher?.code || checkout.appliedCoupon?.code;
+
       await checkoutApi.createTransaction(
         eventId!,
         ticketTierId!,
         quantity,
         priceCalculation.pointsUsed,
-        checkout.appliedCoupon?.code,
+        discountCode,
       );
 
       if (priceCalculation.cashbackEarned > 0) {
@@ -267,10 +277,11 @@ export default function CheckoutPage() {
                   breakdown={{
                     subtotal: basePrice,
                     pointsDiscount: priceCalculation.pointsUsed,
-                    voucherDiscount: 0,
+                    voucherDiscount: priceCalculation.voucherDiscount,
                     couponDiscount: priceCalculation.couponDiscount,
                     totalDiscount:
                       priceCalculation.pointsUsed +
+                      priceCalculation.voucherDiscount +
                       priceCalculation.couponDiscount,
                     total: priceCalculation.finalPayable,
                   }}
@@ -287,15 +298,16 @@ export default function CheckoutPage() {
                   userPoints={checkout.userPoints}
                   pointsToUse={checkout.pointsUsed}
                   onPointsChange={checkout.updatePointsUsed}
-                  voucher={null}
-                  voucherError={null}
-                  onApplyVoucher={() => {}}
-                  onRemoveVoucher={() => {}}
-                  isVoucherLoading={false}
+                  voucher={checkout.appliedVoucher}
+                  voucherError={checkout.voucherError}
+                  onApplyVoucher={checkout.applyVoucher}
+                  onRemoveVoucher={checkout.removeVoucher}
+                  isVoucherLoading={checkout.voucherValidating}
                   coupon={checkout.appliedCoupon}
-                  couponError={null}
-                  onApplyCoupon={() => {}}
-                  onRemoveCoupon={() => {}}
+                  couponError={checkout.couponError}
+                  onApplyCoupon={checkout.applyCoupon}
+                  onRemoveCoupon={checkout.removeCoupon}
+                  isCouponLoading={checkout.couponValidating}
                 />
                 {/* Desktop Submit Button */}
                 <div className="hidden lg:block">
@@ -334,10 +346,12 @@ export default function CheckoutPage() {
             priceBreakdown={{
               subtotal: basePrice,
               pointsDiscount: priceCalculation.pointsUsed,
-              voucherDiscount: 0,
+              voucherDiscount: priceCalculation.voucherDiscount,
               couponDiscount: priceCalculation.couponDiscount,
               totalDiscount:
-                priceCalculation.pointsUsed + priceCalculation.couponDiscount,
+                priceCalculation.pointsUsed +
+                priceCalculation.voucherDiscount +
+                priceCalculation.couponDiscount,
               total: priceCalculation.finalPayable,
             }}
           />
