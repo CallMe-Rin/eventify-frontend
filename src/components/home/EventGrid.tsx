@@ -97,7 +97,7 @@ export default function EventGrid({
       {/* Mobile View All */}
       {showViewAll && (
         <div className="mt-8 text-center sm:hidden">
-          <Button variant="outline" className="gap-2" asChild>
+          <Button variant="default" className="gap-2 rounded-full" asChild>
             <Link to="/events">
               View All Events
               <ArrowRight className="h-4 w-4" />
