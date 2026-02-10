@@ -261,7 +261,7 @@ export default function DiscoverPage() {
 
   return (
     <Layout>
-      <div className="container mx-auto 2xl:px-20 py-8">
+      <div className="container mx-auto 2xl:px-20 xl:px-0 px-4 py-8">
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Discover Events</h1>
