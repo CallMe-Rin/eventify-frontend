@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 
-import AdminLayout from "@/components/layout/AdminLayout";
+import UserLayout from "@/components/layout/UserLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -113,14 +113,14 @@ export default function EditProfileInformasi() {
 
   if (isLoading) {
     return (
-      <AdminLayout>
+      <UserLayout>
         <p className="text-gray-500">Loading...</p>
-      </AdminLayout>
+      </UserLayout>
     );
   }
 
   return (
-    <AdminLayout>
+    <UserLayout>
       <div className="w-full">
         <h2 className="mb-6 text-lg font-semibold text-gray-800">
           Organizer Information
@@ -160,7 +160,7 @@ export default function EditProfileInformasi() {
           {/* Form (1 Column) */}
           <div className="flex flex-col gap-6">
             <div>
-              <Label className="mb-2">Organizer Name</Label>
+              <Label className="mb-2">Full Name</Label>
               <Input
                 name="fullName"
                 value={form.fullName}
@@ -213,6 +213,6 @@ export default function EditProfileInformasi() {
           </div>
         </div>
       </div>
-    </AdminLayout>
+    </UserLayout>
   );
 }
