@@ -1,14 +1,31 @@
 import { Link, useNavigate } from 'react-router';
 import { useTransactions } from '@/hooks/useTransactions';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Ticket } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ArrowLeft, Ticket, Clock, History } from 'lucide-react';
 import { TransactionCardSkeleton } from '@/components/checkout/TransactionCardSkeleton';
 import TransactionCard from '@/components/checkout/TransactionCard';
 import Layout from '@/components/layout/Layout';
 
+import { useMemo } from 'react';
+import {
+  separateTransactions,
+  sortTransactionsByDate,
+} from '@/lib/transaction-helpers';
+import EmptyState from '@/components/transaction/EmptyState';
+
 export default function TransactionsPage() {
   const { transactions, uploadPaymentProof, isLoading } = useTransactions();
   const navigate = useNavigate();
+
+  // Separate and sort transactions
+  const { ongoing, history } = useMemo(() => {
+    const separated = separateTransactions(transactions);
+    return {
+      ongoing: sortTransactionsByDate(separated.ongoing),
+      history: sortTransactionsByDate(separated.history),
+    };
+  }, [transactions]);
 
   return (
     <Layout>
@@ -49,16 +66,71 @@ export default function TransactionsPage() {
               </Link>
             </div>
           ) : (
-            <div className="space-y-4">
-              {transactions.map((tx) => (
-                <TransactionCard
-                  key={tx.id}
-                  transaction={tx}
-                  onUploadPaymentProof={(url) => uploadPaymentProof(tx.id, url)}
-                  isUploading={isLoading}
-                />
-              ))}
-            </div>
+            <Tabs defaultValue="ongoing" className="w-full rounded-xl">
+              <TabsList className="grid w-full grid-cols-2 mb-6 rounded-xl">
+                <TabsTrigger
+                  value="ongoing"
+                  className="gap-2 rounded-lg hover:cursor-pointer"
+                >
+                  <Clock className="w-4 h-4" />
+                  Ongoing
+                  {ongoing.length > 0 && (
+                    <span className="ml-1 px-2 py-0.5 text-xs rounded-full bg-primary text-primary-foreground">
+                      {ongoing.length}
+                    </span>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="history"
+                  className="gap-2 rounded-lg hover:cursor-pointer"
+                >
+                  <History className="w-4 h-4" />
+                  History
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="ongoing" className="space-y-4">
+                {ongoing.length === 0 ? (
+                  <EmptyState
+                    icon={Clock}
+                    title="No ongoing transactions"
+                    description="You don't have any pending transactions at the moment"
+                  />
+                ) : (
+                  ongoing.map((tx) => (
+                    <TransactionCard
+                      key={tx.id}
+                      transaction={tx}
+                      onUploadPaymentProof={(url) =>
+                        uploadPaymentProof(tx.id, url)
+                      }
+                      isUploading={isLoading}
+                    />
+                  ))
+                )}
+              </TabsContent>
+
+              <TabsContent value="history" className="space-y-4">
+                {history.length === 0 ? (
+                  <EmptyState
+                    icon={History}
+                    title="No transaction history"
+                    description="Your completed transactions will appear here"
+                  />
+                ) : (
+                  history.map((tx) => (
+                    <TransactionCard
+                      key={tx.id}
+                      transaction={tx}
+                      onUploadPaymentProof={(url) =>
+                        uploadPaymentProof(tx.id, url)
+                      }
+                      isUploading={isLoading}
+                    />
+                  ))
+                )}
+              </TabsContent>
+            </Tabs>
           )}
         </main>
       </div>

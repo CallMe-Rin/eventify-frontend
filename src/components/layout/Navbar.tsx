@@ -171,7 +171,7 @@ export default function Navbar() {
                 >
                   <Link to="/transactions">
                     <Ticket className="mr-2 h-4 w-4" />
-                    My Tickets
+                    My Transaction
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
