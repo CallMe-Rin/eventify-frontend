@@ -40,7 +40,7 @@ export default function Hero() {
             key={img}
             className={cn(
               'absolute inset-0 transition-opacity duration-1000',
-              index === currentImage ? 'opacity-20' : 'opacity-0',
+              index === currentImage ? 'opacity-40' : 'opacity-0',
             )}
           >
             <img src={img} alt="" className="h-full w-full object-cover" />

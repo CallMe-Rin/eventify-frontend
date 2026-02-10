@@ -7,16 +7,12 @@ import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEventsWithTiers } from '@/hooks/useEvents';
-import { useLocations } from '@/hooks/useLocations';
-import type { EventCategory } from '@/types/event';
 import { AlertCircle, RefreshCcw } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 export default function HomePage() {
-  const [selectedCategory, setSelectedCategory] = useState<
-    EventCategory | 'all'
-  >('all');
-  const [selectedLocation, setSelectedLocation] = useState('All Locations');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedLocation, setSelectedLocation] = useState<string>('all');
 
   const {
     data: events = [],
@@ -25,22 +21,15 @@ export default function HomePage() {
     refetch: refetchEvents,
   } = useEventsWithTiers(9);
 
-  const { locations } = useLocations();
-
   const filteredEvents = useMemo(() => {
     return events.filter((event) => {
       const categoryMatch =
         selectedCategory === 'all' || event.categoryId === selectedCategory;
       const locationMatch =
-        selectedLocation === 'All Locations' ||
-        event.locationId === selectedLocation;
+        selectedLocation === 'all' || event.locationId === selectedLocation;
       return categoryMatch && locationMatch;
     });
   }, [events, selectedCategory, selectedLocation]);
-
-  const locationNames = useMemo(() => {
-    return locations.map((loc) => loc.name);
-  }, [locations]);
 
   return (
     <Layout>
@@ -50,7 +39,6 @@ export default function HomePage() {
         selectedLocation={selectedLocation}
         onCategoryChange={setSelectedCategory}
         onLocationChange={setSelectedLocation}
-        locations={locationNames}
       />
 
       {/* Loading State */}

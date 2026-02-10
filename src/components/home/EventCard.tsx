@@ -47,7 +47,7 @@ export default function EventCard({
     <Link
       to={`/events/${event.id}`}
       className={cn(
-        'group relative flex flex-col overflow-hidden rounded-2xl bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-premium-xl',
+        'group relative flex flex-col overflow-hidden rounded-2xl bg-card transition-all duration-300 hover:shadow-lg',
         featured ? 'md:flex-row' : '',
       )}
     >
@@ -73,7 +73,7 @@ export default function EventCard({
         {/* Badges */}
         <div className="absolute left-3 top-3 flex flex-wrap gap-2">
           {event.isFree && (
-            <Badge className="bg-success text-success-foreground">Free</Badge>
+            <Badge className="bg-primary text-primary-foreground">Free</Badge>
           )}
           {isAlmostSoldOut && !isSoldOut && (
             <Badge variant="destructive">Almost Sold Out</Badge>
