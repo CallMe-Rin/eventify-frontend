@@ -30,6 +30,10 @@ export default function TransactionCard({
     (t) => t.id === transaction.ticketTierId,
   );
 
+  // Check if event has passed and transaction is completed
+  const isEventPassed = new Date(eventWithTiers.date) < new Date();
+  const canReview = transaction.status === 'DONE' && isEventPassed;
+
   return (
     <div className="bg-card border rounded-xl p-3 sm:p-5 space-y-3 sm:space-y-4">
       <div className="flex items-start justify-between gap-3 sm:gap-4">
@@ -101,15 +105,15 @@ export default function TransactionCard({
         </div>
       )}
 
-      {/* Transaction Done Section */}
-      {transaction.status === 'DONE' && (
+      {/* Transaction Done Section - Show review button only if event has passed */}
+      {canReview && (
         <div className="border-t pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">
             How was your experience at this event?
           </p>
-          <Button variant="default" className="rounded-2xl">
-            <Star className="size-4" />
-            <Link to={`/reviews?transactionId=${transaction.id}`}>
+          <Button asChild variant="default" className="rounded-2xl">
+            <Link to={`/review/${transaction.eventId}`}>
+              <Star className="size-4" />
               Write a Review
             </Link>
           </Button>
