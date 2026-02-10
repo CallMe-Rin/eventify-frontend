@@ -10,17 +10,17 @@ import { Button } from '../ui/button';
 import { useCheckExistingReview } from '@/hooks/useReviews';
 import { useAuth } from '@/hooks/useAuth';
 
-interface TransactionCardProps {
-  transaction: Transaction;
-  onUploadPaymentProof: (url: string) => Promise<Transaction | null>;
-  isUploading: boolean;
-}
+// interface TransactionCardProps {
+//   transaction: Transaction;
+//   onUploadPaymentProof: (url: string) => Promise<Transaction | null>;
+//   isUploading: boolean;
+// }
 
 export default function TransactionCard({
   transaction,
-  onUploadPaymentProof,
-  isUploading,
-}: TransactionCardProps) {
+}: {
+  transaction: Transaction;
+}) {
   const { user } = useAuth();
   const { data: eventWithTiers, isLoading } = useEventWithTiers(
     transaction.eventId,
@@ -41,6 +41,10 @@ export default function TransactionCard({
   const isEventPassed = new Date(eventWithTiers.date) < new Date();
   const canReview = transaction.status === 'DONE' && isEventPassed;
   const hasReviewed = !!existingReview;
+
+  const canUpload = transaction.status === 'WAITING_PAYMENT';
+
+  if (!user) return null;
 
   return (
     <div className="bg-card border rounded-xl p-3 sm:p-5 space-y-3 sm:space-y-4">
@@ -87,10 +91,15 @@ export default function TransactionCard({
               Invalid expiration date
             </div>
           )}
-          <PaymentProofUpload
-            onUpload={onUploadPaymentProof}
-            isUploading={isUploading}
-          />
+          {canUpload && (
+            <PaymentProofUpload
+              transactionId={transaction.id}
+              userId={user.id}
+              onUploadSuccess={() => {
+                console.log('Upload successful!');
+              }}
+            />
+          )}
         </div>
       )}
 
@@ -101,10 +110,10 @@ export default function TransactionCard({
           </div>
 
           {/* Show uploaded proof */}
-          {transaction.proofUrl && (
+          {transaction.paymentProofUrl && (
             <div className="relative rounded-lg overflow-hidden border">
               <img
-                src={transaction.proofUrl}
+                src={transaction.paymentProofUrl}
                 alt="Payment proof"
                 className="w-full h-auto max-h-48 object-contain bg-muted"
               />

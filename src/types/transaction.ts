@@ -18,6 +18,7 @@ export interface Transaction {
   discountAmount: number;
   pointsUsed: number;
   status: TransactionStatus;
+  paymentProofUrl?: string;
   couponId?: string;
   createdAt: string | Date;
   expiresAt?: string | Date;
