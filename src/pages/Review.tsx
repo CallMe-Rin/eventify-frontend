@@ -42,7 +42,7 @@ import Layout from '@/components/layout/Layout';
 export default function ReviewFormPage() {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
-  const { user, role, isAuthenticated } = useAuth();
+  const { user, role, isAuthenticated, isLoading: authLoading } = useAuth();
 
   // Fetch event data
   const {
@@ -78,6 +78,8 @@ export default function ReviewFormPage() {
 
   // Redirect if not authenticated or not a customer
   useEffect(() => {
+    if (authLoading) return;
+
     if (!isAuthenticated) {
       navigate('/login');
       toast.info('Access Denied', {
@@ -91,7 +93,7 @@ export default function ReviewFormPage() {
         position: 'bottom-right',
       });
     }
-  }, [isAuthenticated, role, navigate]);
+  }, [isAuthenticated, role, navigate, authLoading]);
 
   // Handle form submission
   async function onSubmit(data: ReviewFormData) {
@@ -133,7 +135,7 @@ export default function ReviewFormPage() {
   }
 
   // Loading state
-  if (eventLoading || checkingReview) {
+  if (authLoading || eventLoading || checkingReview) {
     return (
       <Layout>
         <div className="min-h-screen bg-background">
