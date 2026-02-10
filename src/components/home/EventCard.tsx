@@ -108,7 +108,7 @@ export default function EventCard({
         {/* Rating */}
         {event.averageRating && (
           <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-background/80 px-2 py-1 backdrop-blur-sm">
-            <Star className="h-3.5 w-3.5 fill-warning text-warning" />
+            <Star className="h-3.5 w-3.5 fill-gold text-gold" />
             <span className="text-xs font-medium">{event.averageRating}</span>
           </div>
         )}

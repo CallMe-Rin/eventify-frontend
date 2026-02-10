@@ -4,9 +4,11 @@ import { TransactionCardSkeleton } from './TransactionCardSkeleton';
 import { CountdownTimer } from './CountdownTimer';
 import { PaymentProofUpload } from './PaymentProofUpload';
 import { TransactionStatusBadge } from './TransactionStatusBadge';
-import { Calendar, Star } from 'lucide-react';
+import { Calendar, CheckCircle, Star } from 'lucide-react';
 import { Link } from 'react-router';
 import { Button } from '../ui/button';
+import { useCheckExistingReview } from '@/hooks/useReviews';
+import { useAuth } from '@/hooks/useAuth';
 
 interface TransactionCardProps {
   transaction: Transaction;
@@ -19,9 +21,14 @@ export default function TransactionCard({
   onUploadPaymentProof,
   isUploading,
 }: TransactionCardProps) {
+  const { user } = useAuth();
   const { data: eventWithTiers, isLoading } = useEventWithTiers(
     transaction.eventId,
   );
+
+  // Check if user has already reviewed this event
+  const { data: existingReview, isLoading: checkingReview } =
+    useCheckExistingReview(transaction.eventId, user?.id || '');
 
   if (isLoading) return <TransactionCardSkeleton />;
   if (!eventWithTiers) return null;
@@ -33,6 +40,7 @@ export default function TransactionCard({
   // Check if event has passed and transaction is completed
   const isEventPassed = new Date(eventWithTiers.date) < new Date();
   const canReview = transaction.status === 'DONE' && isEventPassed;
+  const hasReviewed = !!existingReview;
 
   return (
     <div className="bg-card border rounded-xl p-3 sm:p-5 space-y-3 sm:space-y-4">
@@ -105,18 +113,38 @@ export default function TransactionCard({
         </div>
       )}
 
-      {/* Transaction Done Section - Show review button only if event has passed */}
+      {/* Transaction Done Section: Show review button/status based on conditions */}
       {canReview && (
         <div className="border-t pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-sm text-muted-foreground">
-            How was your experience at this event?
-          </p>
-          <Button asChild variant="default" className="rounded-2xl">
-            <Link to={`/review/${transaction.eventId}`}>
-              <Star className="size-4" />
-              Write a Review
-            </Link>
-          </Button>
+          {checkingReview ? (
+            // Loading state - checking if user already reviewed
+            <div className="text-sm text-muted-foreground animate-pulse w-full text-center sm:text-left">
+              Checking review status...
+            </div>
+          ) : hasReviewed ? (
+            // User has already reviewed: show disabled state
+            <>
+              <div className="flex items-center gap-2 sm:ml-auto">
+                <CheckCircle className="size-4 text-primary" />
+                <p className="text-sm font-medium text-primary">
+                  Review Submitted
+                </p>
+              </div>
+            </>
+          ) : (
+            // User hasn't reviewed yet: show active button
+            <>
+              <p className="text-sm text-muted-foreground">
+                How was your experience at this event?
+              </p>
+              <Button asChild variant="default" className="rounded-2xl">
+                <Link to={`/review/${transaction.eventId}`}>
+                  <Star className="size-4" />
+                  Write a Review
+                </Link>
+              </Button>
+            </>
+          )}
         </div>
       )}
     </div>

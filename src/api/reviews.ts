@@ -55,14 +55,26 @@ export async function checkExistingReview(
   eventId: string,
   userId: string,
 ): Promise<Review | null> {
+  if (!eventId || !userId) {
+    return null;
+  }
+
   try {
-    const { data } = await axiosInstance.get<{ data: Review[] }>(
-      '/api/reviews',
-      { params: { eventId, userId } },
+    // Fetch all reviews for this event
+    const { data } = await axiosInstance.get<{ data: EventReviewsResponse }>(
+      `/api/events/${eventId}/reviews`,
+      { params: { page: 1, limit: 100 } },
     );
-    const reviews = Array.isArray(data) ? data : data.data || [];
-    return reviews.length > 0 ? reviews[0] : null;
-  } catch {
+
+    const response = data.data || data;
+    const reviews = response.reviews || [];
+
+    // Find if this user has already reviewed
+    const userReview = reviews.find((review) => review.userId === userId);
+
+    return userReview || null;
+  } catch (error) {
+    console.error('Error checking existing review:', error);
     return null;
   }
 }
