@@ -14,6 +14,7 @@ import Layout from '@/components/layout/Layout';
 import { useCheckout } from '@/hooks/useCheckout';
 import { usePriceCalculation } from '@/hooks/usePriceCalculation';
 import { useAuth } from '@/hooks/useAuth';
+import { useLocations } from '@/hooks/useLocations';
 import * as checkoutApi from '@/api/checkout';
 import * as eventsApi from '@/api/events';
 import { formatIDR } from '@/types/api';
@@ -37,6 +38,9 @@ export default function CheckoutPage() {
   // Get authenticated user from better-auth
   const { profile, isLoading: authLoading } = useAuth();
   const userId = profile?.id;
+
+  // Get location name helper
+  const { getLocationName } = useLocations();
 
   // Confirmation dialog state
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -137,6 +141,7 @@ export default function CheckoutPage() {
   const handleCheckout = async () => {
     if (
       priceCalculation.finalPayable === 0 &&
+      basePrice > 0 &&
       !checkout.appliedCoupon &&
       !checkout.appliedVoucher
     ) {
@@ -252,7 +257,7 @@ export default function CheckoutPage() {
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                     <MapPin className="size-4" />
                     <span>
-                      {event.venue}, {event.locationId}
+                      {event.venue}, {getLocationName(event.locationId)}
                     </span>
                   </div>
                 </div>
