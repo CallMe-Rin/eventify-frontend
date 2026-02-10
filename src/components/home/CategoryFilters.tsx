@@ -31,7 +31,7 @@ export default function CategoryFilters({
       <div className="max-w-7xl mx-auto py-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           {/* Category Pills */}
-          <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar lg:pb-0 rounded-full">
+          <div className="flex gap-2 overflow-x-auto no-scrollbar lg:pb-0 rounded-full">
             <button
               onClick={() => onCategoryChange('all')}
               className={cn(
