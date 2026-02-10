@@ -4,17 +4,14 @@ import { TransactionCardSkeleton } from './TransactionCardSkeleton';
 import { CountdownTimer } from './CountdownTimer';
 import { PaymentProofUpload } from './PaymentProofUpload';
 import { TransactionStatusBadge } from './TransactionStatusBadge';
-import { Calendar, CheckCircle, Star } from 'lucide-react';
+import { CancelTransactionDialog } from './CancelTransactionDialog';
+import { Calendar, CheckCircle, Star, XCircle } from 'lucide-react';
 import { Link } from 'react-router';
 import { Button } from '../ui/button';
 import { useCheckExistingReview } from '@/hooks/useReviews';
 import { useAuth } from '@/hooks/useAuth';
-
-// interface TransactionCardProps {
-//   transaction: Transaction;
-//   onUploadPaymentProof: (url: string) => Promise<Transaction | null>;
-//   isUploading: boolean;
-// }
+import { useTransactionMutations } from '@/hooks/useTransactionMutations';
+import { useState } from 'react';
 
 export default function TransactionCard({
   transaction,
@@ -22,6 +19,9 @@ export default function TransactionCard({
   transaction: Transaction;
 }) {
   const { user } = useAuth();
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const { cancelTransaction, isCancelling } = useTransactionMutations();
+
   const { data: eventWithTiers, isLoading } = useEventWithTiers(
     transaction.eventId,
   );
@@ -43,6 +43,16 @@ export default function TransactionCard({
   const hasReviewed = !!existingReview;
 
   const canUpload = transaction.status === 'WAITING_PAYMENT';
+
+  // Can cancel if transaction is pending (WAITING_PAYMENT or WAITING_CONFIRMATION)
+  const canCancel =
+    transaction.status === 'WAITING_PAYMENT' ||
+    transaction.status === 'WAITING_CONFIRMATION';
+
+  const handleCancelTransaction = () => {
+    cancelTransaction(transaction.id);
+    setShowCancelDialog(false);
+  };
 
   if (!user) return null;
 
@@ -100,6 +110,19 @@ export default function TransactionCard({
               }}
             />
           )}
+          {canCancel && (
+            <div className="flex justify-end">
+              <Button
+                variant="default"
+                className="rounded-2xl"
+                onClick={() => setShowCancelDialog(true)}
+                disabled={isCancelling}
+              >
+                <XCircle className="size-4" />
+                Cancel Transaction
+              </Button>
+            </div>
+          )}
         </div>
       )}
 
@@ -117,6 +140,20 @@ export default function TransactionCard({
                 alt="Payment proof"
                 className="w-full h-auto max-h-48 object-contain bg-muted"
               />
+            </div>
+          )}
+
+          {canCancel && (
+            <div className="flex justify-end">
+              <Button
+                variant="default"
+                className="rounded-2xl"
+                onClick={() => setShowCancelDialog(true)}
+                disabled={isCancelling}
+              >
+                <XCircle className="size-4" />
+                Cancel Transaction
+              </Button>
             </div>
           )}
         </div>
@@ -156,6 +193,14 @@ export default function TransactionCard({
           )}
         </div>
       )}
+
+      {/* Cancel Transaction Dialog */}
+      <CancelTransactionDialog
+        open={showCancelDialog}
+        onOpenChange={setShowCancelDialog}
+        onConfirm={handleCancelTransaction}
+        isLoading={isCancelling}
+      />
     </div>
   );
 }
