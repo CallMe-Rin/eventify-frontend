@@ -8,7 +8,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "types": ["better-auth"],
+    "typeRoots": ["./node_modules/@types", "./src/types"]
     // "ignoreDeprecations": "6.0"
   }
 }

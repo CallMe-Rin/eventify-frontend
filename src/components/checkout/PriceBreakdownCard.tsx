@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { PriceBreakdown, Voucher, DiscountCoupon } from '@/types/api';
+import type { PriceBreakdown, DiscountCoupon } from '@/types/api';
 import { formatIDR } from '@/types/api';
 import {
   Coins,
@@ -28,13 +28,13 @@ interface PriceBreakdownCardProps {
   userPoints: number;
   pointsToUse: number;
   onPointsChange: (points: number) => void;
-  // Voucher
-  voucher: Voucher | null;
+  // Voucher (event specific coupon)
+  voucher: DiscountCoupon | null;
   voucherError: string | null;
   onApplyVoucher: (code: string) => void;
   onRemoveVoucher: () => void;
   isVoucherLoading?: boolean;
-  // Coupon
+  // Coupon (general coupon)
   coupon: DiscountCoupon | null;
   couponError: string | null;
   onApplyCoupon: (code: string) => void;
@@ -159,7 +159,7 @@ export function PriceBreakdownCard({
                   <span className="font-medium">{voucher.code}</span>
                   <span className="text-sm">
                     (-
-                    {voucher.discountType === 'percentage'
+                    {voucher.discountType === 'PERCENTAGE'
                       ? `${voucher.discountValue}%`
                       : formatIDR(voucher.discountValue)}
                     )
@@ -217,9 +217,9 @@ export function PriceBreakdownCard({
                   <span className="font-medium">{coupon.code}</span>
                   <span className="text-sm">
                     (-
-                    {coupon.discount_type === 'percentage'
-                      ? `${coupon.discount_value}%`
-                      : formatIDR(coupon.discount_value)}
+                    {coupon.discountType === 'PERCENTAGE'
+                      ? `${coupon.discountValue}%`
+                      : formatIDR(coupon.discountValue)}
                     )
                   </span>
                 </div>

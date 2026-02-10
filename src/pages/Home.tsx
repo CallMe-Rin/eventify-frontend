@@ -7,40 +7,29 @@ import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEventsWithTiers } from '@/hooks/useEvents';
-import { useLocations } from '@/hooks/useLocations';
-import type { EventCategory } from '@/types/event';
 import { AlertCircle, RefreshCcw } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 export default function HomePage() {
-  const [selectedCategory, setSelectedCategory] = useState<
-    EventCategory | 'all'
-  >('all');
-  const [selectedLocation, setSelectedLocation] = useState('All Locations');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedLocation, setSelectedLocation] = useState<string>('all');
 
   const {
     data: events = [],
     isPending: isEventsLoading,
     isError: isEventsError,
     refetch: refetchEvents,
-  } = useEventsWithTiers();
-
-  const { data: locations } = useLocations();
+  } = useEventsWithTiers(9);
 
   const filteredEvents = useMemo(() => {
     return events.filter((event) => {
       const categoryMatch =
-        selectedCategory === 'all' || event.category === selectedCategory;
+        selectedCategory === 'all' || event.categoryId === selectedCategory;
       const locationMatch =
-        selectedLocation === 'All Locations' ||
-        event.location === selectedLocation;
+        selectedLocation === 'all' || event.locationId === selectedLocation;
       return categoryMatch && locationMatch;
     });
   }, [events, selectedCategory, selectedLocation]);
-
-  const locationNames = useMemo(() => {
-    return locations?.map((loc) => loc.name);
-  }, [locations]);
 
   return (
     <Layout>
@@ -50,12 +39,11 @@ export default function HomePage() {
         selectedLocation={selectedLocation}
         onCategoryChange={setSelectedCategory}
         onLocationChange={setSelectedLocation}
-        locations={locationNames}
       />
 
       {/* Loading State */}
       {isEventsLoading && (
-        <section className="container mx-auto py-16">
+        <section className="max-w-7xl mx-auto px-4 py-16">
           <div className="mb-8">
             <Skeleton className="h-8 w-48 mb-2 bg-secondary" />
             <Skeleton className="h-5 w-64 bg-secondary" />
@@ -75,8 +63,8 @@ export default function HomePage() {
 
       {/* Error State */}
       {isEventsError && !isEventsLoading && (
-        <section className="container mx-auto py-16">
-          <div className="flex flex-col items-center justify-center rounded-2xl border bg-card py-16 px-4 text-center">
+        <section className="max-w-7xl mx-auto py-16">
+          <div className="flex flex-col items-center justify-center rounded-2xl border bg-card py-16 px-4 max-w-7xl text-center">
             <div className="mb-4 rounded-full bg-destructive/10 p-4">
               <AlertCircle className="h-8 w-8 text-destructive" />
             </div>

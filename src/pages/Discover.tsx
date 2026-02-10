@@ -28,10 +28,12 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useCategories } from '@/hooks/useCategories';
 import useDebounce from '@/hooks/useDebounce';
 import { useEventsWithTiers } from '@/hooks/useEvents';
+import { useLocations } from '@/hooks/useLocations';
 import { cn } from '@/lib/utils';
-import { EVENT_CATEGORIES, EVENT_TYPES, type EventCategory } from '@/types/api';
+import { EVENT_TYPES, type EventCategory } from '@/types/api';
 import {
   AlertCircle,
   Loader2,
@@ -72,27 +74,51 @@ const SORT_OPTIONS = [
 export default function DiscoverPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const urlSearch = searchParams.get('search') || '';
-
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('date_asc');
-  const [selectedLocation, setSelectedLocation] = useState('All Locations');
-  const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>(
-    [],
+
+  const [selectedLocation, setSelectedLocation] = useState(
+    searchParams.get('location') || 'All Locations',
   );
-  const [eventType, setEventType] = useState('all');
-  const [onlineOnly, setOnlineOnly] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(urlSearch);
-  const [currentSearch, setCurrentSearch] = useState(urlSearch);
+  const [selectedCategories, setSelectedCategories] = useState<EventCategory[]>(
+    (searchParams.get('category')?.split(',') as EventCategory[])?.filter(
+      Boolean,
+    ) || [],
+  );
+  const [eventType, setEventType] = useState(searchParams.get('type') || 'all');
+  const [onlineOnly, setOnlineOnly] = useState(
+    searchParams.get('online') === 'true',
+  );
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get('search') || '',
+  );
+  const [currentSearch, setCurrentSearch] = useState(
+    searchParams.get('search') || '',
+  );
+
   const debounce = useDebounce();
+  const { data: categories = [] } = useCategories();
+  const { getLocationName } = useLocations();
 
   useEffect(() => {
-    if (currentSearch) {
-      setSearchParams({ search: currentSearch }, { replace: true });
-    } else {
-      setSearchParams({}, { replace: true });
-    }
-  }, [currentSearch, setSearchParams]);
+    const params: Record<string, string> = {};
+    if (currentSearch) params.search = currentSearch;
+    if (selectedLocation !== 'All Locations')
+      params.location = selectedLocation;
+    if (selectedCategories.length > 0)
+      params.category = selectedCategories.join(',');
+    if (eventType !== 'all') params.type = eventType;
+    if (onlineOnly) params.online = 'true';
+
+    setSearchParams(params, { replace: true });
+  }, [
+    currentSearch,
+    selectedLocation,
+    selectedCategories,
+    eventType,
+    onlineOnly,
+    setSearchParams,
+  ]);
 
   // Fetch data from API
   const {
@@ -100,7 +126,7 @@ export default function DiscoverPage() {
     isPending: isEventsLoading,
     isError: isEventsError,
     refetch: refetchEvents,
-  } = useEventsWithTiers();
+  } = useEventsWithTiers(100);
 
   const toggleCategory = (category: EventCategory) => {
     setSelectedCategories((prev) =>
@@ -138,7 +164,7 @@ export default function DiscoverPage() {
       filtered = filtered.filter(
         (event) =>
           event.title.toLowerCase().includes(query) ||
-          event.shortDescription.toLowerCase().includes(query) ||
+          event.shortDescription?.toLowerCase().includes(query) ||
           event.venue.toLowerCase().includes(query),
       );
     }
@@ -146,14 +172,14 @@ export default function DiscoverPage() {
     // Location filter
     if (selectedLocation !== 'All Locations') {
       filtered = filtered.filter(
-        (event) => event.location === selectedLocation,
+        (event) => event.locationId === selectedLocation,
       );
     }
 
     // Category filter
     if (selectedCategories.length > 0) {
       filtered = filtered.filter((event) =>
-        selectedCategories.includes(event.category),
+        selectedCategories.includes(event.categoryId as EventCategory),
       );
     }
 
@@ -162,6 +188,12 @@ export default function DiscoverPage() {
       filtered = filtered.filter((event) => !event.isFree);
     } else if (eventType === 'free') {
       filtered = filtered.filter((event) => event.isFree);
+    }
+
+    if (onlineOnly) {
+      filtered = filtered.filter((event) =>
+        event.venue.toLowerCase().includes('online'),
+      );
     }
 
     // Sort
@@ -203,6 +235,7 @@ export default function DiscoverPage() {
     selectedLocation,
     selectedCategories,
     eventType,
+    onlineOnly,
     sortBy,
   ]);
 
@@ -228,7 +261,7 @@ export default function DiscoverPage() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto 2xl:px-20 xl:px-0 px-4 py-8">
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Discover Events</h1>
@@ -245,9 +278,12 @@ export default function DiscoverPage() {
             </span>
             {selectedLocation !== 'All Locations' && (
               <Badge variant="secondary" className="gap-1 pl-2">
-                {selectedLocation}
+                {getLocationName(selectedLocation) || selectedLocation}
                 <button
-                  onClick={() => setSelectedLocation('All Locations')}
+                  onClick={() => {
+                    setSelectedLocation('All Locations');
+                    setOnlineOnly(false);
+                  }}
                   className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"
                 >
                   <X className="h-3 w-3 hover:cursor-pointer" />
@@ -267,7 +303,7 @@ export default function DiscoverPage() {
             )}
             {selectedCategories.map((cat: EventCategory) => (
               <Badge key={cat} variant="secondary" className="gap-1 pl-2">
-                {EVENT_CATEGORIES.find((c) => c.value === cat)?.label}
+                {categories.find((c) => c.id === cat)?.label}
                 <button
                   onClick={() => toggleCategory(cat)}
                   className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"
@@ -466,7 +502,11 @@ export default function DiscoverPage() {
                 {paginatedEvents.length > 0 ? (
                   <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                     {paginatedEvents.map((event) => (
-                      <EventCard key={event.id} event={event} />
+                      <EventCard
+                        key={event.id}
+                        event={event}
+                        locationName={getLocationName(event.locationId)}
+                      />
                     ))}
                   </div>
                 ) : (
@@ -484,7 +524,7 @@ export default function DiscoverPage() {
                     <Button
                       onClick={clearFilters}
                       variant="outline"
-                      className="rounded-xl hover:cursor-pointer"
+                      className="rounded-full hover:cursor-pointer"
                     >
                       Clear all filters
                     </Button>

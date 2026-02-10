@@ -1,129 +1,263 @@
 import { axiosInstance } from '@/lib/axiosInstance';
-import type {
-  DiscountCoupon,
-  Transaction,
-  CheckoutResponse,
-} from '@/types/api';
+import type { DiscountCoupon, CheckoutResponse } from '@/types/api';
+import type { CreateTransactionRequest } from '@/types/api';
 
-// Fetch user by ID
-export async function fetchUser(userId: string) {
-  const { data } = await axiosInstance.get(`/users/${userId}`);
-  return data;
+// Fetch current user profile (requires auth)
+export async function fetchCurrentUser() {
+  const { data } = await axiosInstance.get('/api/users/current');
+  return data.data || data;
 }
 
-// Fetch user points balance
-export async function fetchUserPoints(userId: string): Promise<number> {
-  const { data } = await axiosInstance.get(`/user-points?userId=${userId}`);
-  if (Array.isArray(data)) {
-    return data.reduce(
-      (sum: number, point: { amount: number }) => sum + point.amount,
-      0,
-    );
+// Fetch user points (requires auth)
+export async function fetchUserPoints(): Promise<number> {
+  try {
+    const { data } = await axiosInstance.get<{
+      data: {
+        id: string;
+        name: string;
+        email: string;
+        points: number;
+      };
+    }>('/api/users/current');
+
+    // Extract points directly from user object
+    const user = data.data || data;
+    return user.points || 0;
+  } catch (error) {
+    console.error('Failed to fetch user points:', error);
+    return 0;
   }
-  return (data as { amount?: number }).amount || 0;
 }
 
-// Fetch user coupons (owned by user)
+// Fetch user owned coupons (requires auth)
 export async function fetchUserCoupons(
   userId: string,
 ): Promise<DiscountCoupon[]> {
-  const { data } = await axiosInstance.get(`/user-coupons?userId=${userId}`);
-  return Array.isArray(data) ? data : [];
-}
-
-// Validate and fetch coupon by code
-export async function fetchCouponByCode(code: string): Promise<DiscountCoupon> {
-  const { data } = await axiosInstance.get(
-    `/coupons?code=${code.toUpperCase()}`,
-  );
-  if (Array.isArray(data) && data.length > 0) {
-    return data[0];
+  try {
+    const { data } = await axiosInstance.get<{ data: DiscountCoupon[] }>(
+      '/api/coupons',
+      { params: { userId } },
+    );
+    const coupons = data.data || [];
+    return Array.isArray(coupons) ? coupons : [];
+  } catch {
+    return [];
   }
-  throw new Error('Coupon not found');
 }
 
-// Create transaction (checkout)
+// Fetch coupon by code (public endpoint)
+export async function fetchCouponByCode(code: string): Promise<DiscountCoupon> {
+  try {
+    const { data } = await axiosInstance.get<{ data: DiscountCoupon[] }>(
+      '/api/coupons',
+      { params: { code: code.toUpperCase() } },
+    );
+    const coupons = Array.isArray(data) ? data : data.data || [];
+    if (coupons.length > 0) {
+      return coupons[0];
+    }
+    throw new Error('Coupon not found');
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : 'Coupon not found or invalid';
+    throw new Error(message);
+  }
+}
+
+// Validate coupon by code (public endpoint)
+export async function validateCoupon(
+  couponCode: string,
+  eventId: string,
+  amount: number,
+): Promise<{
+  isValid: boolean;
+  coupon?: DiscountCoupon;
+  discountAmount?: number;
+  message?: string;
+}> {
+  try {
+    const { data } = await axiosInstance.post('/api/coupons/validate', {
+      couponCode: couponCode.toUpperCase(),
+      eventId,
+      amount,
+    });
+
+    if (data.data) {
+      return {
+        isValid: true,
+        coupon: data.data.coupon,
+        discountAmount: data.data.discountAmount,
+      };
+    }
+    return { isValid: false };
+  } catch (error) {
+    return {
+      isValid: false,
+      message: error instanceof Error ? error.message : 'Invalid coupon',
+    };
+  }
+}
+
+// List public coupons (for reference, public endpoint)
+export async function fetchCoupons() {
+  try {
+    const { data } = await axiosInstance.get<{ data: DiscountCoupon[] }>(
+      '/api/coupons',
+    );
+    return Array.isArray(data) ? data : data.data || [];
+  } catch {
+    return [];
+  }
+}
+
+// Create transaction (requires auth)
 export async function createTransaction(
-  userId: string,
   eventId: string,
   ticketTierId: string,
   quantity: number,
-  totalAmount: number,
-  discountAmount: number,
   pointsUsed: number,
-  couponId?: string,
+  couponCode?: string,
 ): Promise<CheckoutResponse> {
-  const now = new Date();
-  const expiresAt = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-
-  const transaction: Partial<Transaction> = {
-    user_id: userId,
-    event_id: eventId,
-    ticket_tier_id: ticketTierId,
+  const request: CreateTransactionRequest = {
+    eventId,
+    ticketTierId,
     quantity,
-    total_amount: totalAmount,
-    discount_amount: discountAmount,
-    points_used: pointsUsed,
-    coupon_id: couponId,
-    status: 'waiting_payment',
-    created_at: now.toISOString(),
-    expires_at: expiresAt.toISOString(),
+    pointsUsed,
+    couponCode,
   };
 
-  const { data } = await axiosInstance.post<CheckoutResponse>(
-    '/transactions',
-    transaction,
+  const { data } = await axiosInstance.post<{ data: CheckoutResponse }>(
+    '/api/transactions',
+    request,
   );
-  return data;
+  return data.data || data;
 }
 
-// Update user points (add cashback)
-export async function updateUserPoints(
+// Add user points (requires auth)
+// Note: This might be triggered by referrals or purchase rewards
+export async function addUserPoints(
   userId: string,
   amount: number,
   source: 'referral' | 'purchase' | 'bonus' | 'cashback',
-): Promise<{ id: string; userId: string; amount: number }> {
-  const { data } = await axiosInstance.post('/user-points', {
+) {
+  const { data } = await axiosInstance.post('/api/user-points', {
     userId,
     amount,
     source,
     expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
   });
-  return data;
+  return data.data || data;
+}
+
+// Update user points (requires auth)
+// Used for cashback or point deduction after transaction
+export async function updateUserPoints(
+  userId: string,
+  amount: number,
+  type: 'cashback' | 'deduction',
+) {
+  if (type === 'cashback') {
+    return addUserPoints(userId, amount, 'cashback');
+  } else {
+    // For deduction, send negative amount
+    return addUserPoints(userId, -amount, 'purchase');
+  }
 }
 
 // Validate coupon for checkout
-export async function validateCoupon(
+export async function validateCouponForCheckout(
   couponCode: string,
   cartAmount: number,
 ): Promise<{ valid: boolean; coupon?: DiscountCoupon; error?: string }> {
   try {
-    const coupon = await fetchCouponByCode(couponCode);
+    const result = await validateCoupon(couponCode, '', cartAmount);
+    if (result.isValid && result.coupon) {
+      return { valid: true, coupon: result.coupon };
+    }
+    return { valid: false, error: result.message || 'Invalid coupon' };
+  } catch (error) {
+    return {
+      valid: false,
+      error:
+        error instanceof Error ? error.message : 'Coupon not found or invalid',
+    };
+  }
+}
 
-    // Check expiration
-    const now = new Date();
-    const validFrom = new Date(coupon.valid_from);
-    const validUntil = new Date(coupon.valid_until);
+// Fetch voucher by code (vouchers are event specific coupons)
+export async function fetchVoucherByCode(
+  code: string,
+  eventId: string,
+): Promise<DiscountCoupon> {
+  try {
+    const { data } = await axiosInstance.get<{ data: DiscountCoupon[] }>(
+      '/api/coupons',
+      { params: { code: code.toUpperCase() } },
+    );
+    const coupons = Array.isArray(data) ? data : data.data || [];
 
-    if (now < validFrom || now > validUntil) {
-      return { valid: false, error: 'Coupon has expired or not yet valid' };
+    if (coupons.length === 0) {
+      throw new Error('Voucher not found');
     }
 
-    // Check usage limit
-    if (coupon.usage_limit && coupon.used_count >= coupon.usage_limit) {
-      return { valid: false, error: 'Coupon usage limit reached' };
+    const voucher = coupons[0];
+
+    // Vouchers must be event specific
+    if (!voucher.eventId) {
+      throw new Error('Invalid voucher - not event specific');
     }
 
-    // Check minimum purchase
-    if (coupon.min_purchase && cartAmount < coupon.min_purchase) {
+    // Voucher must match the event
+    if (voucher.eventId !== eventId) {
+      throw new Error('This voucher is not valid for this event');
+    }
+
+    return voucher;
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : 'Voucher not found or invalid';
+    throw new Error(message);
+  }
+}
+
+// Validate voucher (event specific coupon)
+export async function validateVoucher(
+  voucherCode: string,
+  eventId: string,
+  amount: number,
+): Promise<{
+  isValid: boolean;
+  voucher?: DiscountCoupon;
+  discountAmount?: number;
+  message?: string;
+}> {
+  try {
+    const { data } = await axiosInstance.post('/api/coupons/validate', {
+      couponCode: voucherCode.toUpperCase(),
+      eventId,
+      amount,
+    });
+
+    if (data.data) {
+      // Ensure it's event specific (voucher requirement)
+      if (!data.data.coupon.eventId) {
+        return {
+          isValid: false,
+          message: 'Invalid voucher - not event-specific',
+        };
+      }
+
       return {
-        valid: false,
-        error: `Minimum purchase of ${coupon.min_purchase} required`,
+        isValid: true,
+        voucher: data.data.coupon,
+        discountAmount: data.data.discountAmount,
       };
     }
-
-    return { valid: true, coupon };
-  } catch {
-    return { valid: false, error: 'Coupon not found or invalid' };
+    return { isValid: false };
+  } catch (error) {
+    return {
+      isValid: false,
+      message: error instanceof Error ? error.message : 'Invalid voucher',
+    };
   }
 }

@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, ArrowRight, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router';
 
 const heroImages = [
   'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&q=80',
@@ -12,7 +13,16 @@ const heroImages = [
 
 export default function Hero() {
   const [currentImage, setCurrentImage] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+
+  const navigate = useNavigate();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchInput.trim()) {
+      navigate(`/discover?search=${encodeURIComponent(searchInput.trim())}`);
+    }
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -30,7 +40,7 @@ export default function Hero() {
             key={img}
             className={cn(
               'absolute inset-0 transition-opacity duration-1000',
-              index === currentImage ? 'opacity-20' : 'opacity-0',
+              index === currentImage ? 'opacity-40' : 'opacity-0',
             )}
           >
             <img src={img} alt="" className="h-full w-full object-cover" />
@@ -86,32 +96,25 @@ export default function Hero() {
           >
             <div className="flex flex-col gap-3 rounded-2xl bg-card p-3 shadow-premium sm:flex-row sm:rounded-full">
               <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="Search events, artists, venues..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-12 rounded-full border-0 bg-muted/50 pl-12 text-base focus-visible:ring-1"
-                />
+                <form onSubmit={handleSearch}>
+                  <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Search events, artists, venues..."
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    className="h-12 rounded-full border-0 bg-muted/50 pl-12 text-base focus-visible:ring-1"
+                  />
+                </form>
               </div>
-              <Button size="lg" className="h-12 gap-2 rounded-full px-8">
+              <Button
+                size="lg"
+                className="h-12 gap-2 rounded-full px-8"
+                onClick={handleSearch}
+              >
                 Search Events
                 <ArrowRight className="h-4 w-4" />
               </Button>
-            </div>
-
-            {/* Quick Filters */}
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-              <span className="text-sm text-muted-foreground">Popular:</span>
-              {['Music', 'Tech', 'Food', 'Sports'].map((tag) => (
-                <button
-                  key={tag}
-                  className="rounded-full bg-muted px-3 py-1 text-sm font-medium transition-colors hover:bg-primary hover:text-primary-foreground"
-                >
-                  {tag}
-                </button>
-              ))}
             </div>
           </div>
 

@@ -1,8 +1,9 @@
-import { Button } from "@/components/ui/button";
-import { Calendar, Frown, ArrowRight } from "lucide-react";
-import { Link } from "react-router";
-import EventCard from "./EventCard";
-import type { EventWithTiers } from "@/types/api";
+import { Button } from '@/components/ui/button';
+import { Calendar, Frown, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router';
+import EventCard from './EventCard';
+import type { EventWithTiers } from '@/types/api';
+import { useLocations } from '@/hooks/useLocations';
 
 interface EventGridProps {
   events: EventWithTiers[];
@@ -14,11 +15,13 @@ interface EventGridProps {
 
 export default function EventGrid({
   events,
-  title = "Upcoming Events",
+  title = 'Upcoming Events',
   subtitle,
   showViewAll = true,
-  emptyMessage = "No events found",
+  emptyMessage = 'No events found',
 }: EventGridProps) {
+  const { getLocationName } = useLocations();
+
   if (events.length === 0) {
     return (
       <section className="container mx-auto py-12 px-4 sm:px-0">
@@ -31,7 +34,7 @@ export default function EventGrid({
             Try adjusting your filters or search terms to find what you're
             looking for.
           </p>
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2 rounded-full">
             <Calendar className="h-4 w-4" />
             Browse All Events
           </Button>
@@ -44,7 +47,7 @@ export default function EventGrid({
   const [featuredEvent, ...gridEvents] = events;
 
   return (
-    <section className="container mx-auto py-12 px-4 sm:px-0">
+    <section className="max-w-7xl mx-auto py-12 px-4">
       {/* Header */}
       <div className="mb-8 flex items-end justify-between">
         <div>
@@ -59,7 +62,7 @@ export default function EventGrid({
             className="hidden gap-2 sm:inline-flex rounded-full"
             asChild
           >
-            <Link to="/events">
+            <Link to="/discover">
               View All
               <ArrowRight className="h-4 w-4" />
             </Link>
@@ -70,7 +73,11 @@ export default function EventGrid({
       {/* Featured Event */}
       {featuredEvent && (
         <div className="mb-8">
-          <EventCard event={featuredEvent} featured />
+          <EventCard
+            event={featuredEvent}
+            featured
+            locationName={getLocationName(featuredEvent.locationId)}
+          />
         </div>
       )}
 
@@ -78,7 +85,11 @@ export default function EventGrid({
       {gridEvents.length > 0 && (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {gridEvents.map((event) => (
-            <EventCard key={event.id} event={event} />
+            <EventCard
+              key={event.id}
+              event={event}
+              locationName={getLocationName(event.locationId)}
+            />
           ))}
         </div>
       )}
@@ -86,7 +97,7 @@ export default function EventGrid({
       {/* Mobile View All */}
       {showViewAll && (
         <div className="mt-8 text-center sm:hidden">
-          <Button variant="outline" className="gap-2" asChild>
+          <Button variant="default" className="gap-2 rounded-full" asChild>
             <Link to="/events">
               View All Events
               <ArrowRight className="h-4 w-4" />

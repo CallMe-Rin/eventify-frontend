@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router';
+import { useEffect, useState } from 'react';
+import { useSearchParams, useNavigate, useLocation } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import {
   Loader2,
@@ -13,7 +13,8 @@ import Layout from '@/components/layout/Layout';
 
 import { useCheckout } from '@/hooks/useCheckout';
 import { usePriceCalculation } from '@/hooks/usePriceCalculation';
-import { useAuthContext } from '@/hooks/useAuthContext';
+import { useAuth } from '@/hooks/useAuth';
+import { useLocations } from '@/hooks/useLocations';
 import * as checkoutApi from '@/api/checkout';
 import * as eventsApi from '@/api/events';
 import { formatIDR } from '@/types/api';
@@ -26,6 +27,7 @@ import CheckoutSkeleton from '@/components/checkout/CheckoutSkeleton';
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
 
   // Extract eventId and ticketTierId from URL search params
   const eventId = searchParams.get('eventId');
@@ -33,10 +35,12 @@ export default function CheckoutPage() {
   const quantityParam = searchParams.get('quantity');
   const quantity = Math.max(1, Math.min(100, Number(quantityParam) || 1));
 
-  // Get authenticated user from context
-  const auth = useAuthContext();
-  const userId = auth?.profile?.id;
-  const isAuthenticated = auth?.isAuthenticated;
+  // Get authenticated user from better-auth
+  const { profile, isLoading: authLoading } = useAuth();
+  const userId = profile?.id;
+
+  // Get location name helper
+  const { getLocationName } = useLocations();
 
   // Confirmation dialog state
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -44,18 +48,28 @@ export default function CheckoutPage() {
   // Form state
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (!authLoading && !profile) {
+      localStorage.setItem(
+        'redirectAfterLogin',
+        location.pathname + location.search,
+      );
+      navigate('/login', { replace: true });
+    }
+  }, [authLoading, profile, location, navigate]);
+
   // Fetch event details
   const { data: event, isLoading: eventLoading } = useQuery({
     queryKey: ['event', eventId || ''],
     queryFn: () => eventsApi.fetchEventById(eventId || ''),
-    enabled: !!eventId && !!userId,
+    enabled: !!eventId,
   });
 
   // Fetch ticket tiers
   const { data: ticketTiers, isLoading: tiersLoading } = useQuery({
     queryKey: ['ticket-tiers', eventId || ''],
     queryFn: () => eventsApi.fetchTicketTiersByEventId(eventId || ''),
-    enabled: !!eventId && !!userId,
+    enabled: !!eventId,
   });
 
   // Find the selected ticket tier from fetched tiers
@@ -71,32 +85,24 @@ export default function CheckoutPage() {
     userId: userId || '',
     quantity,
     ticketPrice: selectedTicketTier?.price || 0,
+    eventId: eventId || undefined,
   });
 
   // Price calculation
   const priceCalculation = usePriceCalculation({
     basePrice,
+    appliedVoucher: checkout.appliedVoucher,
     appliedCoupon: checkout.appliedCoupon,
     pointsUsed: checkout.pointsUsed,
     maxPointsAvailable: checkout.userPoints,
   });
 
   const isLoading =
-    auth?.isLoading ||
+    authLoading ||
     eventLoading ||
     tiersLoading ||
     checkout.pointsLoading ||
     !userId;
-
-  useEffect(() => {
-    // Only run auth check after loading is complete
-    if (!isLoading && !isAuthenticated) {
-      const returnUrl = `/checkout?eventId=${eventId}&ticketTierId=${ticketTierId}&quantity=${quantity}`;
-      localStorage.setItem('redirectAfterLogin', returnUrl);
-      toast.error('Please sign in to proceed with checkout');
-      navigate('/login');
-    }
-  }, [isLoading, isAuthenticated, eventId, ticketTierId, quantity, navigate]);
 
   // Format date range
   const formatDateRange = () => {
@@ -133,22 +139,28 @@ export default function CheckoutPage() {
 
   // Handle checkout submission
   const handleCheckout = async () => {
-    if (priceCalculation.finalPayable === 0 && !checkout.appliedCoupon) {
+    if (
+      priceCalculation.finalPayable === 0 &&
+      basePrice > 0 &&
+      !checkout.appliedCoupon &&
+      !checkout.appliedVoucher
+    ) {
       toast.error('Invalid checkout state');
       return;
     }
 
     setIsSubmitting(true);
     try {
+      // Use voucher code if applied, otherwise use coupon code
+      const discountCode =
+        checkout.appliedVoucher?.code || checkout.appliedCoupon?.code;
+
       await checkoutApi.createTransaction(
-        userId!,
         eventId!,
         ticketTierId!,
         quantity,
-        priceCalculation.finalPayable,
-        priceCalculation.couponDiscount,
         priceCalculation.pointsUsed,
-        checkout.appliedCoupon?.id,
+        discountCode,
       );
 
       if (priceCalculation.cashbackEarned > 0) {
@@ -212,8 +224,7 @@ export default function CheckoutPage() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8">
-        {/* Breadcrumb */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-2">
           <Button
             variant="ghost"
@@ -246,7 +257,7 @@ export default function CheckoutPage() {
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                     <MapPin className="size-4" />
                     <span>
-                      {event.venue}, {event.location}
+                      {event.venue}, {getLocationName(event.locationId)}
                     </span>
                   </div>
                 </div>
@@ -271,10 +282,11 @@ export default function CheckoutPage() {
                   breakdown={{
                     subtotal: basePrice,
                     pointsDiscount: priceCalculation.pointsUsed,
-                    voucherDiscount: 0,
+                    voucherDiscount: priceCalculation.voucherDiscount,
                     couponDiscount: priceCalculation.couponDiscount,
                     totalDiscount:
                       priceCalculation.pointsUsed +
+                      priceCalculation.voucherDiscount +
                       priceCalculation.couponDiscount,
                     total: priceCalculation.finalPayable,
                   }}
@@ -291,15 +303,16 @@ export default function CheckoutPage() {
                   userPoints={checkout.userPoints}
                   pointsToUse={checkout.pointsUsed}
                   onPointsChange={checkout.updatePointsUsed}
-                  voucher={null}
-                  voucherError={null}
-                  onApplyVoucher={() => {}}
-                  onRemoveVoucher={() => {}}
-                  isVoucherLoading={false}
+                  voucher={checkout.appliedVoucher}
+                  voucherError={checkout.voucherError}
+                  onApplyVoucher={checkout.applyVoucher}
+                  onRemoveVoucher={checkout.removeVoucher}
+                  isVoucherLoading={checkout.voucherValidating}
                   coupon={checkout.appliedCoupon}
-                  couponError={null}
-                  onApplyCoupon={() => {}}
-                  onRemoveCoupon={() => {}}
+                  couponError={checkout.couponError}
+                  onApplyCoupon={checkout.applyCoupon}
+                  onRemoveCoupon={checkout.removeCoupon}
+                  isCouponLoading={checkout.couponValidating}
                 />
                 {/* Desktop Submit Button */}
                 <div className="hidden lg:block">
@@ -338,10 +351,12 @@ export default function CheckoutPage() {
             priceBreakdown={{
               subtotal: basePrice,
               pointsDiscount: priceCalculation.pointsUsed,
-              voucherDiscount: 0,
+              voucherDiscount: priceCalculation.voucherDiscount,
               couponDiscount: priceCalculation.couponDiscount,
               totalDiscount:
-                priceCalculation.pointsUsed + priceCalculation.couponDiscount,
+                priceCalculation.pointsUsed +
+                priceCalculation.voucherDiscount +
+                priceCalculation.couponDiscount,
               total: priceCalculation.finalPayable,
             }}
           />

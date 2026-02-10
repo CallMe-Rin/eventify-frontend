@@ -1,6 +1,7 @@
 import { useAuth } from '@/hooks/useAuth';
 import { useEvent } from '@/hooks/useEvents';
 import { useCheckExistingReview, useCreateReview } from '@/hooks/useReviews';
+import { useTransactions } from '@/hooks/useTransactions';
 import { reviewFormSchema, type ReviewFormData } from '@/types/review';
 import { Link, useNavigate, useParams } from 'react-router';
 import { Controller, useForm } from 'react-hook-form';
@@ -20,8 +21,10 @@ import {
   ArrowLeft,
   Calendar,
   CheckCircle2,
+  Clock,
   Loader2,
   MapPin,
+  XCircle,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -39,7 +42,7 @@ import Layout from '@/components/layout/Layout';
 export default function ReviewFormPage() {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
-  const { user, role, isAuthenticated } = useAuth();
+  const { user, role, isAuthenticated, isLoading: authLoading } = useAuth();
 
   // Fetch event data
   const {
@@ -47,6 +50,12 @@ export default function ReviewFormPage() {
     isLoading: eventLoading,
     error: eventError,
   } = useEvent(eventId || '');
+
+  // Fetch user transactions for this event
+  const { transactions } = useTransactions({ eventId });
+
+  // Find a completed transaction for this event
+  const completedTransaction = transactions.find((tx) => tx.status === 'DONE');
 
   // Check if user already reviewed this event
   const { data: existingReview, isLoading: checkingReview } =
@@ -69,29 +78,30 @@ export default function ReviewFormPage() {
 
   // Redirect if not authenticated or not a customer
   useEffect(() => {
+    if (authLoading) return;
+
     if (!isAuthenticated) {
       navigate('/login');
       toast.info('Access Denied', {
         description: 'Please login to submit reviews.',
         position: 'bottom-right',
       });
-    } else if (role !== 'customer') {
+    } else if (role !== 'CUSTOMER') {
       navigate('/');
       toast.warning('Access Denied', {
         description: 'Only customers can submit reviews.',
         position: 'bottom-right',
       });
     }
-  }, [isAuthenticated, role, navigate]);
+  }, [isAuthenticated, role, navigate, authLoading]);
 
   // Handle form submission
   async function onSubmit(data: ReviewFormData) {
-    if (!eventId || !user) return;
+    if (!eventId || !completedTransaction) return;
 
     try {
       await createReviewMutation.mutateAsync({
-        eventId,
-        userId: user.id,
+        transactionId: completedTransaction.id,
         rating: data.rating,
         comment: data.comment.trim(),
       });
@@ -101,18 +111,31 @@ export default function ReviewFormPage() {
         position: 'bottom-right',
       });
 
-      // Navigate back to transactions page
-      navigate('/transactions');
-    } catch (error) {
-      toast.error('Error', {
-        description: 'Failed to submit review. Please try again.',
-        position: 'bottom-right',
-      });
+      navigate(`/review/${eventId}`);
+    } catch (error: any) {
+      if (
+        error?.response?.status === 409 ||
+        error?.message?.includes('already exists')
+      ) {
+        toast.warning('Already Reviewed', {
+          description: 'You have already submitted a review for this event.',
+          position: 'bottom-right',
+        });
+        setTimeout(() => navigate('/transactions'), 1500);
+      } else {
+        toast.error('Submission Failed', {
+          description:
+            error instanceof Error
+              ? error.message
+              : 'Failed to submit review. Please try again.',
+          position: 'bottom-right',
+        });
+      }
     }
   }
 
   // Loading state
-  if (eventLoading || checkingReview) {
+  if (authLoading || eventLoading || checkingReview) {
     return (
       <Layout>
         <div className="min-h-screen bg-background">
@@ -135,7 +158,7 @@ export default function ReviewFormPage() {
     );
   }
 
-  // Error state
+  // Error state - Event not found
   if (eventError || !event) {
     return (
       <Layout>
@@ -143,19 +166,87 @@ export default function ReviewFormPage() {
           <div className="container max-w-2xl mx-auto px-4 py-8">
             <Link
               to="/transactions"
-              className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6"
+              className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Transactions
             </Link>
-            <Alert variant="destructive">
-              <AlertCircle className="w-4 h-4" />
-              <AlertTitle>Event Not Found</AlertTitle>
-              <AlertDescription>
-                The event you're trying to review doesn't exist or has been
-                removed.
-              </AlertDescription>
-            </Alert>
+            <Card className="border-destructive/50">
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+                  <XCircle className="w-8 h-8 text-destructive" />
+                </div>
+                <CardTitle className="text-destructive">
+                  Event Not Found
+                </CardTitle>
+                <CardDescription className="text-base">
+                  The event you're trying to review doesn't exist or has been
+                  removed.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="text-center pt-2">
+                <Button variant="outline" className="rounded-xl" asChild>
+                  <Link to="/transactions">
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Return to Transactions
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // No completed transaction state
+  if (!completedTransaction) {
+    return (
+      <Layout>
+        <div className="min-h-screen bg-background">
+          <div className="container max-w-2xl mx-auto px-4 py-8">
+            <Link
+              to="/transactions"
+              className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to Transactions
+            </Link>
+            <Card className="border-amber-500/50">
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mb-4">
+                  <AlertCircle className="w-8 h-8 text-amber-600" />
+                </div>
+                <CardTitle className="text-amber-600">
+                  Cannot Submit Review
+                </CardTitle>
+                <CardDescription className="text-base">
+                  You need a completed transaction for this event to write a
+                  review.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Alert className="border-amber-500/30 bg-amber-50">
+                  <AlertCircle className="h-4 w-4 text-amber-600" />
+                  <AlertTitle className="text-amber-900">
+                    Requirements
+                  </AlertTitle>
+                  <AlertDescription className="text-amber-800">
+                    Only users who have successfully attended the event can
+                    submit reviews. Please complete your ticket purchase and
+                    attend the event first.
+                  </AlertDescription>
+                </Alert>
+                <div className="text-center">
+                  <Button variant="outline" className="rounded-xl" asChild>
+                    <Link to="/transactions">
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      View My Transactions
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </Layout>
@@ -169,26 +260,63 @@ export default function ReviewFormPage() {
         <div className="min-h-screen bg-background">
           <div className="container max-w-2xl mx-auto px-4 py-8">
             <Link
-              to="/my-transactions"
-              className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6"
+              to="/transactions"
+              className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Transactions
             </Link>
-            <Card>
-              <CardHeader className="text-center">
-                <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <CheckCircle2 className="w-6 h-6 text-primary" />
+            <Card className="border-primary/50">
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <CheckCircle2 className="w-8 h-8 text-primary" />
                 </div>
-                <CardTitle>Already Reviewed</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-primary">
+                  Review Already Submitted
+                </CardTitle>
+                <CardDescription className="text-base">
                   You have already submitted a review for this event.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="text-center">
-                <Button className="rounded-xl" asChild>
-                  <Link to="/my-transactions">View My Transactions</Link>
-                </Button>
+              <CardContent className="space-y-4">
+                {/* Show existing review details */}
+                <div className="p-4 rounded-xl bg-muted/50 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold">{event.title}</h3>
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <span
+                          key={i}
+                          className={
+                            i < existingReview.rating
+                              ? 'text-yellow-500'
+                              : 'text-gray-300'
+                          }
+                        >
+                          ★
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  {existingReview.comment && (
+                    <p className="text-sm text-muted-foreground italic">
+                      "{existingReview.comment}"
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Submitted on{' '}
+                    {new Date(existingReview.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+
+                <div className="text-center pt-2">
+                  <Button className="rounded-2xl" asChild>
+                    <Link to="/transactions">
+                      <ArrowLeft className="w-4 h-4" />
+                      Back to Transactions
+                    </Link>
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -201,38 +329,77 @@ export default function ReviewFormPage() {
   if (!isEventPassed) {
     return (
       <Layout>
-        {' '}
         <div className="min-h-screen bg-background">
           <div className="container max-w-2xl mx-auto px-4 py-8">
             <Link
-              to="/my-transactions"
-              className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6"
+              to="/transactions"
+              className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Transactions
             </Link>
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Review Not Available</AlertTitle>
-              <AlertDescription>
-                Reviews can only be submitted after the event has ended. This
-                event is scheduled for {formatEventDate(event.date)}.
-              </AlertDescription>
-            </Alert>
+            <Card className="border-blue-500/50">
+              <CardHeader className="text-center pb-4">
+                <div className="mx-auto w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center mb-4">
+                  <Clock className="w-8 h-8 text-blue-600" />
+                </div>
+                <CardTitle className="text-blue-600">
+                  Review Not Available Yet
+                </CardTitle>
+                <CardDescription className="text-base">
+                  You can submit a review after the event has ended.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-4 rounded-xl bg-muted/50 space-y-3">
+                  <h3 className="font-semibold text-lg">{event.title}</h3>
+                  <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="w-4 h-4" />
+                      <span>Event Date: {formatEventDate(event.date)}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <MapPin className="w-4 h-4" />
+                      <span>{event.venue}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <Alert className="border-blue-500/30 bg-blue-50">
+                  <Clock className="h-4 w-4 text-blue-600" />
+                  <AlertTitle className="text-blue-900">Coming Soon</AlertTitle>
+                  <AlertDescription className="text-blue-800">
+                    Reviews can only be submitted after the event has concluded.
+                    Please check back after{' '}
+                    <strong>{formatEventDate(event.date)}</strong> to share your
+                    experience.
+                  </AlertDescription>
+                </Alert>
+
+                <div className="text-center pt-2">
+                  <Button variant="outline" className="rounded-xl" asChild>
+                    <Link to="/transactions">
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Return to Transactions
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </Layout>
     );
   }
 
+  // Main review form (all conditions met)
   return (
     <Layout>
-      {' '}
       <div className="min-h-screen bg-background">
         <div className="container max-w-2xl mx-auto px-4 py-8">
           {/* Back Link */}
           <Link
-            to="/my-transactions"
+            to="/transactions"
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -339,7 +506,7 @@ export default function ReviewFormPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => navigate('/my-transactions')}
+                    onClick={() => navigate('/transactions')}
                     disabled={createReviewMutation.isPending}
                     className="rounded-xl hover:cursor-pointer hover:bg-destructive/20 hover:text-destructive hover:border-destructive/20"
                   >

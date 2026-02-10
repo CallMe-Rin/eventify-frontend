@@ -1,4 +1,4 @@
-import { EVENT_CATEGORIES, EVENT_TYPES, type EventCategory } from '@/types/api';
+import { EVENT_TYPES, type EventCategory } from '@/types/api';
 import { useState } from 'react';
 import { Button } from '../ui/button';
 import { ChevronDown, RefreshCcw, Search } from 'lucide-react';
@@ -13,6 +13,7 @@ import { Input } from '../ui/input';
 import { useLocations } from '@/hooks/useLocations';
 import { cn } from '@/lib/utils';
 import { Separator } from '../ui/separator';
+import { useCategories } from '@/hooks/useCategories';
 
 interface FilterSidebarProps {
   selectedLocation: string;
@@ -52,14 +53,18 @@ export default function FilterSidebar({
   const [typeOpen, setTypeOpen] = useState(true);
   const [categoryOpen, setCategoryOpen] = useState(true);
 
-  const { data: locations = [] } = useLocations();
+  const { locations = [] } = useLocations();
+  const { data: categories = [], isPending: isCategoriesLoading } =
+    useCategories();
+
+  const onlineLocation = locations.find((l) => l.name === 'Online');
 
   // Handle the Online Switch Toggle
   const handleOnlineToggle = (checked: boolean) => {
     onOnlineOnlyChange(checked);
-    if (checked) {
+    if (checked && onlineLocation) {
       // If switch turned ON, force location to Online
-      onLocationChange('Online');
+      onLocationChange(onlineLocation.id);
     } else {
       // If switch turned OFF, reset to All Locations
       onLocationChange('All Locations');
@@ -67,9 +72,9 @@ export default function FilterSidebar({
   };
 
   // Handle specific Location Selection
-  const handleLocationSelect = (locationName: string) => {
-    onLocationChange(locationName);
-    if (locationName !== 'Online') {
+  const handleLocationSelect = (locationId: string) => {
+    onLocationChange(locationId);
+    if (onlineLocation && locationId !== onlineLocation.id) {
       onOnlineOnlyChange(false);
     }
   };
@@ -98,8 +103,12 @@ export default function FilterSidebar({
         </Label>
         <Switch
           id="online-events"
-          checked={onlineOnly || selectedLocation === 'Online'}
+          checked={
+            onlineOnly ||
+            (onlineLocation && selectedLocation === onlineLocation.id)
+          }
           onCheckedChange={handleOnlineToggle}
+          className="hover:cursor-pointer"
         ></Switch>
       </div>
 
@@ -125,22 +134,25 @@ export default function FilterSidebar({
           />
         </CollapsibleTrigger>
         <CollapsibleContent className="pt-2 space-y-1">
-          {locations.slice(0, 8).map((location) => (
-            <button
-              key={location.id}
-              onClick={() => {
-                handleLocationSelect(location.name);
-              }}
-              className={cn(
-                'block w-full rounded-full px-3 py-2 text-left text-sm transition-colors hover:cursor-pointer',
-                selectedLocation === location.name
-                  ? 'bg-primary/10 text-primary font-medium'
-                  : 'hover:bg-muted',
-              )}
-            >
-              {location.name}
-            </button>
-          ))}
+          {locations
+            .filter((loc) => loc.id !== onlineLocation?.id)
+            .slice(0, 8)
+            .map((location) => (
+              <button
+                key={location.id}
+                onClick={() => {
+                  handleLocationSelect(location.id);
+                }}
+                className={cn(
+                  'block w-full rounded-full px-3 py-2 text-left text-sm transition-colors hover:cursor-pointer',
+                  selectedLocation === location.id
+                    ? 'bg-primary/10 text-primary font-medium'
+                    : 'hover:bg-muted',
+                )}
+              >
+                {location.name}
+              </button>
+            ))}
         </CollapsibleContent>
       </Collapsible>
 
@@ -193,18 +205,25 @@ export default function FilterSidebar({
           />
         </CollapsibleTrigger>
         <CollapsibleContent className="pt-2 space-y-1">
-          {EVENT_CATEGORIES.map((category) => (
+          {isCategoriesLoading && (
+            <p className="text-sm text-muted-foreground px-2 py-1">
+              Loading...
+            </p>
+          )}
+
+          {categories.map((category) => (
             <button
-              key={category.value}
-              onClick={() => onCategoryToggle(category.value)}
+              key={category.id}
+              onClick={() => onCategoryToggle(category.id as EventCategory)}
               className={cn(
                 'flex w-full items-center gap-2 rounded-full px-3 py-2 text-left text-sm transition-colors hover:cursor-pointer',
-                selectedCategories.includes(category.value)
+                selectedCategories.includes(category.id as EventCategory)
                   ? 'bg-primary/10 text-primary font-medium'
                   : 'hover:bg-muted',
               )}
             >
-              <span>{category.icon}</span>
+              {/* Optional icon if DB has icon field */}
+              {category.icon && <span>{category.icon}</span>}
               <span>{category.label}</span>
             </button>
           ))}

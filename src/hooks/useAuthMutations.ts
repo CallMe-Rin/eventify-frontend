@@ -1,66 +1,84 @@
-import { useMutation } from "@tanstack/react-query";
-import { useAuthContext } from "./useAuthContext";
-import {
-  registerUser,
-  loginUser,
-  type RegisterPayload,
-  type LoginPayload,
-  type ApiUser,
-} from "@/api/authService";
-import type { User } from "@/types/api";
+import { useMutation } from '@tanstack/react-query';
+import { signIn, authClient } from '@/lib/auth-client';
+import { axiosInstance } from '@/lib/axiosInstance';
+import { toast } from 'sonner';
 
-// Convert API user to User format
-function apiUserToUser(apiUser: ApiUser): User {
-  return {
-    id: apiUser.id,
-    email: apiUser.email,
-    name: apiUser.name,
-    avatarUrl: apiUser.avatar_url,
-    phone: apiUser.phone,
-    bio: apiUser.bio,
-    referralCode: apiUser.referral_code,
-    role: apiUser.role,
-    points: apiUser.points ?? 0,
-    createdAt: apiUser.created_at,
-  };
+interface RegisterPayload {
+  email: string;
+  password: string;
+  name: string;
+  role: 'CUSTOMER' | 'ORGANIZER';
+  referredBy?: string | null;
+}
+
+interface LoginPayload {
+  email: string;
+  password: string;
 }
 
 export function useAuthMutations() {
-  const { signIn } = useAuthContext();
-
-  /**
-   * Register mutation
-   */
   const registerMutation = useMutation({
     mutationFn: async (payload: RegisterPayload) => {
-      const apiUser = await registerUser(payload);
-      return apiUser;
-    },
-    onSuccess: async (apiUser) => {
-      // Store user ID in localStorage
-      localStorage.setItem("auth_user_id", apiUser.id);
+      // Register with custom endpoint (includes referral code generation)
+      const registerResponse = await axiosInstance.post('/api/auth/register', {
+        email: payload.email,
+        password: payload.password,
+        name: payload.name,
+        role: payload.role,
+        referredBy: payload.referredBy || null,
+      });
 
-      // Convert to User format and call signIn
-      const user = apiUserToUser(apiUser);
-      await signIn(user.email, apiUser.password);
+      // Sign in immediately to set session cookie
+      const { data: signInData, error: signInError } = await signIn.email({
+        email: payload.email,
+        password: payload.password,
+        callbackURL: '/',
+      });
+
+      if (signInError) {
+        throw new Error(
+          signInError.message ||
+            'Registration successful but sign-in failed. Please sign in manually.',
+        );
+      }
+
+      return {
+        user: registerResponse.data.data.user,
+        session: signInData,
+      };
+    },
+
+    onSuccess: async () => {
+      // Refresh session
+      await authClient.getSession();
+      toast.success('Account created successfully!');
+    },
+
+    onError: (error: Error) => {
+      toast.error(error.message || 'Registration failed');
     },
   });
 
-  /**
-   * Login mutation
-   */
   const loginMutation = useMutation({
     mutationFn: async (payload: LoginPayload) => {
-      const apiUser = await loginUser(payload);
-      return apiUser;
-    },
-    onSuccess: async (apiUser) => {
-      // Store user ID in localStorage
-      localStorage.setItem("auth_user_id", apiUser.id);
+      const { data, error } = await signIn.email({
+        email: payload.email,
+        password: payload.password,
+        callbackURL: '/',
+      });
 
-      // Convert to User format and call signIn
-      const user = apiUserToUser(apiUser);
-      await signIn(user.email, apiUser.password);
+      if (error) {
+        throw new Error(error.message || 'Login failed');
+      }
+
+      return data;
+    },
+    onSuccess: async () => {
+      await authClient.getSession();
+      toast.success('Welcome back!');
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
     },
   });
 

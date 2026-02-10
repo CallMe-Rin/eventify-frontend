@@ -1,6 +1,6 @@
 import type { TicketTier } from '@/types';
 import { formatIDR } from '@/types';
-import { Check, Ticket } from 'lucide-react';
+import { Ticket } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface TicketTierSelectorProps {
@@ -36,11 +36,11 @@ export function TicketTierSelector({
                 isSoldOut && 'opacity-60 cursor-not-allowed',
               )}
             >
-              {isSelected && (
+              {/* {isSelected && (
                 <div className="absolute top-3 right-3 size-6 rounded-full bg-primary flex items-center justify-center">
                   <Check className="size-4 text-primary-foreground" />
                 </div>
-              )}
+              )} */}
 
               {/* Ticket Logo */}
               <div className="flex items-start gap-3">

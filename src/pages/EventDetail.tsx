@@ -24,19 +24,21 @@ import {
 } from 'lucide-react';
 import { SocialIcon } from 'react-social-icons';
 import { useEventWithTiers } from '@/hooks/useEvents';
-import { useAuthContext } from '@/hooks/useAuthContext';
-import { EVENT_CATEGORIES, formatIDR } from '@/types/api';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useCategories } from '@/hooks/useCategories';
+import { formatIDR } from '@/types';
+import { useLocations } from '@/hooks/useLocations';
 
 export default function EventDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('description');
+  const { getLocationName } = useLocations();
 
   // Get authenticated user
-  const auth = useAuthContext();
-  const isAuthenticated = auth?.isAuthenticated;
+  const { isAuthenticated, role } = useAuth();
 
   // Fetch event from API
   const {
@@ -46,29 +48,50 @@ export default function EventDetailPage() {
     refetch,
   } = useEventWithTiers(id || '');
 
+  // Fetch category from API
+  const { data: categories } = useCategories();
+
+  const categoryId = event?.categoryId;
+
+  const eventCategory = categories?.find((c) => c.id === categoryId) ?? null;
+
   const [openTiers, setOpenTiers] = useState<Record<string, boolean>>({});
 
   // Handle Buy Ticket click with auth and role guard
   const handleBuyTicket = (ticketTierId: string) => {
-    if (!isAuthenticated) {
-      toast.error('Please sign in to purchase tickets');
-      // Store the intended destination for post-login redirect
-      const returnUrl = `/checkout?eventId=${id}&ticketTierId=${ticketTierId}&quantity=1`;
-      localStorage.setItem('redirectAfterLogin', returnUrl);
-      navigate('/login', { state: { from: { pathname: returnUrl } } });
+    if (!id) {
+      toast.error('Invalid event');
       return;
     }
 
-    // Check if user is organizer
-    if (auth?.role === 'organizer') {
+    const params = new URLSearchParams({
+      eventId: id,
+      ticketTierId,
+      quantity: '1',
+    });
+
+    const checkoutUrl = `/checkout?${params.toString()}`;
+
+    if (!isAuthenticated) {
+      toast.error('Please sign in to purchase tickets');
+      localStorage.setItem('redirectAfterLogin', checkoutUrl);
+      navigate('/login', { state: { from: { pathname: checkoutUrl } } });
+      return;
+    }
+
+    if (!role) {
+      toast.error('Loading user info, please try again');
+      return;
+    }
+
+    if (role === 'ORGANIZER') {
       toast.error(
         'Organizers cannot purchase tickets. Please use a customer account.',
       );
       return;
     }
 
-    // Navigate to checkout with search params
-    navigate(`/checkout?eventId=${id}&ticketTierId=${ticketTierId}&quantity=1`);
+    navigate(checkoutUrl);
   };
 
   // Handle group Buy Ticket (select first tier in group)
@@ -80,6 +103,8 @@ export default function EventDetailPage() {
 
   // Auto-update active tab on scroll
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+
     const handleScroll = () => {
       const sections = ['description', 'tickets', 'terms'];
       const scrollPosition = window.scrollY + 100;
@@ -101,8 +126,9 @@ export default function EventDetailPage() {
     };
 
     window.addEventListener('scroll', handleScroll);
+
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [id]);
 
   // Group tiers by category
   const groupedTiers = useMemo(() => {
@@ -261,8 +287,6 @@ export default function EventDetailPage() {
     );
   }
 
-  const category = EVENT_CATEGORIES.find((c) => c.value === event?.category);
-
   return (
     <Layout>
       <div className="min-h-screen bg-background pb-20">
@@ -275,7 +299,7 @@ export default function EventDetailPage() {
             <div className="absolute inset-0 bg-black/70 backdrop-blur-xl" />
           </div>
 
-          <div className="container mx-auto px-4 py-16 relative z-10">
+          <div className="max-w-7xl mx-auto px-4 py-16 relative z-10">
             <div className="max-w-3xl space-y-6">
               <Button
                 variant="ghost"
@@ -293,7 +317,10 @@ export default function EventDetailPage() {
                 <div className="flex items-center gap-2">
                   <MapPin className="h-5 w-5 text-primary" />
                   <span>
-                    {event?.venue}, {event?.location}
+                    {event?.venue},{' '}
+                    {event?.locationId
+                      ? getLocationName(event.locationId)
+                      : 'Location TBA'}
                   </span>
                 </div>
 
@@ -303,7 +330,7 @@ export default function EventDetailPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Ticket className="h-5 w-5 text-primary" />
-                  <span>{category?.label}</span>
+                  <span>{eventCategory?.label}</span>
                 </div>
               </div>
             </div>
@@ -311,7 +338,7 @@ export default function EventDetailPage() {
         </div>
 
         {/* Main Content Area */}
-        <div className="container mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="grid lg:grid-cols-[1fr_400px] gap-12">
             {/* Left Column: Sections */}
             <div className="relative">
@@ -325,7 +352,7 @@ export default function EventDetailPage() {
                   <button
                     key={tab.id}
                     onClick={() => scrollToSection(tab.id)}
-                    className={`py-4 text-sm font-semibold border-b-2 transition-all ${
+                    className={`py-4 text-sm font-semibold border-b-2 transition-all hover:cursor-pointer ${
                       activeTab === tab.id
                         ? 'border-primary text-primary'
                         : 'border-transparent text-muted-foreground hover:text-primary'
@@ -514,7 +541,10 @@ export default function EventDetailPage() {
                       <div className="flex gap-3 items-start text-sm">
                         <MapPin className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                         <span>
-                          {event?.venue}, {event?.location}
+                          {event?.venue},{' '}
+                          {event?.locationId
+                            ? getLocationName(event.locationId)
+                            : 'Location TBA'}
                         </span>
                       </div>
                       <div className="flex gap-3 items-start text-sm">
@@ -523,7 +553,7 @@ export default function EventDetailPage() {
                       </div>
                       <div className="flex gap-3 items-start text-sm">
                         <Ticket className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                        <span>{category?.label}</span>
+                        <span>{eventCategory?.label}</span>
                       </div>
                     </div>
                   </div>

@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
-import MobileTabBar from "./MobileTabBar";
+import type { ReactNode } from 'react';
+import Navbar from './Navbar';
+import Footer from './Footer';
+import MobileTabBar from './MobileTabBar';
 
 type LayoutProps = {
   children: ReactNode;

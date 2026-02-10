@@ -1,98 +1,81 @@
-// Transaction Status Types
+// Transaction Status from Prisma schema
 export type TransactionStatus =
-  | 'waiting_payment'
-  | 'waiting_confirmation'
-  | 'done'
-  | 'rejected'
-  | 'expired'
-  | 'canceled';
+  | 'WAITING_PAYMENT'
+  | 'WAITING_CONFIRMATION'
+  | 'DONE'
+  | 'REJECTED'
+  | 'EXPIRED'
+  | 'CANCELED';
 
-// Transaction Interface - matches API snake_case
+// Transaction Interface - matches backend TransactionResponse
 export interface Transaction {
   id: string;
-  user_id: string;
-  event_id: string;
-  ticket_tier_id: string;
+  userId: string;
+  eventId: string;
+  ticketTierId: string;
   quantity: number;
-  original_amount?: number;
-  discount_amount: number;
-  points_used: number;
-  points_discount?: number;
-  voucher_id?: string;
-  coupon_id?: string;
-  total_amount: number;
+  totalAmount: number;
+  discountAmount: number;
+  pointsUsed: number;
   status: TransactionStatus;
-  payment_proof_url?: string;
-  created_at: string;
-  expires_at: string;
-  paid_at?: string;
-  confirmed_at?: string;
-  rejected_at?: string;
-  rejection_reason?: string;
+  paymentProofUrl?: string;
+  couponId?: string;
+  createdAt: string | Date;
+  expiresAt?: string | Date;
 }
 
-// Create Transaction Request
+// Create Transaction Request for API
 export interface CreateTransactionRequest {
-  user_id: string;
-  event_id: string;
-  ticket_tier_id: string;
+  eventId: string;
+  ticketTierId: string;
   quantity: number;
-  original_amount?: number;
-  discount_amount: number;
-  points_used: number;
-  points_discount?: number;
-  voucher_id?: string;
-  coupon_id?: string;
-  total_amount: number;
-  status: TransactionStatus;
+  pointsUsed?: number;
+  couponCode?: string;
 }
 
-// Update Transaction Request
+// Update Transaction Request for API
 export interface UpdateTransactionRequest {
   status?: TransactionStatus;
-  payment_proof_url?: string;
-  paid_at?: string;
-  confirmed_at?: string;
-  rejected_at?: string;
-  rejection_reason?: string;
+  paymentProofUrl?: string;
 }
 
-// Attendee Interface
-export interface Attendee {
-  id: string;
-  transaction_id: string;
-  user_id: string;
-  user_name: string;
-  user_email: string;
-  event_id: string;
-  ticket_tier_id: string;
-  ticket_tier_name: string;
-  quantity: number;
-  total_paid: number;
-  purchased_at: string;
+// Payment Proof Upload Request
+export interface PaymentProofRequest {
+  proofUrl: string;
+}
+
+// Paginated Transaction Response
+export interface PaginatedTransactionResponse {
+  data: Transaction[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 // Helper Functions
 export function getStatusLabel(status: TransactionStatus): string {
   const labels: Record<TransactionStatus, string> = {
-    waiting_payment: 'Waiting for Payment',
-    waiting_confirmation: 'Waiting for Confirmation',
-    done: 'Completed',
-    rejected: 'Rejected',
-    expired: 'Expired',
-    canceled: 'Canceled',
+    WAITING_PAYMENT: 'Waiting for Payment',
+    WAITING_CONFIRMATION: 'Waiting for Confirmation',
+    DONE: 'Completed',
+    REJECTED: 'Rejected',
+    EXPIRED: 'Expired',
+    CANCELED: 'Canceled',
   };
   return labels[status];
 }
 
 export function getStatusColor(status: TransactionStatus): string {
   const colors: Record<TransactionStatus, string> = {
-    waiting_payment: 'status-waiting-payment',
-    waiting_confirmation: 'status-waiting-confirmation',
-    done: 'status-done',
-    rejected: 'status-rejected',
-    expired: 'status-expired',
-    canceled: 'status-canceled',
+    WAITING_PAYMENT: 'status-waiting-payment',
+    WAITING_CONFIRMATION: 'status-waiting-confirmation',
+    DONE: 'status-done',
+    REJECTED: 'status-rejected',
+    EXPIRED: 'status-expired',
+    CANCELED: 'status-canceled',
   };
   return colors[status];
 }

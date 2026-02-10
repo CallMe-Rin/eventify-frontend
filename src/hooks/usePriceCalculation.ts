@@ -1,8 +1,9 @@
-import { useMemo } from "react";
-import type { DiscountCoupon, PriceCalculation } from "@/types/checkout";
+import { useMemo } from 'react';
+import type { DiscountCoupon, PriceCalculation } from '@/types/checkout';
 
 interface UsePriceCalculationProps {
   basePrice: number;
+  appliedVoucher: DiscountCoupon | null;
   appliedCoupon: DiscountCoupon | null;
   pointsUsed: number;
   maxPointsAvailable: number;
@@ -10,56 +11,91 @@ interface UsePriceCalculationProps {
 
 export function usePriceCalculation({
   basePrice,
+  appliedVoucher,
   appliedCoupon,
   pointsUsed,
   maxPointsAvailable,
-}: UsePriceCalculationProps): PriceCalculation {
+}: UsePriceCalculationProps): PriceCalculation & {
+  voucherDiscount: number;
+} {
   return useMemo(() => {
-    const calculation: PriceCalculation = {
+    const calculation = {
       basePrice,
+      voucherDiscount: 0,
       couponDiscount: 0,
       pointsUsed: 0,
       finalPayable: basePrice,
       cashbackEarned: 0,
     };
 
-    // Apply coupon discount
+    let currentPayable = basePrice;
+
+    // Apply voucher discount first (event specific)
+    if (appliedVoucher) {
+      let discount = 0;
+
+      if (appliedVoucher.discountType === 'PERCENTAGE') {
+        discount = Math.floor(
+          (currentPayable * appliedVoucher.discountValue) / 100,
+        );
+      } else if (appliedVoucher.discountType === 'FIXED') {
+        discount = appliedVoucher.discountValue;
+      }
+
+      // Cap discount with maxDiscount if set
+      if (appliedVoucher.maxDiscount) {
+        discount = Math.min(discount, appliedVoucher.maxDiscount);
+      }
+
+      // Ensure discount doesn't exceed current payable
+      discount = Math.min(discount, currentPayable);
+
+      calculation.voucherDiscount = discount;
+      currentPayable -= discount;
+    }
+
+    // Apply coupon discount second (user owned)
     if (appliedCoupon) {
       let discount = 0;
 
-      if (appliedCoupon.discount_type === "percentage") {
-        discount = Math.floor((basePrice * appliedCoupon.discount_value) / 100);
-      } else if (appliedCoupon.discount_type === "fixed") {
-        discount = appliedCoupon.discount_value;
+      if (appliedCoupon.discountType === 'PERCENTAGE') {
+        discount = Math.floor(
+          (currentPayable * appliedCoupon.discountValue) / 100,
+        );
+      } else if (appliedCoupon.discountType === 'FIXED') {
+        discount = appliedCoupon.discountValue;
       }
 
-      // Cap discount with max_discount if set
-      if (appliedCoupon.max_discount) {
-        discount = Math.min(discount, appliedCoupon.max_discount);
+      // Cap discount with maxDiscount if set
+      if (appliedCoupon.maxDiscount) {
+        discount = Math.min(discount, appliedCoupon.maxDiscount);
       }
+
+      // Ensure discount doesn't exceed current payable
+      discount = Math.min(discount, currentPayable);
 
       calculation.couponDiscount = discount;
-      calculation.finalPayable = basePrice - discount;
+      currentPayable -= discount;
     }
 
     // Apply points (validate points don't exceed available and current payable)
     const validPointsUsed = Math.min(
       pointsUsed,
       maxPointsAvailable,
-      calculation.finalPayable,
+      currentPayable,
     );
     calculation.pointsUsed = validPointsUsed;
-    calculation.finalPayable -= validPointsUsed;
-
-    // Handle cashback: if coupon discount exceeds what was needed for price
-    if (appliedCoupon && calculation.finalPayable < 0) {
-      calculation.cashbackEarned = Math.abs(calculation.finalPayable);
-      calculation.finalPayable = 0;
-    }
+    currentPayable -= validPointsUsed;
 
     // Ensure final payable is never negative
-    calculation.finalPayable = Math.max(0, calculation.finalPayable);
+    calculation.finalPayable = Math.max(0, currentPayable);
 
     return calculation;
-  }, [basePrice, appliedCoupon, pointsUsed, maxPointsAvailable]);
+  }, [
+    basePrice,
+    appliedVoucher,
+    appliedCoupon,
+    pointsUsed,
+    maxPointsAvailable,
+  ]);
 }

@@ -4,29 +4,57 @@ import { TransactionCardSkeleton } from './TransactionCardSkeleton';
 import { CountdownTimer } from './CountdownTimer';
 import { PaymentProofUpload } from './PaymentProofUpload';
 import { TransactionStatusBadge } from './TransactionStatusBadge';
-import { Calendar } from 'lucide-react';
-
-interface TransactionCardProps {
-  transaction: Transaction;
-  onUploadPaymentProof: (url: string) => Promise<Transaction | null>;
-  isUploading: boolean;
-}
+import { CancelTransactionDialog } from './CancelTransactionDialog';
+import { Calendar, CheckCircle, Star, XCircle } from 'lucide-react';
+import { Link } from 'react-router';
+import { Button } from '../ui/button';
+import { useCheckExistingReview } from '@/hooks/useReviews';
+import { useAuth } from '@/hooks/useAuth';
+import { useTransactionMutations } from '@/hooks/useTransactionMutations';
+import { useState } from 'react';
 
 export default function TransactionCard({
   transaction,
-  onUploadPaymentProof,
-  isUploading,
-}: TransactionCardProps) {
+}: {
+  transaction: Transaction;
+}) {
+  const { user } = useAuth();
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const { cancelTransaction, isCancelling } = useTransactionMutations();
+
   const { data: eventWithTiers, isLoading } = useEventWithTiers(
-    transaction.event_id,
+    transaction.eventId,
   );
+
+  // Check if user has already reviewed this event
+  const { data: existingReview, isLoading: checkingReview } =
+    useCheckExistingReview(transaction.eventId, user?.id || '');
 
   if (isLoading) return <TransactionCardSkeleton />;
   if (!eventWithTiers) return null;
 
   const tier = eventWithTiers.ticketTiers.find(
-    (t) => t.id === transaction.ticket_tier_id,
+    (t) => t.id === transaction.ticketTierId,
   );
+
+  // Check if event has passed and transaction is completed
+  const isEventPassed = new Date(eventWithTiers.date) < new Date();
+  const canReview = transaction.status === 'DONE' && isEventPassed;
+  const hasReviewed = !!existingReview;
+
+  const canUpload = transaction.status === 'WAITING_PAYMENT';
+
+  // Can cancel if transaction is pending (WAITING_PAYMENT or WAITING_CONFIRMATION)
+  const canCancel =
+    transaction.status === 'WAITING_PAYMENT' ||
+    transaction.status === 'WAITING_CONFIRMATION';
+
+  const handleCancelTransaction = () => {
+    cancelTransaction(transaction.id);
+    setShowCancelDialog(false);
+  };
+
+  if (!user) return null;
 
   return (
     <div className="bg-card border rounded-xl p-3 sm:p-5 space-y-3 sm:space-y-4">
@@ -48,7 +76,7 @@ export default function TransactionCard({
             <div className="flex items-center gap-2 text-sm sm:text-sm text-muted-foreground mt-1">
               <Calendar className="size-3 shrink-0" />
               <span className="truncate">
-                {formatDateTime(transaction.created_at)}
+                {formatDateTime(transaction.createdAt)}
               </span>
             </div>
           </div>
@@ -58,46 +86,121 @@ export default function TransactionCard({
         <div className="flex flex-col items-end text-right gap-2 shrink-0">
           <TransactionStatusBadge status={transaction.status} />
           <p className="font-bold text-sm sm:text-lg whitespace-nowrap">
-            {formatIDR(transaction.total_amount)}
+            {formatIDR(transaction.totalAmount)}
           </p>
         </div>
       </div>
 
-      {transaction.status === 'waiting_payment' && transaction.expires_at && (
+      {transaction.status === 'WAITING_PAYMENT' && transaction.expiresAt && (
         <div className="border-t pt-4 space-y-4">
           {/* Validate expiresAt is a valid date string */}
-          {!isNaN(new Date(transaction.expires_at).getTime()) ? (
-            <CountdownTimer expiresAt={transaction.expires_at} />
+          {!isNaN(new Date(transaction.expiresAt).getTime()) ? (
+            <CountdownTimer expiresAt={transaction.expiresAt} />
           ) : (
             <div className="text-sm text-muted-foreground">
               Invalid expiration date
             </div>
           )}
-          <PaymentProofUpload
-            onUpload={onUploadPaymentProof}
-            isUploading={isUploading}
-          />
+          {canUpload && (
+            <PaymentProofUpload
+              transactionId={transaction.id}
+              userId={user.id}
+              onUploadSuccess={() => {
+                console.log('Upload successful!');
+              }}
+            />
+          )}
+          {canCancel && (
+            <div className="flex justify-end">
+              <Button
+                variant="default"
+                className="rounded-2xl"
+                onClick={() => setShowCancelDialog(true)}
+                disabled={isCancelling}
+              >
+                <XCircle className="size-4" />
+                Cancel Transaction
+              </Button>
+            </div>
+          )}
         </div>
       )}
 
-      {transaction.status === 'waiting_confirmation' && (
+      {transaction.status === 'WAITING_CONFIRMATION' && (
         <div className="border-t pt-4 space-y-3">
           <div className="bg-blue-50 text-blue-700 px-4 py-3 rounded-lg text-sm">
             Payment proof submitted. Waiting for organizer confirmation.
           </div>
 
           {/* Show uploaded proof */}
-          {transaction.payment_proof_url && (
+          {transaction.paymentProofUrl && (
             <div className="relative rounded-lg overflow-hidden border">
               <img
-                src={transaction.payment_proof_url}
+                src={transaction.paymentProofUrl}
                 alt="Payment proof"
                 className="w-full h-auto max-h-48 object-contain bg-muted"
               />
             </div>
           )}
+
+          {canCancel && (
+            <div className="flex justify-end">
+              <Button
+                variant="default"
+                className="rounded-2xl"
+                onClick={() => setShowCancelDialog(true)}
+                disabled={isCancelling}
+              >
+                <XCircle className="size-4" />
+                Cancel Transaction
+              </Button>
+            </div>
+          )}
         </div>
       )}
+
+      {/* Transaction Done Section: Show review button/status based on conditions */}
+      {canReview && (
+        <div className="border-t pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          {checkingReview ? (
+            // Loading state - checking if user already reviewed
+            <div className="text-sm text-muted-foreground animate-pulse w-full text-center sm:text-left">
+              Checking review status...
+            </div>
+          ) : hasReviewed ? (
+            // User has already reviewed: show disabled state
+            <>
+              <div className="flex items-center gap-2 sm:ml-auto">
+                <CheckCircle className="size-4 text-primary" />
+                <p className="text-sm font-medium text-primary">
+                  Review Submitted
+                </p>
+              </div>
+            </>
+          ) : (
+            // User hasn't reviewed yet: show active button
+            <>
+              <p className="text-sm text-muted-foreground">
+                How was your experience at this event?
+              </p>
+              <Button asChild variant="default" className="rounded-2xl">
+                <Link to={`/review/${transaction.eventId}`}>
+                  <Star className="size-4" />
+                  Write a Review
+                </Link>
+              </Button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Cancel Transaction Dialog */}
+      <CancelTransactionDialog
+        open={showCancelDialog}
+        onOpenChange={setShowCancelDialog}
+        onConfirm={handleCancelTransaction}
+        isLoading={isCancelling}
+      />
     </div>
   );
 }

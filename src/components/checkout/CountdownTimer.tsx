@@ -2,7 +2,7 @@ import { useCountdown } from '@/hooks/useCountdown';
 import { Clock, AlertTriangle } from 'lucide-react';
 
 interface CountdownTimerProps {
-  expiresAt: string;
+  expiresAt: string | Date;
   onExpire?: () => void;
 }
 

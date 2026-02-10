@@ -1,8 +1,6 @@
-import { Link, useNavigate } from 'react-router';
+import { Link, useLocation, useNavigate } from 'react-router';
 import { useState } from 'react';
 import {
-  CalendarPlus,
-  Compass,
   HelpCircle,
   Info,
   LayoutDashboard,
@@ -24,12 +22,35 @@ import {
 } from '../ui/dropdown-menu';
 import { Button } from '../ui/button';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/useAuth';
+import { signOut } from '@/lib/auth-client';
+import { toast } from 'sonner';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchInput, setSearchInput] = useState('');
+  const location = useLocation();
   const navigate = useNavigate();
+
+  const { user, isAuthenticated } = useAuth();
+
+  const handleLoginClick = () => {
+    localStorage.setItem(
+      'redirectAfterLogin',
+      location.pathname + location.search,
+    );
+    navigate('/login');
+  };
+
+  const handleRegisterClick = () => {
+    localStorage.setItem(
+      'redirectAfterLogin',
+      location.pathname + location.search,
+    );
+    navigate('/register');
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,12 +60,17 @@ export default function Navbar() {
     }
   };
 
-  // Mock authentication state - will be replaced with better-auth later
-  const isAuthenticated = true;
-  const user = {
-    name: 'John Doe',
-    email: 'john@example.com',
-  };
+  async function handleSignOut() {
+    try {
+      await signOut();
+      toast.success('Signed out successfully');
+      navigate('/');
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to sign out',
+      );
+    }
+  }
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/96 backdrop-blur supports-backdrop-filter:bg-background/60">
@@ -70,7 +96,7 @@ export default function Navbar() {
             placeholder="Search events..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="max-w-3xl rounded-full border-muted bg-muted/50 pl-10 focus-visible:ring-primary"
+            className="max-w-full rounded-full border bg-muted/50 pl-10 focus-visible:ring-primary py-5"
           />
         </form>
 
@@ -81,23 +107,25 @@ export default function Navbar() {
             <Button
               variant="ghost"
               asChild
-              className="rounded-full cursor-pointer gap-2 px-4 hover:bg-transparent hover:text-primary transition-all active:scale-95"
+              className="rounded-full cursor-pointer gap-2 px-4 hover:text-primary transition-all active:scale-95"
             >
               <Link to="/create-event">
-                <CalendarPlus className="h-4 w-4" />
-                <span className="text-sm font-medium">Create Event</span>
+                {/* <CalendarPlus className="h-4 w-4" /> */}
+                <span className="text-sm font-bold text-primary">
+                  Create Event
+                </span>
               </Link>
             </Button>
 
             {/* Discover Button */}
             <Button
-              variant="default"
+              variant="ghost"
               asChild
               className="rounded-full cursor-pointer gap-2 px-4 transition-all active:scale-95"
             >
               <Link to="/discover">
-                <Compass className="h-4 w-4" />
-                <span className="text-sm font-medium">Discover</span>
+                {/* <Compass className="h-4 w-4" /> */}
+                <span className="text-sm font-bold text-primary">Discover</span>
               </Link>
             </Button>
           </nav>
@@ -111,13 +139,23 @@ export default function Navbar() {
                   size="icon"
                   className="relative h-9 w-9 rounded-full"
                 >
-                  <User className="h-5 w-5" />
+                  <Avatar>
+                    <AvatarImage src={user.avatarUrl} alt={user.name} />
+                    <AvatarFallback>
+                      <User className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl">
                 <div className="flex items-center gap-2 p-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                    <User className="h-4 w-4 text-primary" />
+                    <Avatar>
+                      <AvatarImage src={user.avatarUrl} alt={user.name} />
+                      <AvatarFallback>
+                        <User className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-medium">{user.name}</span>
@@ -127,16 +165,29 @@ export default function Navbar() {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="rounded-lg hover:cursor-pointer">
-                  <Ticket className="mr-2 h-4 w-4" />
-                  My Tickets
+                <DropdownMenuItem
+                  asChild
+                  className="rounded-lg hover:cursor-pointer"
+                >
+                  <Link to="/transactions">
+                    <Ticket className="mr-2 h-4 w-4" />
+                    My Transaction
+                  </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="rounded-lg hover:cursor-pointer">
-                  <LayoutDashboard className="mr-2 h-4 w-4" />
-                  Dashboard
+                <DropdownMenuItem
+                  asChild
+                  className="rounded-lg hover:cursor-pointer"
+                >
+                  <Link to="/dashboard">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive focus:text-destructive rounded-lg hover:cursor-pointer">
+                <DropdownMenuItem
+                  onClick={handleSignOut}
+                  className="text-destructive focus:text-destructive rounded-lg hover:cursor-pointer"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
                 </DropdownMenuItem>
@@ -144,11 +195,25 @@ export default function Navbar() {
             </DropdownMenu>
           ) : (
             <>
-              <Button variant="outline" className="rounded-full" asChild>
-                <Link to="/login">Sign In</Link>
+              <Button
+                variant="ghost"
+                className="rounded-full font-bold"
+                asChild
+                onClick={handleLoginClick}
+              >
+                <Link to="/login" className="text-primary">
+                  Login
+                </Link>
               </Button>
-              <Button className="rounded-full" asChild>
-                <Link to="/register">Get Started</Link>
+              <Button
+                variant="ghost"
+                className="rounded-full font-bold"
+                asChild
+                onClick={handleRegisterClick}
+              >
+                <Link to="/register" className="text-primary">
+                  Sign Up
+                </Link>
               </Button>
             </>
           )}
@@ -221,11 +286,12 @@ export default function Navbar() {
                   variant="outline"
                   size="lg"
                   className="flex-1 rounded-full"
+                  asChild
                 >
-                  Register
+                  <Link to="/register">Register</Link>
                 </Button>
-                <Button size="lg" className="flex-1 rounded-full">
-                  Log In
+                <Button size="lg" className="flex-1 rounded-full" asChild>
+                  <Link to="/login">Log In</Link>
                 </Button>
               </div>
             </div>
@@ -237,14 +303,16 @@ export default function Navbar() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-foreground">
-                    {user.name}
+                    {user?.name}
                   </h2>
-                  <p className="text-sm text-muted-foreground">{user.email}</p>
+                  <p className="text-sm text-muted-foreground">{user?.email}</p>
                 </div>
               </div>
-              <Button className="w-full rounded-full">
-                <LayoutDashboard className="h-4 w-4 mr-2" />
-                Go to Dashboard
+              <Button className="w-full rounded-full" asChild>
+                <Link to="/dashboard">
+                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                  Go to Dashboard
+                </Link>
               </Button>
             </div>
           )}
@@ -263,10 +331,13 @@ export default function Navbar() {
               Become an Event Creator
             </button>
 
-            <button className="flex w-full items-center gap-4 rounded-lg px-3 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted">
+            <Link
+              to="/discover"
+              className="flex w-full items-center gap-4 rounded-lg px-3 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+            >
               <Search className="h-5 w-5 text-muted-foreground" />
               Discover Events
-            </button>
+            </Link>
 
             <button className="flex w-full items-center gap-4 rounded-lg px-3 py-3 text-sm font-medium text-foreground transition-colors hover:bg-muted">
               <Info className="h-5 w-5 text-muted-foreground" />
@@ -283,7 +354,10 @@ export default function Navbar() {
           {isAuthenticated && (
             <>
               <div className="border-t border-border mt-2 mb-0">
-                <button className="flex w-full items-center gap-4 rounded-lg px-3 pt-4 mb-0 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10">
+                <button
+                  onClick={handleSignOut}
+                  className="flex w-full items-center gap-4 rounded-lg px-3 pt-4 mb-0 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
+                >
                   <LogOut className="h-5 w-5" />
                   Sign Out
                 </button>
